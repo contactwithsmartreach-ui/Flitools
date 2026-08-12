@@ -15,7 +15,6 @@
   *{ font-family: 'Inter', sans-serif; }
   body{ background:#fff; color:#000; }
 
-  /* ---------- entrance choreography ---------- */
   @keyframes fadeSlideDown{
     from{ opacity:0; transform: translateY(-16px); }
     to{ opacity:1; transform: translateY(0); }
@@ -121,7 +120,7 @@
       </div>
 
       <div class="flex items-center gap-2 md:justify-end flex-wrap">
-        <span class="text-[11px] rounded-full px-3 py-1.5 bg-white border" style="border-color:rgba(0,0,0,0.12);">Trim &amp; Frame Rate</span>
+        <span class="text-[11px] rounded-full px-3 py-1.5 bg-white border" style="border-color:rgba(0,0,0,0.12);">Trim & Frame Rate</span>
         <span class="text-[11px] rounded-full px-3 py-1.5 bg-white border" style="border-color:rgba(0,0,0,0.12);">Live Preview</span>
         <span class="text-[11px] rounded-full px-3 py-1.5 bg-white border" style="border-color:rgba(0,0,0,0.12);">Instant Download</span>
       </div>
@@ -150,7 +149,7 @@
             <path d="M12 16V4M12 4l-4 4M12 4l4 4" stroke-linecap="round" stroke-linejoin="round"/>
             <path d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
-          <p class="text-sm font-medium">Drag &amp; drop a video, or click to browse</p>
+          <p class="text-sm font-medium">Drag & drop a video, or click to browse</p>
           <p class="text-xs text-black/40 mt-1">MP4 / WEBM / MOV — one video at a time</p>
           <input id="fileInput" type="file" accept="video/*" class="hidden">
         </div>
@@ -159,7 +158,7 @@
 
       <!-- adjustments -->
       <div>
-        <h3 class="text-sm font-medium mb-3">2. Trim &amp; adjust</h3>
+        <h3 class="text-sm font-medium mb-3">2. Trim & adjust</h3>
         <div class="border border-black/10 rounded-2xl p-5 flex flex-col gap-5">
 
           <div>
@@ -262,12 +261,12 @@
       </div>
       <div>
         <div class="flex items-center justify-center rounded-full bg-black text-white text-sm font-medium mb-4" style="width:32px;height:32px;">2</div>
-        <h3 class="text-sm font-medium mb-2">Trim &amp; set the frame rate</h3>
+        <h3 class="text-sm font-medium mb-2">Trim & set the frame rate</h3>
         <p class="text-xs text-black/50 leading-relaxed">Pick the start and end time of the clip you want, choose how many frames per second to sample, and set the output width. Fewer frames per second and a smaller width mean a smaller GIF.</p>
       </div>
       <div>
         <div class="flex items-center justify-center rounded-full bg-black text-white text-sm font-medium mb-4" style="width:32px;height:32px;">3</div>
-        <h3 class="text-sm font-medium mb-2">Generate &amp; preview</h3>
+        <h3 class="text-sm font-medium mb-2">Generate & preview</h3>
         <p class="text-xs text-black/50 leading-relaxed">Hit "Generate GIF" and your browser seeks through the trimmed range, draws each sampled frame to a canvas, and encodes them into a GIF using an open-source encoder — no server involved. The result plays instantly in the preview panel.</p>
       </div>
       <div>
@@ -315,7 +314,7 @@
   const progressLabel = document.getElementById('progressLabel');
   const downloadBtn = document.getElementById('downloadBtn');
 
-  const MAX_FRAMES = 200; // safety cap so huge ranges/fps don't freeze the tab
+  const MAX_FRAMES = 200;
 
   let videoLoaded = false;
   let videoDuration = 0;
@@ -345,12 +344,13 @@
     generateBtn.disabled = true;
     videoInfo.textContent = 'Loading video…';
 
+    sourceVideo.crossOrigin = 'anonymous';
     const url = URL.createObjectURL(file);
     sourceVideo.src = url;
     sourceVideo.onloadedmetadata = () => {
       videoDuration = sourceVideo.duration;
-      videoNaturalWidth = sourceVideo.videoWidth;
-      videoNaturalHeight = sourceVideo.videoHeight;
+      videoNaturalWidth = sourceVideo.videoWidth || 640;
+      videoNaturalHeight = sourceVideo.videoHeight || 360;
 
       startRange.min = 0;
       startRange.max = videoDuration;
@@ -450,7 +450,7 @@
       const delay = Math.round(1000 / fps);
 
       const targetWidth = parseInt(widthRange.value, 10);
-      const aspect = videoNaturalHeight / videoNaturalWidth;
+      const aspect = (videoNaturalHeight || 360) / (videoNaturalWidth || 640);
       const targetHeight = Math.round(targetWidth * aspect);
 
       progressLabel.textContent = 'Loading encoder…';

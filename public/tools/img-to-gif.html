@@ -8,10 +8,6 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdn.tailwindcss.com"></script>
-<!-- GIF encoding is done with the open-source "gifenc" library (github.com/mattdesl/gifenc),
-     loaded dynamically via ESM import at generate-time. It runs synchronously on the main
-     thread (no Web Worker), which avoids cross-origin worker restrictions when this page
-     is opened directly from disk (file://). -->
 <style>
   :root{
     --ease: cubic-bezier(0.16, 1, 0.3, 1);
@@ -19,7 +15,6 @@
   *{ font-family: 'Inter', sans-serif; }
   body{ background:#fff; color:#000; }
 
-  /* ---------- entrance choreography ---------- */
   @keyframes fadeSlideDown{
     from{ opacity:0; transform: translateY(-16px); }
     to{ opacity:1; transform: translateY(0); }
@@ -133,7 +128,7 @@
       </div>
 
       <div class="flex items-center gap-2 md:justify-end flex-wrap">
-        <span class="text-[11px] rounded-full px-3 py-1.5 bg-white border" style="border-color:rgba(0,0,0,0.12);">Drag &amp; Drop</span>
+        <span class="text-[11px] rounded-full px-3 py-1.5 bg-white border" style="border-color:rgba(0,0,0,0.12);">Drag & Drop</span>
         <span class="text-[11px] rounded-full px-3 py-1.5 bg-white border" style="border-color:rgba(0,0,0,0.12);">Frame Control</span>
         <span class="text-[11px] rounded-full px-3 py-1.5 bg-white border" style="border-color:rgba(0,0,0,0.12);">Instant Download</span>
       </div>
@@ -162,7 +157,7 @@
             <path d="M12 16V4M12 4l-4 4M12 4l4 4" stroke-linecap="round" stroke-linejoin="round"/>
             <path d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
-          <p class="text-sm font-medium">Drag &amp; drop images, or click to browse</p>
+          <p class="text-sm font-medium">Drag & drop images, or click to browse</p>
           <p class="text-xs text-black/40 mt-1">Upload 2+ DIFFERENT images — each one becomes one animation frame, in upload order</p>
           <input id="fileInput" type="file" accept="image/*" multiple class="hidden">
         </div>
@@ -257,12 +252,12 @@
       </div>
       <div>
         <div class="flex items-center justify-center rounded-full bg-black text-white text-sm font-medium mb-4" style="width:32px;height:32px;">2</div>
-        <h3 class="text-sm font-medium mb-2">Adjust the timing &amp; size</h3>
+        <h3 class="text-sm font-medium mb-2">Adjust the timing & size</h3>
         <p class="text-xs text-black/50 leading-relaxed">Set the frame delay to control playback speed, choose the output width (height scales automatically), pick whether it loops forever, and balance quality against file size.</p>
       </div>
       <div>
         <div class="flex items-center justify-center rounded-full bg-black text-white text-sm font-medium mb-4" style="width:32px;height:32px;">3</div>
-        <h3 class="text-sm font-medium mb-2">Generate &amp; preview</h3>
+        <h3 class="text-sm font-medium mb-2">Generate & preview</h3>
         <p class="text-xs text-black/50 leading-relaxed">Hit "Generate GIF" and your browser encodes every frame locally using an open-source GIF encoder — no upload, no waiting on a server. The finished animation plays instantly in the preview panel.</p>
       </div>
       <div>
@@ -332,12 +327,25 @@
   function addFiles(fileList){
     const files = Array.from(fileList).filter(f => f.type.startsWith('image/'));
     files.forEach(file => {
-      const url = URL.createObjectURL(file);
       const img = new Image();
-      img.src = url;
-      images.push({ file, url, img });
+      img.crossOrigin = 'anonymous';
+
+      if (file.type === 'image/svg+xml') {
+        const reader = new FileReader();
+        reader.onload = e => {
+          const url = e.target.result;
+          img.src = url;
+          images.push({ file, url, img });
+          renderThumbs();
+        };
+        reader.readAsDataURL(file);
+      } else {
+        const url = URL.createObjectURL(file);
+        img.src = url;
+        images.push({ file, url, img });
+        renderThumbs();
+      }
     });
-    renderThumbs();
   }
 
   dropZone.addEventListener('click', () => fileInput.click());
@@ -378,14 +386,13 @@
 
       const targetWidth = parseInt(widthRange.value, 10);
       const firstImg = images[0].img;
-      const aspect = firstImg.naturalHeight / firstImg.naturalWidth;
+      const aspect = (firstImg.naturalHeight || 300) / (firstImg.naturalWidth || 400);
       const targetHeight = Math.round(targetWidth * aspect);
 
       progressLabel.textContent = 'Loading encoder…';
       const { GIFEncoder, quantize, applyPalette } = await import('https://unpkg.com/gifenc@1.0.3/dist/gifenc.esm.js');
 
       const delay = parseInt(delayRange.value, 10);
-      // map quality slider (1 best .. 20 fastest) to a palette color format
       const q = parseInt(qualityRange.value, 10);
       const format = q <= 7 ? 'rgb565' : (q <= 14 ? 'rgb444' : 'rgba4444');
 
@@ -397,8 +404,6 @@
       for (let i = 0; i < images.length; i++) {
         const item = images[i];
 
-        // each frame gets its own fresh canvas so pixel data can't be
-        // accidentally shared/overwritten between frames
         const frameCanvas = document.createElement('canvas');
         frameCanvas.width = targetWidth;
         frameCanvas.height = targetHeight;
@@ -407,7 +412,6 @@
 
         const { data } = fctx.getImageData(0, 0, targetWidth, targetHeight);
 
-        // cheap identical-frame detector: sample every 251st byte
         let sample = '';
         for (let s = 0; s < data.length; s += 251) sample += data[s];
         if (i === 0) firstFrameData = sample;
@@ -424,7 +428,6 @@
         progressBar.style.width = Math.round(((i + 1) / images.length) * 100) + '%';
         progressLabel.textContent = 'Encoding… ' + (i + 1) + ' / ' + images.length + ' frames';
 
-        // yield to the browser so the progress bar actually repaints
         await new Promise(r => setTimeout(r, 0));
       }
 

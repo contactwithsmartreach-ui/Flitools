@@ -3,14 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Image Studio — Compress &amp; Resize Images Locally</title>
+<title>Image Studio — Compress & Resize Images Locally</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdn.tailwindcss.com"></script>
-<!-- Compression/resizing uses the browser's native Canvas API (drawImage + toBlob) —
-     no image data ever leaves the page. Batch downloads are zipped with the open-source
-     "JSZip" library (github.com/Stuk/jszip), loaded dynamically at download-time. -->
 <style>
   :root{ --ease: cubic-bezier(0.16, 1, 0.3, 1); }
   *{ font-family: 'Inter', sans-serif; }
@@ -105,7 +102,7 @@
       </div>
       <div class="flex items-center gap-2 md:justify-end flex-wrap">
         <span class="text-[11px] rounded-full px-3 py-1.5 bg-white border" style="border-color:rgba(0,0,0,0.12);">Batch Processing</span>
-        <span class="text-[11px] rounded-full px-3 py-1.5 bg-white border" style="border-color:rgba(0,0,0,0.12);">Resize &amp; Compress</span>
+        <span class="text-[11px] rounded-full px-3 py-1.5 bg-white border" style="border-color:rgba(0,0,0,0.12);">Resize & Compress</span>
         <span class="text-[11px] rounded-full px-3 py-1.5 bg-white border" style="border-color:rgba(0,0,0,0.12);">Zip Download</span>
       </div>
     </div>
@@ -116,7 +113,7 @@
 <section id="tool" class="w-full max-w-6xl mx-auto px-4 md:px-8 py-16">
 
   <div class="mb-10">
-    <h2 class="text-2xl md:text-3xl font-light tracking-tight mb-2">Compress &amp; resize your images</h2>
+    <h2 class="text-2xl md:text-3xl font-light tracking-tight mb-2">Compress & resize your images</h2>
     <p class="text-sm text-black/50">Upload one or many images, dial in size and quality, preview the results, then download — nothing ever leaves your browser.</p>
   </div>
 
@@ -132,7 +129,7 @@
             <path d="M12 16V4M12 4l-4 4M12 4l4 4" stroke-linecap="round" stroke-linejoin="round"/>
             <path d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
-          <p class="text-sm font-medium">Drag &amp; drop images, or click to browse</p>
+          <p class="text-sm font-medium">Drag & drop images, or click to browse</p>
           <p class="text-xs text-black/40 mt-1">Upload any number of JPG, PNG, or WebP images</p>
           <input id="fileInput" type="file" accept="image/*" multiple class="hidden">
         </div>
@@ -239,12 +236,12 @@
       </div>
       <div>
         <div class="flex items-center justify-center rounded-full bg-black text-white text-sm font-medium mb-4" style="width:32px;height:32px;">2</div>
-        <h3 class="text-sm font-medium mb-2">Pick format &amp; size</h3>
+        <h3 class="text-sm font-medium mb-2">Pick format & size</h3>
         <p class="text-xs text-black/50 leading-relaxed">Choose an output format, dial in a quality level, and either scale down by a percentage or cap the maximum width.</p>
       </div>
       <div>
         <div class="flex items-center justify-center rounded-full bg-black text-white text-sm font-medium mb-4" style="width:32px;height:32px;">3</div>
-        <h3 class="text-sm font-medium mb-2">Process &amp; compare</h3>
+        <h3 class="text-sm font-medium mb-2">Process & compare</h3>
         <p class="text-xs text-black/50 leading-relaxed">Your browser redraws each image on a canvas at the new size and re-encodes it — no upload, no waiting on a server. Original vs. new file size is shown for every image.</p>
       </div>
       <div>
@@ -340,12 +337,25 @@
   function addFiles(fileList){
     const files = Array.from(fileList).filter(f => f.type.startsWith('image/'));
     files.forEach(file => {
-      const url = URL.createObjectURL(file);
       const img = new Image();
-      img.src = url;
-      images.push({ file, url, img });
+      img.crossOrigin = 'anonymous';
+
+      if (file.type === 'image/svg+xml') {
+        const reader = new FileReader();
+        reader.onload = e => {
+          const url = e.target.result;
+          img.src = url;
+          images.push({ file, url, img });
+          renderThumbs();
+        };
+        reader.readAsDataURL(file);
+      } else {
+        const url = URL.createObjectURL(file);
+        img.src = url;
+        images.push({ file, url, img });
+        renderThumbs();
+      }
     });
-    renderThumbs();
   }
 
   dropZone.addEventListener('click', () => fileInput.click());
@@ -389,8 +399,8 @@
 
   async function processOne(item){
     await new Promise(res => { if (item.img.complete) res(); else item.img.onload = () => res(); });
-    const naturalW = item.img.naturalWidth;
-    const naturalH = item.img.naturalHeight;
+    const naturalW = item.img.naturalWidth || 800;
+    const naturalH = item.img.naturalHeight || 600;
 
     let targetW = naturalW, targetH = naturalH;
     if (mode === 'scale') {

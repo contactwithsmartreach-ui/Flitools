@@ -8,9 +8,6 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdn.tailwindcss.com"></script>
-<!-- QR encoding is done with the open-source "qrcode" library (github.com/soldair/node-qrcode),
-     loaded dynamically via ESM import at generate-time. It renders straight to a canvas element,
-     entirely on the main thread — nothing you type is ever sent anywhere. -->
 <style>
   :root{ --ease: cubic-bezier(0.16, 1, 0.3, 1); }
   *{ font-family: 'Inter', sans-serif; }
@@ -106,7 +103,7 @@
       <div class="flex items-center gap-2 md:justify-end flex-wrap">
         <span class="text-[11px] rounded-full px-3 py-1.5 bg-white border" style="border-color:rgba(0,0,0,0.12);">Live Preview</span>
         <span class="text-[11px] rounded-full px-3 py-1.5 bg-white border" style="border-color:rgba(0,0,0,0.12);">Custom Colors</span>
-        <span class="text-[11px] rounded-full px-3 py-1.5 bg-white border" style="border-color:rgba(0,0,0,0.12);">PNG &amp; SVG</span>
+        <span class="text-[11px] rounded-full px-3 py-1.5 bg-white border" style="border-color:rgba(0,0,0,0.12);">PNG & SVG</span>
       </div>
     </div>
   </div>
@@ -383,8 +380,12 @@
       qrCanvas.classList.remove('hidden');
       previewPlaceholder.classList.add('hidden');
 
-      downloadPngBtn.href = qrCanvas.toDataURL('image/png');
-      downloadPngBtn.classList.remove('pointer-events-none','opacity-30');
+      try {
+        downloadPngBtn.href = qrCanvas.toDataURL('image/png');
+        downloadPngBtn.classList.remove('pointer-events-none','opacity-30');
+      } catch (err) {
+        console.warn('Canvas export failed:', err);
+      }
 
       const svgString = await QRCode.toString(payload, { type: 'svg', margin: opts.margin, errorCorrectionLevel: currentEcl, color: opts.color });
       const svgBlob = new Blob([svgString], { type: 'image/svg+xml' });
@@ -398,7 +399,6 @@
     }
   }
 
-  // seed a default example so the preview isn't empty on load
   document.getElementById('urlInput').value = 'https://example.com';
   generate();
 })();
