@@ -64,6 +64,16 @@ export const TOOLS_LIST: ToolItem[] = [
     badge: "Live Tool"
   },
   {
+    id: "json-formatter-validator",
+    title: "JSON Formatter & Validator",
+    description: "Clean, format, validate, minify, and inspect JSON data with precise error highlighting.",
+    path: "/tools/json-formatter-validator.html",
+    htmlPath: "/tools/json-formatter-validator.html",
+    iconName: "Code",
+    category: "Developer",
+    badge: "Live Tool"
+  },
+  {
     id: "qr-code-generator",
     title: "QR Code Generator",
     description: "Generate and customize clean QR codes instantly with instant export options.",
@@ -92,15 +102,6 @@ export const TOOLS_LIST: ToolItem[] = [
     iconName: "Shield",
     category: "Utilities",
     badge: "Live Tool"
-  },
-  {
-    id: "sample-2",
-    title: "JSON Formatter & Validator",
-    description: "Clean, format, and validate complex JSON data structures instantly.",
-    path: "/tools/json-formatter",
-    iconName: "Code",
-    category: "Developer",
-    badge: "Fast"
   },
   {
     id: "sample-4",

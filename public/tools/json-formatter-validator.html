@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JSON Studio — Format &amp; Validate JSON Locally</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<!-- Formatting, minifying, and validation use the browser's native JSON.parse / JSON.stringify —
+     nothing you paste here is ever sent anywhere. -->
+<style>
+  :root{ --ease: cubic-bezier(0.16, 1, 0.3, 1); }
+  *{ font-family: 'Inter', sans-serif; }
+  body{ background:#fff; color:#000; }
+  .mono{ font-family: 'JetBrains Mono', monospace; }
+
+  @keyframes fadeSlideDown{ from{ opacity:0; transform: translateY(-16px); } to{ opacity:1; transform: translateY(0); } }
+  @keyframes fadeSlideUp{ from{ opacity:0; transform: translateY(20px); } to{ opacity:1; transform: translateY(0); } }
+  @keyframes fadeScaleIn{ from{ opacity:0; transform: scale(1.05); } to{ opacity:1; transform: scale(1); } }
+  .anim-navbar{ animation: fadeSlideDown 0.8s var(--ease) both; }
+  .anim-bg{ animation: fadeScaleIn 1.8s var(--ease) both; }
+  .anim-footer{ animation: fadeSlideUp 1s var(--ease) both; animation-delay: .5s; }
+  .anim-subtitle{ animation: fadeSlideUp .8s var(--ease) both; animation-delay: .6s; }
+  .anim-heading{ animation: fadeSlideUp .8s var(--ease) both; animation-delay: .8s; }
+  .anim-buttons{ animation: fadeSlideUp .8s var(--ease) both; animation-delay: 1s; }
+
+  .hero-heading{ font-weight:300; letter-spacing:-0.03em; line-height:1; font-size: clamp(2rem, 8vw, 4.5rem); }
+  @media (min-width:768px){ .hero-heading{ font-size: clamp(2.5rem, 5.5vw, 4.5rem); } }
+
+  .hero-gradient-bg{
+    background:
+      radial-gradient(circle at 20% 20%, rgba(0,0,0,0.06), transparent 45%),
+      radial-gradient(circle at 80% 30%, rgba(0,0,0,0.04), transparent 50%),
+      linear-gradient(135deg, #fafafa 0%, #f0f0f2 100%);
+  }
+  .hero-fade{ background: linear-gradient(to top, #ffffff 0%, rgba(255,255,255,0.85) 55%, transparent 100%); }
+
+  textarea{ transition: border-color .15s ease; }
+  textarea:focus{ outline:none; border-color:#000; }
+  input[type=range]{ accent-color:#000; }
+
+  ::-webkit-scrollbar{ width:8px; height:8px; }
+  ::-webkit-scrollbar-thumb{ background:#ddd; border-radius:9999px; }
+
+  .seg-btn{ transition: background-color .15s ease, color .15s ease; }
+
+  .json-key{ color:#0b5fae; }
+  .json-string{ color:#22863a; }
+  .json-number{ color:#b35900; }
+  .json-boolean{ color:#a626a4; }
+  .json-null{ color:#a626a4; }
+</style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+<!-- ============ HERO ============ -->
+<section class="relative w-full min-h-screen flex flex-col justify-between overflow-hidden">
+  <div class="anim-bg absolute inset-0 z-0 hero-gradient-bg"></div>
+
+  <nav class="anim-navbar relative z-50 flex items-center justify-between px-4 py-4 md:px-8 md:py-6" style="pointer-events:none;">
+    <div class="flex items-center gap-3 md:gap-5" style="pointer-events:auto;">
+      <div class="flex items-center gap-2">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+          <path d="M8 3c-2 0-3 1-3 3v3c0 1-1 2-2 2 1 0 2 1 2 2v3c0 2 1 3 3 3" stroke="black" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M16 3c2 0 3 1 3 3v3c0 1 1 2 2 2-1 0-2 1-2 2v3c0 2-1 3-3 3" stroke="black" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <span class="hidden md:inline text-sm font-medium tracking-tight">JSON Studio</span>
+      </div>
+      <div class="hidden md:flex items-center gap-3 rounded-full px-4 py-2" style="background:#F4F4F6;">
+        <span class="text-[11px] text-black/70">In-Browser</span>
+        <span class="text-[11px] text-black/70">No Uploads</span>
+      </div>
+    </div>
+    <div class="hidden md:flex items-center gap-3" style="pointer-events:auto;">
+      <div class="flex items-center gap-2 rounded-full pl-2 pr-4 py-1.5" style="background:#F4F4F6;">
+        <span class="flex items-center justify-center bg-black rounded-full" style="width:28px;height:28px;">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="white">
+            <rect x="2" y="2" width="7" height="7" rx="1.5"/><rect x="15" y="2" width="7" height="7" rx="1.5"/>
+            <rect x="2" y="15" width="7" height="7" rx="1.5"/><rect x="15" y="15" width="7" height="7" rx="1.5"/>
+          </svg>
+        </span>
+        <span class="text-[11px] text-black/70">100% Client-Side</span>
+      </div>
+    </div>
+  </nav>
+
+  <div class="anim-footer relative z-30 hero-fade px-4 pb-8 pt-24 md:px-8 md:pb-10">
+    <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-8">
+      <div>
+        <div class="anim-subtitle flex items-center gap-2 mb-4">
+          <span class="rounded-full bg-black" style="width:8px;height:8px;"></span>
+          <span class="text-[13px]" style="color:rgba(0,0,0,0.55);">Format, validate, and clean up JSON, right here</span>
+        </div>
+        <h1 class="anim-heading hero-heading mb-6">
+          JSON In,<br/>Zero Uploads.<br/>Clean Out.
+        </h1>
+        <div class="anim-buttons flex items-center gap-3">
+          <a href="#how-it-works" class="bg-black text-white text-[13px] rounded-full px-5 py-2.5">How It Works</a>
+        </div>
+      </div>
+      <div class="flex items-center gap-2 md:justify-end flex-wrap">
+        <span class="text-[11px] rounded-full px-3 py-1.5 bg-white border" style="border-color:rgba(0,0,0,0.12);">Format &amp; Minify</span>
+        <span class="text-[11px] rounded-full px-3 py-1.5 bg-white border" style="border-color:rgba(0,0,0,0.12);">Error Locator</span>
+        <span class="text-[11px] rounded-full px-3 py-1.5 bg-white border" style="border-color:rgba(0,0,0,0.12);">Sort Keys</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ TOOL ============ -->
+<section id="tool" class="w-full max-w-6xl mx-auto px-4 md:px-8 py-16">
+
+  <div class="mb-10">
+    <h2 class="text-2xl md:text-3xl font-light tracking-tight mb-2">Format &amp; validate your JSON</h2>
+    <p class="text-sm text-black/50">Paste in raw JSON, catch syntax errors, and get a clean, indented (or minified) result — nothing ever leaves your browser.</p>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
+
+    <!-- LEFT: input + options -->
+    <div class="flex flex-col gap-8">
+      <div>
+        <h3 class="text-sm font-medium mb-3">1. Paste your JSON</h3>
+        <textarea id="jsonInput" spellcheck="false" placeholder='{"hello": "world", "nested": {"a": 1, "b": [1,2,3]}}' class="mono w-full h-64 border border-black/10 rounded-2xl p-4 text-xs leading-relaxed resize-none"></textarea>
+        <p id="statusMsg" class="text-xs mt-2 text-black/40">Paste or type JSON above to get started.</p>
+      </div>
+
+      <div>
+        <h3 class="text-sm font-medium mb-3">2. Options</h3>
+        <div class="border border-black/10 rounded-2xl p-5 flex flex-col gap-5">
+          <div>
+            <div class="flex items-center justify-between mb-1">
+              <label class="text-xs text-black/60">Indent size</label>
+              <span id="indentValue" class="text-xs font-medium">2 spaces</span>
+            </div>
+            <input id="indentRange" type="range" min="0" max="8" step="1" value="2" class="w-full">
+          </div>
+          <div class="flex items-center justify-between">
+            <label class="text-xs text-black/60">Sort object keys alphabetically</label>
+            <input id="sortKeys" type="checkbox" class="accent-black w-4 h-4">
+          </div>
+          <div class="flex gap-3">
+            <button id="formatBtn" class="flex-1 bg-black text-white text-[13px] rounded-full px-5 py-2.5">Format</button>
+            <button id="minifyBtn" class="flex-1 bg-white text-black border border-black/15 text-[13px] rounded-full px-5 py-2.5">Minify</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: output -->
+    <div class="flex flex-col gap-8">
+      <div>
+        <h3 class="text-sm font-medium mb-3">3. Result</h3>
+        <pre id="jsonOutput" class="mono w-full h-64 border border-black/10 rounded-2xl p-4 text-xs leading-relaxed overflow-auto bg-black/[0.02]"><span class="text-black/30">Formatted or minified JSON will appear here</span></pre>
+        <p id="statsMsg" class="text-xs text-black/40 mt-2"></p>
+      </div>
+      <div>
+        <h3 class="text-sm font-medium mb-3">4. Download</h3>
+        <div class="border border-black/10 rounded-2xl p-5 flex flex-col gap-3">
+          <div class="flex gap-3">
+            <button id="copyBtn" class="pointer-events-none opacity-30 flex-1 bg-white text-black border border-black/15 text-[13px] rounded-full px-5 py-2.5">Copy to Clipboard</button>
+            <a id="downloadBtn" download="formatted.json" class="pointer-events-none opacity-30 flex-1 bg-black text-white text-[13px] rounded-full px-5 py-2.5 text-center">Download .json</a>
+          </div>
+          <p class="text-xs text-black/40">Everything is parsed and formatted locally using the browser's native JSON engine — nothing you paste is ever sent anywhere.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ HOW IT WORKS ============ -->
+<section id="how-it-works" class="w-full bg-black/[0.02] border-t border-black/10">
+  <div class="max-w-6xl mx-auto px-4 md:px-8 py-16">
+    <div class="mb-10">
+      <h2 class="text-2xl md:text-3xl font-light tracking-tight mb-2">How it works</h2>
+      <p class="text-sm text-black/50 max-w-2xl">JSON Studio parses and re-serializes your JSON entirely inside your browser. Nothing is ever sent to a server — everything below happens on your own device.</p>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div>
+        <div class="flex items-center justify-center rounded-full bg-black text-white text-sm font-medium mb-4" style="width:32px;height:32px;">1</div>
+        <h3 class="text-sm font-medium mb-2">Paste your JSON</h3>
+        <p class="text-xs text-black/50 leading-relaxed">Drop in raw or minified JSON from an API response, config file, or log line.</p>
+      </div>
+      <div>
+        <div class="flex items-center justify-center rounded-full bg-black text-white text-sm font-medium mb-4" style="width:32px;height:32px;">2</div>
+        <h3 class="text-sm font-medium mb-2">Pick your options</h3>
+        <p class="text-xs text-black/50 leading-relaxed">Choose an indent width and whether to sort object keys alphabetically before formatting.</p>
+      </div>
+      <div>
+        <div class="flex items-center justify-center rounded-full bg-black text-white text-sm font-medium mb-4" style="width:32px;height:32px;">3</div>
+        <h3 class="text-sm font-medium mb-2">Format or minify</h3>
+        <p class="text-xs text-black/50 leading-relaxed">Invalid JSON is caught immediately with the exact line and column of the syntax error. Valid JSON is pretty-printed or compacted on the spot.</p>
+      </div>
+      <div>
+        <div class="flex items-center justify-center rounded-full bg-black text-white text-sm font-medium mb-4" style="width:32px;height:32px;">4</div>
+        <h3 class="text-sm font-medium mb-2">Copy or download</h3>
+        <p class="text-xs text-black/50 leading-relaxed">Copy the result to your clipboard or save it as a .json file. Your data never leaves your computer.</p>
+      </div>
+    </div>
+
+    <div class="mt-10">
+      <a href="#tool" class="bg-black text-white text-[13px] rounded-full px-5 py-2.5 inline-block">Get Started</a>
+    </div>
+  </div>
+</section>
+
+<footer class="text-center text-xs text-black/30 py-8">
+  Built entirely client-side — your data never leaves this browser.
+</footer>
+
+<script>
+(function(){
+  const jsonInput = document.getElementById('jsonInput');
+  const jsonOutput = document.getElementById('jsonOutput');
+  const statusMsg = document.getElementById('statusMsg');
+  const statsMsg = document.getElementById('statsMsg');
+  const indentRange = document.getElementById('indentRange');
+  const indentValue = document.getElementById('indentValue');
+  const sortKeys = document.getElementById('sortKeys');
+  const formatBtn = document.getElementById('formatBtn');
+  const minifyBtn = document.getElementById('minifyBtn');
+  const copyBtn = document.getElementById('copyBtn');
+  const downloadBtn = document.getElementById('downloadBtn');
+
+  let lastResult = '';
+
+  indentRange.addEventListener('input', () => {
+    indentValue.textContent = indentRange.value === '0' ? 'Tab' : indentRange.value + ' spaces';
+  });
+
+  function sortObjectKeys(obj){
+    if (Array.isArray(obj)) return obj.map(sortObjectKeys);
+    if (obj !== null && typeof obj === 'object') {
+      return Object.keys(obj).sort().reduce((acc, key) => {
+        acc[key] = sortObjectKeys(obj[key]);
+        return acc;
+      }, {});
+    }
+    return obj;
+  }
+
+  function escapeHtml(s){
+    return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  function highlight(json){
+    const escaped = escapeHtml(json);
+    return escaped.replace(
+      /("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false)\b|\bnull\b|-?\d+(?:\.\d*)?(?:[eE][+-]?\d+)?)/g,
+      (match) => {
+        let cls = 'json-number';
+        if (/^"/.test(match)) {
+          cls = /:$/.test(match) ? 'json-key' : 'json-string';
+        } else if (/true|false/.test(match)) {
+          cls = 'json-boolean';
+        } else if (/null/.test(match)) {
+          cls = 'json-null';
+        }
+        return '<span class="' + cls + '">' + match + '</span>';
+      }
+    );
+  }
+
+  function locateError(text, err){
+    const match = /position (\d+)/.exec(err.message);
+    if (!match) return err.message;
+    const pos = parseInt(match[1], 10);
+    const upToError = text.slice(0, pos);
+    const line = upToError.split('\n').length;
+    const col = pos - upToError.lastIndexOf('\n');
+    return err.message + ' (line ' + line + ', column ' + col + ')';
+  }
+
+  function run(mode){
+    const raw = jsonInput.value.trim();
+    if (!raw) {
+      statusMsg.textContent = 'Paste or type JSON above to get started.';
+      statusMsg.className = 'text-xs mt-2 text-black/40';
+      jsonOutput.innerHTML = '<span class="text-black/30">Formatted or minified JSON will appear here</span>';
+      statsMsg.textContent = '';
+      copyBtn.classList.add('pointer-events-none','opacity-30');
+      downloadBtn.classList.add('pointer-events-none','opacity-30');
+      return;
+    }
+    try {
+      let parsed = JSON.parse(raw);
+      if (sortKeys.checked) parsed = sortObjectKeys(parsed);
+
+      const indent = indentRange.value === '0' ? '\t' : parseInt(indentRange.value, 10);
+      lastResult = mode === 'minify' ? JSON.stringify(parsed) : JSON.stringify(parsed, null, indent);
+
+      jsonOutput.innerHTML = highlight(lastResult);
+      statusMsg.textContent = '✓ Valid JSON';
+      statusMsg.className = 'text-xs mt-2 text-black/60';
+
+      const objCount = raw.length;
+      statsMsg.textContent = fmtBytes(new Blob([lastResult]).size) + ' output · ' + fmtBytes(new Blob([raw]).size) + ' input';
+
+      copyBtn.classList.remove('pointer-events-none','opacity-30');
+      downloadBtn.classList.remove('pointer-events-none','opacity-30');
+      downloadBtn.href = URL.createObjectURL(new Blob([lastResult], { type: 'application/json' }));
+    } catch (err) {
+      jsonOutput.innerHTML = '<span class="text-black/30">Fix the error below to see formatted output</span>';
+      statusMsg.textContent = '✕ ' + locateError(raw, err);
+      statusMsg.className = 'text-xs mt-2 text-red-600';
+      statsMsg.textContent = '';
+      copyBtn.classList.add('pointer-events-none','opacity-30');
+      downloadBtn.classList.add('pointer-events-none','opacity-30');
+    }
+  }
+
+  function fmtBytes(n){
+    if (n < 1024) return n + ' B';
+    if (n < 1024*1024) return (n/1024).toFixed(1) + ' KB';
+    return (n/1024/1024).toFixed(2) + ' MB';
+  }
+
+  formatBtn.addEventListener('click', () => run('format'));
+  minifyBtn.addEventListener('click', () => run('minify'));
+  sortKeys.addEventListener('change', () => { if (lastResult) run(lastResult.includes('\n') ? 'format' : 'minify'); });
+
+  copyBtn.addEventListener('click', async () => {
+    if (!lastResult) return;
+    await navigator.clipboard.writeText(lastResult);
+    const orig = copyBtn.textContent;
+    copyBtn.textContent = 'Copied!';
+    setTimeout(() => copyBtn.textContent = orig, 1200);
+  });
+})();
+</script>
+
+</body>
+</html>
