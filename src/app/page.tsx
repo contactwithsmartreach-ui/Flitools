@@ -22,7 +22,7 @@ export default function Home() {
     <div className="relative min-h-screen bg-white text-black flex flex-col justify-between overflow-x-hidden font-sans">
       
       {/* Fixed Navbar at top */}
-      <Navbar onMenuClick={scrollToTools} />
+      <Navbar onMenuClick={scrollToTools} onSelectTool={(tool) => setSelectedTool(tool)} />
 
       {/* Hero Section Container (Full Viewport) */}
       <section className="relative min-h-screen w-full flex flex-col justify-between pt-24 pb-8 px-4 md:px-12 z-10 overflow-hidden">
