@@ -12,7 +12,8 @@ import {
   ExternalLink,
   ArrowRight,
   Layers,
-  Film
+  Film,
+  QrCode
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -21,6 +22,7 @@ const iconMap: Record<string, React.ReactNode> = {
   Code: <Code className="w-5 h-5 text-neutral-800" />,
   Image: <ImageIcon className="w-5 h-5 text-neutral-800" />,
   Film: <Film className="w-5 h-5 text-neutral-800" />,
+  QrCode: <QrCode className="w-5 h-5 text-neutral-800" />,
   Sparkles: <Sparkles className="w-5 h-5 text-neutral-800" />,
   Wrench: <Wrench className="w-5 h-5 text-neutral-800" />
 };

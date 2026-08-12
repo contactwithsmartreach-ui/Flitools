@@ -1,4 +1,4 @@
-import { LucideIcon, Wrench, Code, FileText, Image, Zap, Cpu, Sparkles, Layers, Film } from "lucide-react";
+import { LucideIcon, Wrench, Code, FileText, Image, Zap, Cpu, Sparkles, Layers, Film, QrCode } from "lucide-react";
 
 export interface ToolItem {
   id: string;
@@ -31,6 +31,16 @@ export const TOOLS_LIST: ToolItem[] = [
     htmlPath: "/tools/video-to-gif.html",
     iconName: "Film",
     category: "Media",
+    badge: "Live Tool"
+  },
+  {
+    id: "qr-code-generator",
+    title: "QR Code Generator",
+    description: "Generate and customize clean QR codes instantly with instant export options.",
+    path: "/tools/qr-code-generator.html",
+    htmlPath: "/tools/qr-code-generator.html",
+    iconName: "QrCode",
+    category: "Utilities",
     badge: "Live Tool"
   },
   {
@@ -70,4 +80,4 @@ export const TOOLS_LIST: ToolItem[] = [
   }
 ];
 
-export const CATEGORIES = ["All", "Media", "Developer", "Documents", "AI Tools", "Utilities"];
+export const CATEGORIES = ["All", "Media", "Utilities", "Developer", "Documents", "AI Tools"];
