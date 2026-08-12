@@ -120,7 +120,7 @@ export default function ToolsGrid({ onSelectTool }: ToolsGridProps) {
                   exit={{ opacity: 0, scale: 0.96 }}
                   transition={{ duration: 0.3 }}
                   onClick={() => onSelectTool?.(tool)}
-                  className="group relative bg-transparent hover:bg-neutral-50/80 rounded-2xl p-6 border border-neutral-200 hover:border-black/40 hover:shadow-xl transition-all duration-300 cursor-pointer flex flex-col justify-between"
+                  className="group relative bg-white rounded-2xl p-6 border border-neutral-200/80 hover:border-black/30 hover:shadow-xl transition-all duration-300 cursor-pointer flex flex-col justify-between"
                 >
                   <div>
                     <div className="flex items-start justify-between gap-3 mb-4">
