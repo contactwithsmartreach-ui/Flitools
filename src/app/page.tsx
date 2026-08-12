@@ -5,11 +5,13 @@ import { motion } from "framer-motion";
 import Navbar from "@/components/Navbar";
 import ToolsGrid from "@/components/ToolsGrid";
 import ToolModal from "@/components/ToolModal";
+import HowItWorksModal from "@/components/HowItWorksModal";
 import Footer from "@/components/Footer";
 import { ToolItem } from "@/data/tools";
 
 export default function Home() {
   const [selectedTool, setSelectedTool] = useState<ToolItem | null>(null);
+  const [isHowItWorksOpen, setIsHowItWorksOpen] = useState(false);
 
   const scrollToTools = () => {
     const el = document.getElementById("tools-directory");
@@ -97,7 +99,7 @@ export default function Home() {
                 Explore Directory
               </button>
               <button
-                onClick={scrollToTools}
+                onClick={() => setIsHowItWorksOpen(true)}
                 className="bg-transparent border border-black/35 text-black rounded-full px-6 py-2.5 text-[13px] font-medium hover:bg-black/5 transition-all cursor-pointer"
               >
                 How It Works
@@ -131,6 +133,13 @@ export default function Home() {
       <ToolModal
         tool={selectedTool}
         onClose={() => setSelectedTool(null)}
+      />
+
+      {/* How It Works Modal */}
+      <HowItWorksModal
+        isOpen={isHowItWorksOpen}
+        onClose={() => setIsHowItWorksOpen(false)}
+        onExplore={scrollToTools}
       />
 
       {/* Footer Branding & Legal Links */}
