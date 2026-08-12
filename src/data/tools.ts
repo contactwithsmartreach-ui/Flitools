@@ -1,4 +1,4 @@
-import { LucideIcon, Wrench, Code, FileText, Image, Zap, Cpu, Sparkles, Layers, Film, QrCode, Shield, Mic } from "lucide-react";
+import { LucideIcon, Wrench, Code, FileText, Image, Zap, Cpu, Sparkles, Layers, Film, QrCode, Shield, Mic, FileCode } from "lucide-react";
 
 export interface ToolItem {
   id: string;
@@ -51,6 +51,16 @@ export const TOOLS_LIST: ToolItem[] = [
     htmlPath: "/tools/voice-memo-waveform-trimmer.html",
     iconName: "Mic",
     category: "Media",
+    badge: "Live Tool"
+  },
+  {
+    id: "markdown-html-converter",
+    title: "Markdown to HTML Converter",
+    description: "Convert Markdown to sanitized HTML with live side-by-side preview and rich formatting.",
+    path: "/tools/markdown-html-converter.html",
+    htmlPath: "/tools/markdown-html-converter.html",
+    iconName: "FileCode",
+    category: "Developer",
     badge: "Live Tool"
   },
   {

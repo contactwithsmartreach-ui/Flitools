@@ -15,13 +15,15 @@ import {
   Film,
   QrCode,
   Shield,
-  Mic
+  Mic,
+  FileCode
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 const iconMap: Record<string, React.ReactNode> = {
   FileText: <FileText className="w-5 h-5 text-neutral-800" />,
   Code: <Code className="w-5 h-5 text-neutral-800" />,
+  FileCode: <FileCode className="w-5 h-5 text-neutral-800" />,
   Image: <ImageIcon className="w-5 h-5 text-neutral-800" />,
   Film: <Film className="w-5 h-5 text-neutral-800" />,
   QrCode: <QrCode className="w-5 h-5 text-neutral-800" />,
