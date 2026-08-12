@@ -70,18 +70,6 @@ export default function Home() {
         >
           {/* Left block */}
           <div className="flex flex-col gap-4 max-w-3xl">
-            {/* Subtitle line */}
-            <motion.div
-              initial={{ y: 16, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 0.6, duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-              className="flex items-center gap-2"
-            >
-              <span className="w-2.5 h-2.5 rounded-full bg-purple-400 animate-pulse shrink-0" />
-              <span className="text-[13px] text-purple-200/90 font-medium tracking-wide">
-                Ultimate Digital Toolkit & Utility Directory 2026
-              </span>
-            </motion.div>
 
             {/* Heading */}
             <motion.h1
