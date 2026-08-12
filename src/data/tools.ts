@@ -24,6 +24,16 @@ export const TOOLS_LIST: ToolItem[] = [
     badge: "Live Tool"
   },
   {
+    id: "video-to-gif",
+    title: "Video to GIF Converter",
+    description: "Trim, adjust frame rates, and convert video clips into optimized animated GIFs.",
+    path: "/tools/video-to-gif.html",
+    htmlPath: "/tools/video-to-gif.html",
+    iconName: "Film",
+    category: "Media",
+    badge: "Live Tool"
+  },
+  {
     id: "sample-1",
     title: "PDF Converter & Merger",
     description: "Fast in-browser PDF manipulation and page reordering.",

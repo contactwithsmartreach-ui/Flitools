@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GIF Studio — Convert Video to Animated GIF</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  :root{
+    --ease: cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  *{ font-family: 'Inter', sans-serif; }
+  body{ background:#fff; color:#000; }
+
+  /* ---------- entrance choreography ---------- */
+  @keyframes fadeSlideDown{
+    from{ opacity:0; transform: translateY(-16px); }
+    to{ opacity:1; transform: translateY(0); }
+  }
+  @keyframes fadeSlideUp{
+    from{ opacity:0; transform: translateY(20px); }
+    to{ opacity:1; transform: translateY(0); }
+  }
+  @keyframes fadeScaleIn{
+    from{ opacity:0; transform: scale(1.05); }
+    to{ opacity:1; transform: scale(1); }
+  }
+  .anim-navbar{ animation: fadeSlideDown 0.8s var(--ease) both; }
+  .anim-bg{ animation: fadeScaleIn 1.8s var(--ease) both; }
+  .anim-footer{ animation: fadeSlideUp 1s var(--ease) both; animation-delay: .5s; }
+  .anim-subtitle{ animation: fadeSlideUp .8s var(--ease) both; animation-delay: .6s; }
+  .anim-heading{ animation: fadeSlideUp .8s var(--ease) both; animation-delay: .8s; }
+  .anim-buttons{ animation: fadeSlideUp .8s var(--ease) both; animation-delay: 1s; }
+
+  .hero-heading{
+    font-weight:300;
+    letter-spacing:-0.03em;
+    line-height:1;
+    font-size: clamp(2rem, 8vw, 4.5rem);
+  }
+  @media (min-width:768px){
+    .hero-heading{ font-size: clamp(2.5rem, 5.5vw, 4.5rem); }
+  }
+
+  .hero-gradient-bg{
+    background:
+      radial-gradient(circle at 20% 20%, rgba(0,0,0,0.06), transparent 45%),
+      radial-gradient(circle at 80% 30%, rgba(0,0,0,0.04), transparent 50%),
+      linear-gradient(135deg, #fafafa 0%, #f0f0f2 100%);
+  }
+  .hero-fade{
+    background: linear-gradient(to top, #ffffff 0%, rgba(255,255,255,0.85) 55%, transparent 100%);
+  }
+
+  .drop-zone{ transition: border-color .2s ease, background-color .2s ease; }
+  .drop-zone.dragover{ border-color:#000; background-color:#f7f7f7; }
+
+  input[type=range]{ accent-color:#000; }
+
+  ::-webkit-scrollbar{ width:8px; }
+  ::-webkit-scrollbar-thumb{ background:#ddd; border-radius:9999px; }
+</style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+<!-- ============ HERO ============ -->
+<section class="relative w-full min-h-screen flex flex-col justify-between overflow-hidden">
+
+  <!-- background -->
+  <div class="anim-bg absolute inset-0 z-0 hero-gradient-bg"></div>
+
+  <!-- navbar -->
+  <nav class="anim-navbar relative z-50 flex items-center justify-between px-4 py-4 md:px-8 md:py-6" style="pointer-events:none;">
+    <div class="flex items-center gap-3 md:gap-5" style="pointer-events:auto;">
+      <!-- logo -->
+      <div class="flex items-center gap-2">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+          <rect x="2" y="8" width="12" height="8" rx="2" transform="rotate(-35 8 12)" fill="black"/>
+          <rect x="10" y="8" width="12" height="8" rx="2" transform="rotate(-35 16 12)" fill="black"/>
+        </svg>
+        <span class="hidden md:inline text-sm font-medium tracking-tight">GIF Studio</span>
+      </div>
+
+      <!-- tags pill -->
+      <div class="hidden md:flex items-center gap-3 rounded-full px-4 py-2" style="background:#F4F4F6;">
+        <span class="text-[11px] text-black/70">In-Browser</span>
+        <span class="text-[11px] text-black/70">No Uploads</span>
+      </div>
+    </div>
+
+    <div class="hidden md:flex items-center gap-3" style="pointer-events:auto;">
+      <div class="flex items-center gap-2 rounded-full pl-2 pr-4 py-1.5" style="background:#F4F4F6;">
+        <span class="flex items-center justify-center bg-black rounded-full" style="width:28px;height:28px;">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="white">
+            <rect x="2" y="2" width="7" height="7" rx="1.5"/><rect x="15" y="2" width="7" height="7" rx="1.5"/>
+            <rect x="2" y="15" width="7" height="7" rx="1.5"/><rect x="15" y="15" width="7" height="7" rx="1.5"/>
+          </svg>
+        </span>
+        <span class="text-[11px] text-black/70">100% Client-Side</span>
+      </div>
+    </div>
+  </nav>
+
+  <!-- footer content -->
+  <div class="anim-footer relative z-30 hero-fade px-4 pb-8 pt-24 md:px-8 md:pb-10">
+    <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-8">
+      <div>
+        <div class="anim-subtitle flex items-center gap-2 mb-4">
+          <span class="rounded-full bg-black" style="width:8px;height:8px;"></span>
+          <span class="text-[13px]" style="color:rgba(0,0,0,0.55);">Turn a video clip into an animated GIF, right here</span>
+        </div>
+        <h1 class="anim-heading hero-heading mb-6">
+          Video In,<br/>Zero Uploads.<br/>GIFs Out.
+        </h1>
+        <div class="anim-buttons flex items-center gap-3">
+          <a href="#how-it-works" class="bg-black text-white text-[13px] rounded-full px-5 py-2.5">How It Works</a>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-2 md:justify-end flex-wrap">
+        <span class="text-[11px] rounded-full px-3 py-1.5 bg-white border" style="border-color:rgba(0,0,0,0.12);">Trim &amp; Frame Rate</span>
+        <span class="text-[11px] rounded-full px-3 py-1.5 bg-white border" style="border-color:rgba(0,0,0,0.12);">Live Preview</span>
+        <span class="text-[11px] rounded-full px-3 py-1.5 bg-white border" style="border-color:rgba(0,0,0,0.12);">Instant Download</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ TOOL ============ -->
+<section id="tool" class="w-full max-w-6xl mx-auto px-4 md:px-8 py-16">
+
+  <div class="mb-10">
+    <h2 class="text-2xl md:text-3xl font-light tracking-tight mb-2">Build your GIF</h2>
+    <p class="text-sm text-black/50">Upload a video, trim the range and set the frame rate, preview it live, then download — nothing ever leaves your browser.</p>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
+
+    <!-- LEFT: upload + adjustments -->
+    <div class="flex flex-col gap-8">
+
+      <!-- upload zone -->
+      <div>
+        <h3 class="text-sm font-medium mb-3">1. Upload a video</h3>
+        <div id="dropZone" class="drop-zone border-2 border-dashed border-black/20 rounded-2xl flex flex-col items-center justify-center text-center py-14 px-6 cursor-pointer">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="1.5" class="mb-3 opacity-60">
+            <path d="M12 16V4M12 4l-4 4M12 4l4 4" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <p class="text-sm font-medium">Drag &amp; drop a video, or click to browse</p>
+          <p class="text-xs text-black/40 mt-1">MP4 / WEBM / MOV — one video at a time</p>
+          <input id="fileInput" type="file" accept="video/*" class="hidden">
+        </div>
+        <p id="videoInfo" class="text-xs text-black/40 mt-2">No video loaded</p>
+      </div>
+
+      <!-- adjustments -->
+      <div>
+        <h3 class="text-sm font-medium mb-3">2. Trim &amp; adjust</h3>
+        <div class="border border-black/10 rounded-2xl p-5 flex flex-col gap-5">
+
+          <div>
+            <div class="flex items-center justify-between mb-1">
+              <label class="text-xs text-black/60">Start time</label>
+              <span id="startValue" class="text-xs font-medium">0.0 s</span>
+            </div>
+            <input id="startRange" type="range" min="0" max="0" step="0.1" value="0" class="w-full" disabled>
+          </div>
+
+          <div>
+            <div class="flex items-center justify-between mb-1">
+              <label class="text-xs text-black/60">End time</label>
+              <span id="endValue" class="text-xs font-medium">0.0 s</span>
+            </div>
+            <input id="endRange" type="range" min="0" max="0" step="0.1" value="0" class="w-full" disabled>
+          </div>
+
+          <div>
+            <div class="flex items-center justify-between mb-1">
+              <label class="text-xs text-black/60">Frame rate</label>
+              <span id="fpsValue" class="text-xs font-medium">8 fps</span>
+            </div>
+            <input id="fpsRange" type="range" min="2" max="20" step="1" value="8" class="w-full">
+          </div>
+
+          <div>
+            <div class="flex items-center justify-between mb-1">
+              <label class="text-xs text-black/60">Output width</label>
+              <span id="widthValue" class="text-xs font-medium">400 px</span>
+            </div>
+            <input id="widthRange" type="range" min="80" max="1000" step="10" value="400" class="w-full">
+          </div>
+
+          <div class="flex items-center justify-between">
+            <label class="text-xs text-black/60">Loop forever</label>
+            <input id="loopCheckbox" type="checkbox" checked class="accent-black w-4 h-4">
+          </div>
+
+          <div>
+            <div class="flex items-center justify-between mb-1">
+              <label class="text-xs text-black/60">Quality (1 best – 20 fastest)</label>
+              <span id="qualityValue" class="text-xs font-medium">10</span>
+            </div>
+            <input id="qualityRange" type="range" min="1" max="20" step="1" value="10" class="w-full">
+          </div>
+
+          <p id="frameEstimate" class="text-xs text-black/40">—</p>
+
+          <button id="generateBtn" class="bg-black text-white text-[13px] rounded-full px-5 py-2.5 disabled:opacity-30 disabled:cursor-not-allowed" disabled>
+            Generate GIF
+          </button>
+          <div id="progressWrap" class="hidden">
+            <div class="w-full h-1.5 bg-black/10 rounded-full overflow-hidden">
+              <div id="progressBar" class="h-full bg-black" style="width:0%;"></div>
+            </div>
+            <p id="progressLabel" class="text-xs text-black/40 mt-1">Encoding…</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: preview + download -->
+    <div class="flex flex-col gap-8">
+      <div>
+        <h3 class="text-sm font-medium mb-3">3. Preview</h3>
+        <div class="border border-black/10 rounded-2xl aspect-square flex items-center justify-center bg-black/[0.02] overflow-hidden">
+          <video id="sourceVideo" class="max-w-full max-h-full hidden" controls muted playsinline></video>
+          <img id="previewImg" class="max-w-full max-h-full hidden" alt="GIF preview">
+          <span id="previewPlaceholder" class="text-xs text-black/30">Your video, then your GIF, will appear here</span>
+        </div>
+      </div>
+
+      <div>
+        <h3 class="text-sm font-medium mb-3">4. Download</h3>
+        <div class="border border-black/10 rounded-2xl p-5 flex flex-col gap-3">
+          <a id="downloadBtn" download="animation.gif" class="pointer-events-none opacity-30 bg-black text-white text-[13px] rounded-full px-5 py-2.5 text-center">
+            Download GIF
+          </a>
+          <p class="text-xs text-black/40">Frames are sampled straight from the video and encoded locally with an open-source JavaScript library (gifenc) running on the main thread — no video is ever uploaded anywhere.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ HOW IT WORKS ============ -->
+<section id="how-it-works" class="w-full bg-black/[0.02] border-t border-black/10">
+  <div class="max-w-6xl mx-auto px-4 md:px-8 py-16">
+    <div class="mb-10">
+      <h2 class="text-2xl md:text-3xl font-light tracking-tight mb-2">How it works</h2>
+      <p class="text-sm text-black/50 max-w-2xl">GIF Studio samples still frames straight out of your video and stitches them into one looping animated GIF, entirely inside your browser. No files are ever sent to a server — everything below happens on your own device.</p>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div>
+        <div class="flex items-center justify-center rounded-full bg-black text-white text-sm font-medium mb-4" style="width:32px;height:32px;">1</div>
+        <h3 class="text-sm font-medium mb-2">Upload your video</h3>
+        <p class="text-xs text-black/50 leading-relaxed">Drag and drop, or click to browse, any MP4, WEBM, or MOV file. Your browser reads its duration and dimensions locally — the file itself never leaves your device.</p>
+      </div>
+      <div>
+        <div class="flex items-center justify-center rounded-full bg-black text-white text-sm font-medium mb-4" style="width:32px;height:32px;">2</div>
+        <h3 class="text-sm font-medium mb-2">Trim &amp; set the frame rate</h3>
+        <p class="text-xs text-black/50 leading-relaxed">Pick the start and end time of the clip you want, choose how many frames per second to sample, and set the output width. Fewer frames per second and a smaller width mean a smaller GIF.</p>
+      </div>
+      <div>
+        <div class="flex items-center justify-center rounded-full bg-black text-white text-sm font-medium mb-4" style="width:32px;height:32px;">3</div>
+        <h3 class="text-sm font-medium mb-2">Generate &amp; preview</h3>
+        <p class="text-xs text-black/50 leading-relaxed">Hit "Generate GIF" and your browser seeks through the trimmed range, draws each sampled frame to a canvas, and encodes them into a GIF using an open-source encoder — no server involved. The result plays instantly in the preview panel.</p>
+      </div>
+      <div>
+        <div class="flex items-center justify-center rounded-full bg-black text-white text-sm font-medium mb-4" style="width:32px;height:32px;">4</div>
+        <h3 class="text-sm font-medium mb-2">Download</h3>
+        <p class="text-xs text-black/50 leading-relaxed">Once it's ready, the Download button saves the finished .gif straight to your device. Your original video and the final file never leave your computer.</p>
+      </div>
+    </div>
+
+    <div class="mt-10">
+      <a href="#tool" class="bg-black text-white text-[13px] rounded-full px-5 py-2.5 inline-block">Get Started</a>
+    </div>
+  </div>
+</section>
+
+<footer class="text-center text-xs text-black/30 py-8">
+  Built entirely client-side — your video never leaves this browser.
+</footer>
+
+<script>
+(function(){
+  const dropZone = document.getElementById('dropZone');
+  const fileInput = document.getElementById('fileInput');
+  const videoInfo = document.getElementById('videoInfo');
+  const sourceVideo = document.getElementById('sourceVideo');
+  const previewImg = document.getElementById('previewImg');
+  const previewPlaceholder = document.getElementById('previewPlaceholder');
+
+  const startRange = document.getElementById('startRange');
+  const startValue = document.getElementById('startValue');
+  const endRange = document.getElementById('endRange');
+  const endValue = document.getElementById('endValue');
+  const fpsRange = document.getElementById('fpsRange');
+  const fpsValue = document.getElementById('fpsValue');
+  const widthRange = document.getElementById('widthRange');
+  const widthValue = document.getElementById('widthValue');
+  const qualityRange = document.getElementById('qualityRange');
+  const qualityValue = document.getElementById('qualityValue');
+  const loopCheckbox = document.getElementById('loopCheckbox');
+  const frameEstimate = document.getElementById('frameEstimate');
+
+  const generateBtn = document.getElementById('generateBtn');
+  const progressWrap = document.getElementById('progressWrap');
+  const progressBar = document.getElementById('progressBar');
+  const progressLabel = document.getElementById('progressLabel');
+  const downloadBtn = document.getElementById('downloadBtn');
+
+  const MAX_FRAMES = 200; // safety cap so huge ranges/fps don't freeze the tab
+
+  let videoLoaded = false;
+  let videoDuration = 0;
+  let videoNaturalWidth = 0;
+  let videoNaturalHeight = 0;
+
+  function fmt(n){ return (Math.round(n * 10) / 10).toFixed(1); }
+
+  function updateFrameEstimate(){
+    if (!videoLoaded) { frameEstimate.textContent = '—'; return; }
+    const start = parseFloat(startRange.value);
+    const end = parseFloat(endRange.value);
+    const fps = parseInt(fpsRange.value, 10);
+    const span = Math.max(0, end - start);
+    const count = Math.max(1, Math.round(span * fps));
+    if (count > MAX_FRAMES) {
+      frameEstimate.textContent = '⚠ ' + count + ' frames requested — will be capped at ' + MAX_FRAMES + ' for performance. Shorten the range or lower the frame rate.';
+    } else {
+      frameEstimate.textContent = '≈ ' + count + ' frame' + (count === 1 ? '' : 's') + ' will be captured (' + fmt(span) + 's at ' + fps + ' fps)';
+    }
+  }
+
+  function loadVideoFile(file){
+    if (!file || !file.type.startsWith('video/')) return;
+
+    videoLoaded = false;
+    generateBtn.disabled = true;
+    videoInfo.textContent = 'Loading video…';
+
+    const url = URL.createObjectURL(file);
+    sourceVideo.src = url;
+    sourceVideo.onloadedmetadata = () => {
+      videoDuration = sourceVideo.duration;
+      videoNaturalWidth = sourceVideo.videoWidth;
+      videoNaturalHeight = sourceVideo.videoHeight;
+
+      startRange.min = 0;
+      startRange.max = videoDuration;
+      startRange.value = 0;
+      startRange.step = Math.max(0.1, videoDuration / 500);
+      startRange.disabled = false;
+
+      endRange.min = 0;
+      endRange.max = videoDuration;
+      endRange.value = Math.min(videoDuration, videoDuration <= 6 ? videoDuration : 5);
+      endRange.step = Math.max(0.1, videoDuration / 500);
+      endRange.disabled = false;
+
+      startValue.textContent = fmt(0) + ' s';
+      endValue.textContent = fmt(parseFloat(endRange.value)) + ' s';
+
+      videoInfo.textContent = fmt(videoDuration) + 's · ' + videoNaturalWidth + '×' + videoNaturalHeight;
+
+      sourceVideo.classList.remove('hidden');
+      previewImg.classList.add('hidden');
+      previewPlaceholder.classList.add('hidden');
+      downloadBtn.classList.add('pointer-events-none', 'opacity-30');
+
+      videoLoaded = true;
+      generateBtn.disabled = false;
+      updateFrameEstimate();
+    };
+    sourceVideo.onerror = () => {
+      videoInfo.textContent = 'Could not read this video file — try a different format (MP4/WEBM).';
+    };
+  }
+
+  dropZone.addEventListener('click', () => fileInput.click());
+  fileInput.addEventListener('change', e => loadVideoFile(e.target.files[0]));
+
+  ['dragenter','dragover'].forEach(evt => {
+    dropZone.addEventListener(evt, e => { e.preventDefault(); dropZone.classList.add('dragover'); });
+  });
+  ['dragleave','drop'].forEach(evt => {
+    dropZone.addEventListener(evt, e => { e.preventDefault(); dropZone.classList.remove('dragover'); });
+  });
+  dropZone.addEventListener('drop', e => {
+    e.preventDefault();
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) loadVideoFile(e.dataTransfer.files[0]);
+  });
+
+  startRange.addEventListener('input', () => {
+    if (parseFloat(startRange.value) >= parseFloat(endRange.value)) {
+      startRange.value = Math.max(0, parseFloat(endRange.value) - parseFloat(startRange.step));
+    }
+    startValue.textContent = fmt(parseFloat(startRange.value)) + ' s';
+    updateFrameEstimate();
+  });
+  endRange.addEventListener('input', () => {
+    if (parseFloat(endRange.value) <= parseFloat(startRange.value)) {
+      endRange.value = Math.min(videoDuration, parseFloat(startRange.value) + parseFloat(endRange.step));
+    }
+    endValue.textContent = fmt(parseFloat(endRange.value)) + ' s';
+    updateFrameEstimate();
+  });
+  fpsRange.addEventListener('input', () => {
+    fpsValue.textContent = fpsRange.value + ' fps';
+    updateFrameEstimate();
+  });
+  widthRange.addEventListener('input', () => widthValue.textContent = widthRange.value + ' px');
+  qualityRange.addEventListener('input', () => qualityValue.textContent = qualityRange.value);
+
+  function seekTo(video, time){
+    return new Promise(resolve => {
+      function onSeeked(){
+        video.removeEventListener('seeked', onSeeked);
+        resolve();
+      }
+      video.addEventListener('seeked', onSeeked);
+      video.currentTime = time;
+    });
+  }
+
+  generateBtn.addEventListener('click', async () => {
+    if (!videoLoaded) return;
+
+    generateBtn.disabled = true;
+    progressWrap.classList.remove('hidden');
+    progressBar.style.width = '0%';
+    progressLabel.textContent = 'Preparing…';
+    downloadBtn.classList.add('pointer-events-none', 'opacity-30');
+    sourceVideo.pause();
+
+    try {
+      const start = parseFloat(startRange.value);
+      const end = parseFloat(endRange.value);
+      const fps = parseInt(fpsRange.value, 10);
+      const span = Math.max(0, end - start);
+
+      let frameCount = Math.max(1, Math.round(span * fps));
+      if (frameCount > MAX_FRAMES) frameCount = MAX_FRAMES;
+      const delay = Math.round(1000 / fps);
+
+      const targetWidth = parseInt(widthRange.value, 10);
+      const aspect = videoNaturalHeight / videoNaturalWidth;
+      const targetHeight = Math.round(targetWidth * aspect);
+
+      progressLabel.textContent = 'Loading encoder…';
+      const { GIFEncoder, quantize, applyPalette } = await import('https://unpkg.com/gifenc@1.0.3/dist/gifenc.esm.js');
+
+      const q = parseInt(qualityRange.value, 10);
+      const format = q <= 7 ? 'rgb565' : (q <= 14 ? 'rgb444' : 'rgba4444');
+
+      const gif = GIFEncoder();
+
+      for (let i = 0; i < frameCount; i++) {
+        const t = frameCount === 1 ? start : start + (i / (frameCount - 1)) * span;
+
+        progressLabel.textContent = 'Capturing frame ' + (i + 1) + ' / ' + frameCount + '…';
+        await seekTo(sourceVideo, Math.min(t, videoDuration - 0.001));
+
+        const frameCanvas = document.createElement('canvas');
+        frameCanvas.width = targetWidth;
+        frameCanvas.height = targetHeight;
+        const fctx = frameCanvas.getContext('2d');
+        fctx.drawImage(sourceVideo, 0, 0, targetWidth, targetHeight);
+
+        const { data } = fctx.getImageData(0, 0, targetWidth, targetHeight);
+        const palette = quantize(data, 256, { format });
+        const index = applyPalette(data, palette, format);
+
+        const frameOpts = { palette, delay };
+        if (i === 0) frameOpts.repeat = loopCheckbox.checked ? 0 : -1;
+
+        gif.writeFrame(index, targetWidth, targetHeight, frameOpts);
+
+        progressBar.style.width = Math.round(((i + 1) / frameCount) * 100) + '%';
+        await new Promise(r => setTimeout(r, 0));
+      }
+
+      progressLabel.textContent = 'Finalizing…';
+      gif.finish();
+      const bytes = gif.bytes();
+      const blob = new Blob([bytes], { type: 'image/gif' });
+      const url = URL.createObjectURL(blob);
+
+      sourceVideo.classList.add('hidden');
+      previewImg.src = url;
+      previewImg.classList.remove('hidden');
+      previewPlaceholder.classList.add('hidden');
+      downloadBtn.href = url;
+      downloadBtn.classList.remove('pointer-events-none', 'opacity-30');
+      progressLabel.textContent = 'Done! ' + frameCount + ' frames, ' + Math.round(blob.size / 1024) + ' KB.';
+      generateBtn.disabled = false;
+    } catch (err) {
+      console.error(err);
+      progressLabel.textContent = 'Error: ' + err.message;
+      generateBtn.disabled = false;
+    }
+  });
+})();
+</script>
+
+</body>
+</html>
