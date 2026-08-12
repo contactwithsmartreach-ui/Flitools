@@ -34,6 +34,16 @@ export const TOOLS_LIST: ToolItem[] = [
     badge: "Live Tool"
   },
   {
+    id: "image-compressor-resizer",
+    title: "Image Compressor & Resizer",
+    description: "Compress, resize, and convert images to WebP, JPEG, or PNG directly in client memory.",
+    path: "/tools/image-compressor-resizer.html",
+    htmlPath: "/tools/image-compressor-resizer.html",
+    iconName: "Image",
+    category: "Media",
+    badge: "Live Tool"
+  },
+  {
     id: "qr-code-generator",
     title: "QR Code Generator",
     description: "Generate and customize clean QR codes instantly with instant export options.",
@@ -60,14 +70,6 @@ export const TOOLS_LIST: ToolItem[] = [
     iconName: "Code",
     category: "Developer",
     badge: "Fast"
-  },
-  {
-    id: "sample-3",
-    title: "Image Compressor & WebP",
-    description: "Compress images with zero visual loss directly in client memory.",
-    path: "/tools/image-compressor",
-    iconName: "Image",
-    category: "Media"
   },
   {
     id: "sample-4",
