@@ -28,20 +28,20 @@ export default function ToolModal({ tool, onClose }: ToolModalProps) {
           }`}
         >
           {/* Header bar */}
-          <div className="px-6 py-3.5 border-b border-neutral-200 flex items-center justify-between bg-neutral-50/80 shrink-0">
-            <div className="flex items-center gap-3">
-              <span className="bg-black text-white text-[10px] uppercase tracking-wider font-semibold px-2.5 py-0.5 rounded-full">
+          <div className="px-3 sm:px-6 py-3 border-b border-neutral-200 flex items-center justify-between gap-2 bg-neutral-50/80 shrink-0">
+            <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+              <span className="bg-black text-white text-[9px] sm:text-[10px] uppercase tracking-wider font-semibold px-2 py-0.5 rounded-full shrink-0">
                 {tool.category}
               </span>
-              <h3 className="text-base font-medium text-neutral-900 truncate max-w-xs md:max-w-md">
+              <h3 className="text-xs sm:text-base font-medium text-neutral-900 truncate">
                 {tool.title}
               </h3>
             </div>
 
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
               <button
                 onClick={() => setIsFullscreen(!isFullscreen)}
-                className="w-8 h-8 rounded-full bg-neutral-200/70 hover:bg-neutral-300 flex items-center justify-center text-neutral-700 transition-colors"
+                className="w-8 h-8 rounded-full bg-neutral-200/70 hover:bg-neutral-300 flex items-center justify-center text-neutral-700 transition-colors shrink-0"
                 title={isFullscreen ? "Exit Fullscreen" : "Fullscreen"}
               >
                 {isFullscreen ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
@@ -50,14 +50,14 @@ export default function ToolModal({ tool, onClose }: ToolModalProps) {
                 href={tool.htmlPath || tool.path}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-8 h-8 rounded-full bg-neutral-200/70 hover:bg-neutral-300 flex items-center justify-center text-neutral-700 transition-colors"
+                className="w-8 h-8 rounded-full bg-neutral-200/70 hover:bg-neutral-300 flex items-center justify-center text-neutral-700 transition-colors shrink-0"
                 title="Open in new tab"
               >
                 <ExternalLink className="w-4 h-4" />
               </a>
               <button
                 onClick={onClose}
-                className="w-8 h-8 rounded-full bg-black text-white hover:bg-neutral-800 flex items-center justify-center transition-colors"
+                className="w-8 h-8 rounded-full bg-black text-white hover:bg-neutral-800 flex items-center justify-center transition-colors shrink-0"
                 title="Close"
               >
                 <X className="w-4 h-4" />
