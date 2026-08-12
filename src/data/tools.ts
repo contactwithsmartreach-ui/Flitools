@@ -1,4 +1,4 @@
-import { LucideIcon, Wrench, Code, FileText, Image, Zap, Cpu, Sparkles, Layers, Film, QrCode, Shield } from "lucide-react";
+import { LucideIcon, Wrench, Code, FileText, Image, Zap, Cpu, Sparkles, Layers, Film, QrCode, Shield, Mic } from "lucide-react";
 
 export interface ToolItem {
   id: string;
@@ -40,6 +40,16 @@ export const TOOLS_LIST: ToolItem[] = [
     path: "/tools/image-compressor-resizer.html",
     htmlPath: "/tools/image-compressor-resizer.html",
     iconName: "Image",
+    category: "Media",
+    badge: "Live Tool"
+  },
+  {
+    id: "voice-memo-waveform-trimmer",
+    title: "Voice Memo Waveform Trimmer",
+    description: "Record audio or load voice memos, visualize waveforms, trim precision clips, and export locally.",
+    path: "/tools/voice-memo-waveform-trimmer.html",
+    htmlPath: "/tools/voice-memo-waveform-trimmer.html",
+    iconName: "Mic",
     category: "Media",
     badge: "Live Tool"
   },
