@@ -102,7 +102,7 @@ export default function ToolsGrid({ onSelectTool }: ToolsGridProps) {
             <Layers className="w-10 h-10 text-neutral-300 mx-auto mb-3" />
             <h3 className="text-base font-medium text-neutral-700">No tools found</h3>
             <p className="text-xs text-neutral-400 mt-1 max-w-sm mx-auto">
-              We couldn't find any tools matching your criteria. Attach your HTML tool files or adjust search filters.
+              We couldn't find any tools matching your criteria.
             </p>
           </div>
         ) : (
@@ -120,11 +120,12 @@ export default function ToolsGrid({ onSelectTool }: ToolsGridProps) {
                   exit={{ opacity: 0, scale: 0.96 }}
                   transition={{ duration: 0.3 }}
                   onClick={() => onSelectTool?.(tool)}
-                  className="group relative bg-white rounded-2xl p-6 border border-neutral-200/80 hover:border-black/30 hover:shadow-xl transition-all duration-300 cursor-pointer flex flex-col justify-between"
+                  className="card group cursor-pointer"
                 >
-                  <div>
-                    <div className="flex items-start justify-between gap-3 mb-4">
-                      <div className="w-12 h-12 rounded-xl bg-neutral-100 flex items-center justify-center group-hover:bg-black group-hover:text-white transition-colors duration-300">
+                  <div className="content">
+                    {/* Top Row */}
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="w-11 h-11 rounded-xl bg-neutral-100 flex items-center justify-center group-hover:bg-black group-hover:text-white transition-colors duration-300">
                         {iconMap[tool.iconName] || <Wrench className="w-5 h-5 text-neutral-800 group-hover:text-white" />}
                       </div>
                       {tool.badge && (
@@ -134,21 +135,28 @@ export default function ToolsGrid({ onSelectTool }: ToolsGridProps) {
                       )}
                     </div>
 
-                    <h3 className="text-lg font-medium text-neutral-900 group-hover:text-black mb-1.5 flex items-center gap-2">
-                      {tool.title}
-                    </h3>
-                    <p className="text-xs text-neutral-500 line-clamp-2 leading-relaxed">
-                      {tool.description}
-                    </p>
-                  </div>
+                    {/* Words Content Block */}
+                    <div className="space-y-1.5 my-2">
+                      <div className="word text-[11px] uppercase tracking-wider font-semibold text-neutral-400">
+                        {tool.category}
+                      </div>
+                      <div className="word text-lg font-semibold text-neutral-900 group-hover:text-black leading-tight">
+                        {tool.title}
+                      </div>
+                      <div className="word text-xs text-neutral-500 line-clamp-2 leading-relaxed font-normal pt-0.5">
+                        {tool.description}
+                      </div>
+                    </div>
 
-                  <div className="mt-6 pt-4 border-t border-neutral-100 flex items-center justify-between text-xs text-neutral-600 font-medium">
-                    <span className="bg-neutral-100 px-2.5 py-1 rounded-md text-[11px] font-normal text-neutral-600">
-                      {tool.category}
-                    </span>
-                    <span className="flex items-center gap-1 group-hover:translate-x-1 transition-transform duration-200 text-black font-semibold">
-                      Open Tool <ArrowRight className="w-3.5 h-3.5" />
-                    </span>
+                    {/* Bottom Action Row */}
+                    <div className="pt-3 border-t border-neutral-100 flex items-center justify-between text-xs text-neutral-600 font-medium mt-auto">
+                      <span className="bg-neutral-100 px-2.5 py-1 rounded-md text-[11px] font-normal text-neutral-600">
+                        {tool.category}
+                      </span>
+                      <span className="flex items-center gap-1 group-hover:translate-x-1 transition-transform duration-200 text-black font-semibold">
+                        Open Tool <ArrowRight className="w-3.5 h-3.5" />
+                      </span>
+                    </div>
                   </div>
                 </motion.div>
               ))}
