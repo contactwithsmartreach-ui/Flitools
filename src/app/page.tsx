@@ -5,8 +5,8 @@ import { motion } from "framer-motion";
 import Navbar from "@/components/Navbar";
 import ToolsGrid from "@/components/ToolsGrid";
 import ToolModal from "@/components/ToolModal";
+import Footer from "@/components/Footer";
 import { ToolItem } from "@/data/tools";
-import { MadeWithDyad } from "@/components/made-with-dyad";
 
 export default function Home() {
   const [selectedTool, setSelectedTool] = useState<ToolItem | null>(null);
@@ -133,10 +133,8 @@ export default function Home() {
         onClose={() => setSelectedTool(null)}
       />
 
-      {/* Footer Branding */}
-      <footer className="bg-white border-t border-neutral-100">
-        <MadeWithDyad />
-      </footer>
+      {/* Footer Branding & Legal Links */}
+      <Footer />
     </div>
   );
 }
