@@ -53,9 +53,9 @@ export default function ToolsGrid({ onSelectTool }: ToolsGridProps) {
       <div className="max-w-6xl mx-auto space-y-8">
         
         {/* Header */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-neutral-100 pb-8">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-purple-900/10 pb-8">
           <div>
-            <div className="inline-flex items-center gap-2 bg-neutral-100 px-3 py-1 rounded-full text-xs font-medium text-neutral-700 mb-3">
+            <div className="inline-flex items-center gap-2 border border-purple-300/30 bg-gradient-to-r from-purple-900/10 via-purple-700/5 to-purple-950/10 backdrop-blur-md px-3.5 py-1 rounded-full text-xs font-semibold text-purple-950 mb-3">
               <span className="w-2 h-2 rounded-full bg-purple-600 animate-pulse" />
               <span>Catalog ({TOOLS_LIST.length} Tools Available)</span>
             </div>
@@ -64,15 +64,15 @@ export default function ToolsGrid({ onSelectTool }: ToolsGridProps) {
             </h2>
           </div>
 
-          {/* Search input */}
+          {/* Search input with purple glass glow */}
           <div className="relative w-full md:w-80">
-            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400" />
+            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-purple-700/60" />
             <input
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search tools..."
-              className="w-full bg-neutral-50 border border-neutral-200 rounded-full pl-10 pr-4 py-2.5 text-xs text-neutral-900 focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-600 transition-all"
+              className="w-full bg-purple-950/5 border border-purple-900/20 rounded-full pl-10 pr-4 py-2.5 text-xs text-purple-950 placeholder-purple-900/40 focus:outline-none focus:ring-2 focus:ring-purple-500/30 focus:border-purple-600 transition-all"
             />
           </div>
         </div>
@@ -83,10 +83,10 @@ export default function ToolsGrid({ onSelectTool }: ToolsGridProps) {
             <button
               key={cat}
               onClick={() => setSelectedCategory(cat)}
-              className={`px-4 py-1.5 rounded-full text-xs font-medium transition-all whitespace-nowrap cursor-pointer ${
+              className={`px-4 py-2 rounded-full text-xs font-medium transition-all whitespace-nowrap cursor-pointer border ${
                 selectedCategory === cat
-                  ? "bg-purple-900 text-white shadow-sm"
-                  : "bg-neutral-100 text-neutral-600 hover:bg-neutral-200"
+                  ? "border-[rgba(75,30,133,0.5)] bg-gradient-to-r from-[rgba(75,30,133,1)] via-purple-700 to-[rgba(75,30,133,0.9)] text-white shadow-md shadow-purple-950/20"
+                  : "border-purple-900/15 bg-purple-900/5 text-purple-950 hover:bg-purple-900/10"
               }`}
             >
               {cat}
@@ -94,13 +94,13 @@ export default function ToolsGrid({ onSelectTool }: ToolsGridProps) {
           ))}
         </div>
 
-        {/* Grid display */}
+        {/* Grid display using Uiverse card structure */}
         {filteredTools.length === 0 ? (
-          <div className="py-20 text-center rounded-2xl border border-dashed border-neutral-200 bg-neutral-50/50">
-            <Layers className="w-10 h-10 text-neutral-300 mx-auto mb-3" />
-            <h3 className="text-base font-medium text-neutral-700">No tools found</h3>
-            <p className="text-xs text-neutral-400 mt-1 max-w-sm mx-auto">
-              We couldn't find any tools matching your criteria. Adjust search filters to view available tools.
+          <div className="py-20 text-center rounded-3xl border-2 border-dashed border-purple-900/20 bg-purple-950/5">
+            <Layers className="w-10 h-10 text-purple-400/60 mx-auto mb-3" />
+            <h3 className="text-base font-medium text-purple-950">No tools found</h3>
+            <p className="text-xs text-purple-900/60 mt-1 max-w-sm mx-auto">
+              We couldn't find any tools matching your search criteria. Try adjusting your query or filter category.
             </p>
           </div>
         ) : (
@@ -125,7 +125,7 @@ export default function ToolsGrid({ onSelectTool }: ToolsGridProps) {
 
                   <div className="absolute top-4 right-4 flex items-center gap-2 z-20">
                     {tool.badge && (
-                      <span className="bg-purple-900/80 border border-purple-300/30 text-purple-100 text-[10px] uppercase font-semibold tracking-wider px-2.5 py-0.5 rounded-full">
+                      <span className="bg-purple-950/80 border border-purple-300/30 text-purple-100 text-[10px] uppercase font-semibold tracking-wider px-2.5 py-0.5 rounded-full">
                         {tool.badge}
                       </span>
                     )}

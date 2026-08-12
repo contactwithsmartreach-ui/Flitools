@@ -10,23 +10,21 @@ interface NavbarProps {
   onSelectTool?: (tool: ToolItem) => void;
 }
 
-// Icon helper map
 const iconMap: Record<string, React.ReactNode> = {
-  Image: <Image className="w-3.5 h-3.5" />,
-  Film: <Film className="w-3.5 h-3.5" />,
-  Mic: <Mic className="w-3.5 h-3.5" />,
-  FileCode: <FileCode className="w-3.5 h-3.5" />,
-  Code: <Code className="w-3.5 h-3.5" />,
-  QrCode: <QrCode className="w-3.5 h-3.5" />,
-  FileText: <FileText className="w-3.5 h-3.5" />,
-  Shield: <Shield className="w-3.5 h-3.5" />,
+  Image: <Image className="w-3.5 h-3.5 text-purple-200" />,
+  Film: <Film className="w-3.5 h-3.5 text-purple-200" />,
+  Mic: <Mic className="w-3.5 h-3.5 text-purple-200" />,
+  FileCode: <FileCode className="w-3.5 h-3.5 text-purple-200" />,
+  Code: <Code className="w-3.5 h-3.5 text-purple-200" />,
+  QrCode: <QrCode className="w-3.5 h-3.5 text-purple-200" />,
+  FileText: <FileText className="w-3.5 h-3.5 text-purple-200" />,
+  Shield: <Shield className="w-3.5 h-3.5 text-purple-200" />,
 };
 
 export default function Navbar({ onMenuClick, onSelectTool }: NavbarProps) {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  // Close dropdown on outside click
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
@@ -56,28 +54,15 @@ export default function Navbar({ onMenuClick, onSelectTool }: NavbarProps) {
       {/* Left side items */}
       <div className="flex items-center gap-3 pointer-events-auto">
         {/* Logo */}
-        <a href="/" className="flex items-center gap-2.5 bg-white/90 backdrop-blur-md px-3 py-1.5 rounded-full border border-black/10 shadow-sm hover:bg-white transition-colors">
+        <a 
+          href="/" 
+          className="flex items-center gap-2.5 bg-gradient-to-br from-[#2a134a] via-[#4b1e85] to-[#1e0a38] text-white backdrop-blur-md px-3.5 py-1.5 rounded-full border border-purple-300/30 shadow-lg shadow-purple-900/30 hover:border-purple-300/60 transition-all group"
+        >
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" className="shrink-0">
-            <rect
-              x="5"
-              y="4"
-              width="6"
-              height="14"
-              rx="2.5"
-              fill="#000000"
-              transform="rotate(-35 8 11)"
-            />
-            <rect
-              x="12"
-              y="4"
-              width="6"
-              height="14"
-              rx="2.5"
-              fill="#000000"
-              transform="rotate(-35 15 11)"
-            />
+            <rect x="5" y="4" width="6" height="14" rx="2.5" fill="#e9d5ff" transform="rotate(-35 8 11)" />
+            <rect x="12" y="4" width="6" height="14" rx="2.5" fill="#c084fc" transform="rotate(-35 15 11)" />
           </svg>
-          <span className="font-semibold text-sm tracking-tight text-black hidden md:inline-block">
+          <span className="font-semibold text-sm tracking-tight text-white hidden md:inline-block">
             FliTools
           </span>
         </a>
@@ -86,13 +71,15 @@ export default function Navbar({ onMenuClick, onSelectTool }: NavbarProps) {
         <div className="relative" ref={dropdownRef}>
           <button
             onClick={() => setIsOpen(!isOpen)}
-            className="flex items-center gap-2 bg-black text-white rounded-full px-3.5 py-1.5 hover:bg-neutral-800 transition-all cursor-pointer shadow-md text-[11px] font-medium tracking-wide"
+            className="relative overflow-hidden flex items-center gap-2 text-white rounded-full px-4 py-1.5 transition-all cursor-pointer shadow-md text-[11px] font-medium tracking-wide border border-purple-300/30 bg-gradient-to-r from-purple-900/90 via-purple-700/80 to-purple-950/90 hover:border-purple-300/60 hover:shadow-purple-500/20 active:scale-95 group/btn"
           >
-            <div className="w-5 h-5 rounded-full bg-white text-black flex items-center justify-center shrink-0">
+            <div className="absolute inset-0 bg-gradient-to-r from-purple-600/40 via-fuchsia-500/40 to-purple-600/40 translate-x-[-100%] group-hover/btn:translate-x-[100%] transition-transform duration-700 pointer-events-none"></div>
+
+            <div className="w-5 h-5 rounded-full bg-purple-300/20 text-purple-200 flex items-center justify-center shrink-0 border border-purple-300/30">
               <Wrench className="w-3 h-3 stroke-[2.5]" />
             </div>
-            <span>Tools</span>
-            <ChevronDown className={`w-3 h-3 transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`} />
+            <span className="relative z-10">Tools</span>
+            <ChevronDown className={`w-3 h-3 text-purple-200 transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`} />
           </button>
 
           {/* Dropdown Menu */}
@@ -103,10 +90,10 @@ export default function Navbar({ onMenuClick, onSelectTool }: NavbarProps) {
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 exit={{ opacity: 0, y: 8, scale: 0.96 }}
                 transition={{ duration: 0.18, ease: "easeOut" }}
-                className="absolute left-0 mt-2 w-72 sm:w-80 bg-white/95 backdrop-blur-xl border border-neutral-200 shadow-2xl rounded-2xl p-2 z-50 text-black max-h-[80vh] overflow-y-auto"
+                className="absolute left-0 mt-2 w-72 sm:w-80 bg-gradient-to-br from-[rgba(45,15,85,0.98)] via-[rgba(75,30,133,0.95)] to-[rgba(25,8,50,0.98)] backdrop-blur-2xl border-2 border-[rgba(168,85,247,0.4)] shadow-2xl shadow-purple-950/80 rounded-2xl p-2.5 z-50 text-white max-h-[80vh] overflow-y-auto scrollbar-none"
               >
-                <div className="px-3 py-2 border-b border-neutral-100 flex items-center justify-between mb-1">
-                  <span className="text-[10px] uppercase font-bold tracking-wider text-neutral-400">
+                <div className="px-3 py-2 border-b border-purple-300/10 flex items-center justify-between mb-1">
+                  <span className="text-[10px] uppercase font-bold tracking-wider text-purple-200/60">
                     Tool Directory ({TOOLS_LIST.length})
                   </span>
                   <button
@@ -114,33 +101,33 @@ export default function Navbar({ onMenuClick, onSelectTool }: NavbarProps) {
                       setIsOpen(false);
                       onMenuClick?.();
                     }}
-                    className="text-[10px] font-medium text-black hover:underline"
+                    className="text-[10px] font-medium text-purple-300 hover:text-white underline"
                   >
                     View All
                   </button>
                 </div>
 
-                <div className="space-y-0.5">
+                <div className="space-y-1">
                   {TOOLS_LIST.map((tool) => (
                     <button
                       key={tool.id}
                       onClick={() => handleToolClick(tool)}
-                      className="w-full flex items-center justify-between gap-3 p-2 rounded-xl hover:bg-neutral-100 transition-colors text-left group"
+                      className="w-full flex items-center justify-between gap-3 p-2 rounded-xl hover:bg-purple-600/20 border border-transparent hover:border-purple-300/20 transition-all text-left group"
                     >
                       <div className="flex items-center gap-2.5 min-w-0">
-                        <div className="w-7 h-7 rounded-lg bg-neutral-100 group-hover:bg-black group-hover:text-white flex items-center justify-center text-neutral-700 transition-colors shrink-0">
-                          {iconMap[tool.iconName] || <Sparkles className="w-3.5 h-3.5" />}
+                        <div className="w-7 h-7 rounded-lg bg-purple-950/80 border border-purple-300/20 group-hover:bg-purple-600/40 flex items-center justify-center transition-colors shrink-0">
+                          {iconMap[tool.iconName] || <Sparkles className="w-3.5 h-3.5 text-purple-200" />}
                         </div>
                         <div className="min-w-0">
-                          <p className="text-xs font-medium text-neutral-900 group-hover:text-black truncate">
+                          <p className="text-xs font-medium text-white group-hover:text-purple-100 truncate">
                             {tool.title}
                           </p>
-                          <p className="text-[10px] text-neutral-400 truncate">
+                          <p className="text-[10px] text-purple-300/60 truncate">
                             {tool.category}
                           </p>
                         </div>
                       </div>
-                      <ExternalLink className="w-3 h-3 text-neutral-300 group-hover:text-neutral-700 transition-colors shrink-0" />
+                      <ExternalLink className="w-3 h-3 text-purple-400/50 group-hover:text-purple-200 transition-colors shrink-0" />
                     </button>
                   ))}
                 </div>
@@ -150,18 +137,17 @@ export default function Navbar({ onMenuClick, onSelectTool }: NavbarProps) {
         </div>
 
         {/* Tags pill */}
-        <div className="hidden md:flex items-center gap-3 bg-[#F4F4F6]/90 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-black/5 text-[11px] text-neutral-600 font-medium">
-          <span>Tool Directory</span>
-          <span className="w-1 h-1 rounded-full bg-neutral-400" />
+        <div className="hidden md:flex items-center gap-2.5 bg-purple-950/40 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-purple-300/20 text-[11px] text-purple-200 font-medium">
+          <span>Directory</span>
+          <span className="w-1.5 h-1.5 rounded-full bg-purple-400/80" />
           <span>Client-Side</span>
         </div>
       </div>
 
       {/* Right side items */}
       <div className="hidden md:flex items-center gap-2 pointer-events-auto">
-        <div className="flex items-center gap-2 bg-[#F4F4F6]/90 backdrop-blur-md pl-1.5 pr-3.5 py-1.5 rounded-full border border-black/5 text-[11px] font-medium text-neutral-800">
-          <div className="w-6 h-6 rounded-full bg-black flex items-center justify-center text-white shrink-0">
-            {/* 4-dot grid icon */}
+        <div className="flex items-center gap-2 bg-gradient-to-r from-purple-950/70 via-purple-900/50 to-purple-950/70 backdrop-blur-md pl-1.5 pr-3.5 py-1.5 rounded-full border border-purple-300/20 text-[11px] font-medium text-purple-200 shadow-sm">
+          <div className="w-6 h-6 rounded-full bg-purple-800/80 border border-purple-300/30 flex items-center justify-center text-white shrink-0">
             <svg width="10" height="10" viewBox="0 0 10 10" fill="currentColor">
               <circle cx="2" cy="2" r="1.2" />
               <circle cx="8" cy="2" r="1.2" />
