@@ -55,10 +55,6 @@ export default function ToolsGrid({ onSelectTool }: ToolsGridProps) {
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-purple-900/30 pb-8">
           <div>
-            <div className="inline-flex items-center gap-2 border border-purple-300/30 bg-purple-950/40 backdrop-blur-md px-3.5 py-1 rounded-full text-xs font-semibold text-purple-200 mb-3">
-              <span className="w-2 h-2 rounded-full bg-purple-400 animate-pulse" />
-              <span>Catalog ({TOOLS_LIST.length} Tools Available)</span>
-            </div>
             <h2 className="text-3xl md:text-4xl font-light tracking-tight text-white">
               Directory & Utilities
             </h2>
