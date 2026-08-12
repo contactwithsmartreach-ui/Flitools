@@ -102,16 +102,7 @@ export const TOOLS_LIST: ToolItem[] = [
     iconName: "Shield",
     category: "Utilities",
     badge: "Live Tool"
-  },
-  {
-    id: "sample-4",
-    title: "AI Prompt Enhancer",
-    description: "Transform concise ideas into rich, structured LLM prompts.",
-    path: "/tools/prompt-enhancer",
-    iconName: "Sparkles",
-    category: "AI Tools",
-    badge: "New"
   }
 ];
 
-export const CATEGORIES = ["All", "Media", "Documents", "Utilities", "Developer", "AI Tools"];
+export const CATEGORIES = ["All", "Media", "Documents", "Utilities", "Developer"];
