@@ -46,17 +46,17 @@ export default function Navbar({ onMenuClick, onSelectTool }: NavbarProps) {
 
   return (
     <motion.nav
-      initial={{ y: -12, opacity: 0 }}
+      initial={{ y: -16, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
-      transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-      className="fixed top-0 left-0 right-0 z-50 pointer-events-none p-4 md:px-8 md:py-6 flex items-center justify-between transform-gpu"
+      transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+      className="fixed top-0 left-0 right-0 z-50 pointer-events-none p-4 md:px-8 md:py-6 flex items-center justify-between"
     >
       {/* Left side items */}
       <div className="flex items-center gap-3 pointer-events-auto">
         {/* Logo */}
         <a 
           href="/" 
-          className="flex items-center gap-2.5 bg-gradient-to-br from-[#2a134a] via-[#4b1e85] to-[#1e0a38] text-white backdrop-blur-md px-3.5 py-1.5 rounded-full border border-purple-300/30 shadow-lg shadow-purple-900/30 hover:border-purple-300/60 transition-all group transform-gpu"
+          className="flex items-center gap-2.5 bg-gradient-to-br from-[#2a134a] via-[#4b1e85] to-[#1e0a38] text-white backdrop-blur-md px-3.5 py-1.5 rounded-full border border-purple-300/30 shadow-lg shadow-purple-900/30 hover:border-purple-300/60 transition-all group"
         >
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" className="shrink-0">
             <rect x="5" y="4" width="6" height="14" rx="2.5" fill="#e9d5ff" transform="rotate(-35 8 11)" />
@@ -71,7 +71,7 @@ export default function Navbar({ onMenuClick, onSelectTool }: NavbarProps) {
         <div className="relative" ref={dropdownRef}>
           <button
             onClick={() => setIsOpen(!isOpen)}
-            className="relative overflow-hidden flex items-center gap-2 text-white rounded-full px-4 py-1.5 transition-all cursor-pointer shadow-md text-[11px] font-medium tracking-wide border border-purple-300/30 bg-gradient-to-r from-purple-900/90 via-purple-700/80 to-purple-950/90 hover:border-purple-300/60 hover:shadow-purple-500/20 active:scale-95 group/btn transform-gpu"
+            className="relative overflow-hidden flex items-center gap-2 text-white rounded-full px-4 py-1.5 transition-all cursor-pointer shadow-md text-[11px] font-medium tracking-wide border border-purple-300/30 bg-gradient-to-r from-purple-900/90 via-purple-700/80 to-purple-950/90 hover:border-purple-300/60 hover:shadow-purple-500/20 active:scale-95 group/btn"
           >
             <div className="absolute inset-0 bg-gradient-to-r from-purple-600/40 via-fuchsia-500/40 to-purple-600/40 translate-x-[-100%] group-hover/btn:translate-x-[100%] transition-transform duration-700 pointer-events-none"></div>
 
@@ -86,11 +86,11 @@ export default function Navbar({ onMenuClick, onSelectTool }: NavbarProps) {
           <AnimatePresence>
             {isOpen && (
               <motion.div
-                initial={{ opacity: 0, y: 6, scale: 0.98 }}
+                initial={{ opacity: 0, y: 8, scale: 0.96 }}
                 animate={{ opacity: 1, y: 0, scale: 1 }}
-                exit={{ opacity: 0, y: 6, scale: 0.98 }}
-                transition={{ duration: 0.15, ease: "easeOut" }}
-                className="absolute left-0 mt-2 w-72 sm:w-80 bg-gradient-to-br from-[rgba(45,15,85,0.98)] via-[rgba(75,30,133,0.95)] to-[rgba(25,8,50,0.98)] backdrop-blur-2xl border-2 border-[rgba(168,85,247,0.4)] shadow-2xl shadow-purple-950/80 rounded-2xl p-2.5 z-50 text-white max-h-[80vh] overflow-y-auto scrollbar-none transform-gpu"
+                exit={{ opacity: 0, y: 8, scale: 0.96 }}
+                transition={{ duration: 0.18, ease: "easeOut" }}
+                className="absolute left-0 mt-2 w-72 sm:w-80 bg-gradient-to-br from-[rgba(45,15,85,0.98)] via-[rgba(75,30,133,0.95)] to-[rgba(25,8,50,0.98)] backdrop-blur-2xl border-2 border-[rgba(168,85,247,0.4)] shadow-2xl shadow-purple-950/80 rounded-2xl p-2.5 z-50 text-white max-h-[80vh] overflow-y-auto scrollbar-none"
               >
                 <div className="px-3 py-2 border-b border-purple-300/10 flex items-center justify-between mb-1">
                   <span className="text-[10px] uppercase font-bold tracking-wider text-purple-200/60">
@@ -112,7 +112,7 @@ export default function Navbar({ onMenuClick, onSelectTool }: NavbarProps) {
                     <button
                       key={tool.id}
                       onClick={() => handleToolClick(tool)}
-                      className="w-full flex items-center justify-between gap-3 p-2 rounded-xl hover:bg-purple-600/20 border border-transparent hover:border-purple-300/20 transition-all text-left group transform-gpu"
+                      className="w-full flex items-center justify-between gap-3 p-2 rounded-xl hover:bg-purple-600/20 border border-transparent hover:border-purple-300/20 transition-all text-left group"
                     >
                       <div className="flex items-center gap-2.5 min-w-0">
                         <div className="w-7 h-7 rounded-lg bg-purple-950/80 border border-purple-300/20 group-hover:bg-purple-600/40 flex items-center justify-center transition-colors shrink-0">
@@ -137,7 +137,7 @@ export default function Navbar({ onMenuClick, onSelectTool }: NavbarProps) {
         </div>
 
         {/* Tags pill */}
-        <div className="hidden md:flex items-center gap-2.5 bg-purple-950/40 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-purple-300/20 text-[11px] text-purple-200 font-medium transform-gpu">
+        <div className="hidden md:flex items-center gap-2.5 bg-purple-950/40 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-purple-300/20 text-[11px] text-purple-200 font-medium">
           <span>Directory</span>
           <span className="w-1.5 h-1.5 rounded-full bg-purple-400/80" />
           <span>Client-Side</span>
@@ -146,7 +146,7 @@ export default function Navbar({ onMenuClick, onSelectTool }: NavbarProps) {
 
       {/* Right side items */}
       <div className="hidden md:flex items-center gap-2 pointer-events-auto">
-        <div className="flex items-center gap-2 bg-gradient-to-r from-purple-950/70 via-purple-900/50 to-purple-950/70 backdrop-blur-md pl-1.5 pr-3.5 py-1.5 rounded-full border border-purple-300/20 text-[11px] font-medium text-purple-200 shadow-sm transform-gpu">
+        <div className="flex items-center gap-2 bg-gradient-to-r from-purple-950/70 via-purple-900/50 to-purple-950/70 backdrop-blur-md pl-1.5 pr-3.5 py-1.5 rounded-full border border-purple-300/20 text-[11px] font-medium text-purple-200 shadow-sm">
           <div className="w-6 h-6 rounded-full bg-purple-800/80 border border-purple-300/30 flex items-center justify-center text-white shrink-0">
             <svg width="10" height="10" viewBox="0 0 10 10" fill="currentColor">
               <circle cx="2" cy="2" r="1.2" />
