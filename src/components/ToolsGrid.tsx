@@ -9,7 +9,6 @@ import {
   Image as ImageIcon, 
   Sparkles, 
   Wrench, 
-  ExternalLink,
   ArrowRight,
   Layers,
   Film,
@@ -21,16 +20,16 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 
 const iconMap: Record<string, React.ReactNode> = {
-  FileText: <FileText className="w-5 h-5 text-neutral-800" />,
-  Code: <Code className="w-5 h-5 text-neutral-800" />,
-  FileCode: <FileCode className="w-5 h-5 text-neutral-800" />,
-  Image: <ImageIcon className="w-5 h-5 text-neutral-800" />,
-  Film: <Film className="w-5 h-5 text-neutral-800" />,
-  QrCode: <QrCode className="w-5 h-5 text-neutral-800" />,
-  Shield: <Shield className="w-5 h-5 text-neutral-800" />,
-  Mic: <Mic className="w-5 h-5 text-neutral-800" />,
-  Sparkles: <Sparkles className="w-5 h-5 text-neutral-800" />,
-  Wrench: <Wrench className="w-5 h-5 text-neutral-800" />
+  FileText: <FileText className="w-6 h-6 text-neutral-800" />,
+  Code: <Code className="w-6 h-6 text-neutral-800" />,
+  FileCode: <FileCode className="w-6 h-6 text-neutral-800" />,
+  Image: <ImageIcon className="w-6 h-6 text-neutral-800" />,
+  Film: <Film className="w-6 h-6 text-neutral-800" />,
+  QrCode: <QrCode className="w-6 h-6 text-neutral-800" />,
+  Shield: <Shield className="w-6 h-6 text-neutral-800" />,
+  Mic: <Mic className="w-6 h-6 text-neutral-800" />,
+  Sparkles: <Sparkles className="w-6 h-6 text-neutral-800" />,
+  Wrench: <Wrench className="w-6 h-6 text-neutral-800" />
 };
 
 interface ToolsGridProps {
@@ -102,13 +101,13 @@ export default function ToolsGrid({ onSelectTool }: ToolsGridProps) {
             <Layers className="w-10 h-10 text-neutral-300 mx-auto mb-3" />
             <h3 className="text-base font-medium text-neutral-700">No tools found</h3>
             <p className="text-xs text-neutral-400 mt-1 max-w-sm mx-auto">
-              We couldn't find any tools matching your criteria. Attach your HTML tool files or adjust search filters.
+              We couldn't find any tools matching your criteria. Adjust search filters.
             </p>
           </div>
         ) : (
           <motion.div 
             layout
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 justify-items-center"
           >
             <AnimatePresence>
               {filteredTools.map((tool) => (
@@ -120,35 +119,46 @@ export default function ToolsGrid({ onSelectTool }: ToolsGridProps) {
                   exit={{ opacity: 0, scale: 0.96 }}
                   transition={{ duration: 0.3 }}
                   onClick={() => onSelectTool?.(tool)}
-                  className="group relative bg-white rounded-2xl p-6 border border-neutral-200/80 hover:border-black/30 hover:shadow-xl transition-all duration-300 cursor-pointer flex flex-col justify-between"
+                  className="uiverse-card w-full max-w-[240px] h-[254px] cursor-pointer group hover:scale-[1.02] transition-transform duration-300 relative select-none"
                 >
-                  <div>
-                    <div className="flex items-start justify-between gap-3 mb-4">
-                      <div className="w-12 h-12 rounded-xl bg-neutral-100 flex items-center justify-center group-hover:bg-black group-hover:text-white transition-colors duration-300">
-                        {iconMap[tool.iconName] || <Wrench className="w-5 h-5 text-neutral-800 group-hover:text-white" />}
+                  <div className="uiverse-content">
+                    {/* Slide 1: Icon & Title */}
+                    <div className="uiverse-word">
+                      <div className="w-12 h-12 rounded-2xl bg-white/80 shadow-md flex items-center justify-center mb-3">
+                        {iconMap[tool.iconName] || <Wrench className="w-6 h-6 text-neutral-800" />}
                       </div>
+                      <h3 className="text-lg font-bold text-[#222] tracking-tight leading-snug line-clamp-2 drop-shadow-sm">
+                        {tool.title}
+                      </h3>
+                      <span className="text-[11px] font-semibold text-neutral-600 mt-2 bg-white/60 px-2.5 py-0.5 rounded-full border border-black/5">
+                        {tool.category}
+                      </span>
+                    </div>
+
+                    {/* Slide 2: Description & Badge */}
+                    <div className="uiverse-word">
                       {tool.badge && (
-                        <span className="bg-neutral-900 text-white text-[10px] uppercase font-semibold tracking-wider px-2.5 py-0.5 rounded-full">
+                        <span className="mb-2 bg-black text-white text-[9px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full">
                           {tool.badge}
                         </span>
                       )}
+                      <p className="text-xs font-medium text-neutral-800 leading-relaxed line-clamp-4 px-1 drop-shadow-xs">
+                        {tool.description}
+                      </p>
                     </div>
 
-                    <h3 className="text-lg font-medium text-neutral-900 group-hover:text-black mb-1.5 flex items-center gap-2">
-                      {tool.title}
-                    </h3>
-                    <p className="text-xs text-neutral-500 line-clamp-2 leading-relaxed">
-                      {tool.description}
-                    </p>
-                  </div>
-
-                  <div className="mt-6 pt-4 border-t border-neutral-100 flex items-center justify-between text-xs text-neutral-600 font-medium">
-                    <span className="bg-neutral-100 px-2.5 py-1 rounded-md text-[11px] font-normal text-neutral-600">
-                      {tool.category}
-                    </span>
-                    <span className="flex items-center gap-1 group-hover:translate-x-1 transition-transform duration-200 text-black font-semibold">
-                      Open Tool <ArrowRight className="w-3.5 h-3.5" />
-                    </span>
+                    {/* Slide 3: Action */}
+                    <div className="uiverse-word">
+                      <div className="w-12 h-12 rounded-full bg-black text-white flex items-center justify-center mb-2 shadow-lg group-hover:scale-110 transition-transform">
+                        <ArrowRight className="w-5 h-5" />
+                      </div>
+                      <span className="text-sm font-bold text-black">
+                        Open Tool
+                      </span>
+                      <span className="text-[10px] text-neutral-600 mt-1">
+                        Run in Browser
+                      </span>
+                    </div>
                   </div>
                 </motion.div>
               ))}
