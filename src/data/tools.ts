@@ -1,4 +1,4 @@
-import { LucideIcon, Wrench, Code, FileText, Image, Zap, Cpu, Sparkles, Layers } from "lucide-react";
+import { LucideIcon, Wrench, Code, FileText, Image, Zap, Cpu, Sparkles, Layers, Film } from "lucide-react";
 
 export interface ToolItem {
   id: string;
@@ -9,10 +9,20 @@ export interface ToolItem {
   category: string;
   badge?: string;
   isExternal?: boolean;
+  htmlPath?: string;
 }
 
-// Structured tools list - ready for adding new HTML/page tools
 export const TOOLS_LIST: ToolItem[] = [
+  {
+    id: "img-to-gif",
+    title: "Image to GIF Converter",
+    description: "Convert sequence of images into animated GIFs directly in your browser.",
+    path: "/tools/img-to-gif.html",
+    htmlPath: "/tools/img-to-gif.html",
+    iconName: "Image",
+    category: "Media",
+    badge: "Live Tool"
+  },
   {
     id: "sample-1",
     title: "PDF Converter & Merger",
@@ -50,4 +60,4 @@ export const TOOLS_LIST: ToolItem[] = [
   }
 ];
 
-export const CATEGORIES = ["All", "Developer", "Documents", "Media", "AI Tools", "Utilities"];
+export const CATEGORIES = ["All", "Media", "Developer", "Documents", "AI Tools", "Utilities"];

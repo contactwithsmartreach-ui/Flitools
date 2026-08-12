@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GIF Studio — Make Animated GIFs Locally</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<!-- GIF encoding is done with the open-source "gifenc" library (github.com/mattdesl/gifenc),
+     loaded dynamically via ESM import at generate-time. It runs synchronously on the main
+     thread (no Web Worker), which avoids cross-origin worker restrictions when this page
+     is opened directly from disk (file://). -->
+<style>
+  :root{
+    --ease: cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  *{ font-family: 'Inter', sans-serif; }
+  body{ background:#fff; color:#000; }
+
+  /* ---------- entrance choreography ---------- */
+  @keyframes fadeSlideDown{
+    from{ opacity:0; transform: translateY(-16px); }
+    to{ opacity:1; transform: translateY(0); }
+  }
+  @keyframes fadeSlideUp{
+    from{ opacity:0; transform: translateY(20px); }
+    to{ opacity:1; transform: translateY(0); }
+  }
+  @keyframes fadeScaleIn{
+    from{ opacity:0; transform: scale(1.05); }
+    to{ opacity:1; transform: scale(1); }
+  }
+  .anim-navbar{ animation: fadeSlideDown 0.8s var(--ease) both; }
+  .anim-bg{ animation: fadeScaleIn 1.8s var(--ease) both; }
+  .anim-footer{ animation: fadeSlideUp 1s var(--ease) both; animation-delay: .5s; }
+  .anim-subtitle{ animation: fadeSlideUp .8s var(--ease) both; animation-delay: .6s; }
+  .anim-heading{ animation: fadeSlideUp .8s var(--ease) both; animation-delay: .8s; }
+  .anim-buttons{ animation: fadeSlideUp .8s var(--ease) both; animation-delay: 1s; }
+
+  .hero-heading{
+    font-weight:300;
+    letter-spacing:-0.03em;
+    line-height:1;
+    font-size: clamp(2rem, 8vw, 4.5rem);
+  }
+  @media (min-width:768px){
+    .hero-heading{ font-size: clamp(2.5rem, 5.5vw, 4.5rem); }
+  }
+
+  .hero-gradient-bg{
+    background:
+      radial-gradient(circle at 20% 20%, rgba(0,0,0,0.06), transparent 45%),
+      radial-gradient(circle at 80% 30%, rgba(0,0,0,0.04), transparent 50%),
+      linear-gradient(135deg, #fafafa 0%, #f0f0f2 100%);
+  }
+  .hero-fade{
+    background: linear-gradient(to top, #ffffff 0%, rgba(255,255,255,0.85) 55%, transparent 100%);
+  }
+
+  .drop-zone{ transition: border-color .2s ease, background-color .2s ease; }
+  .drop-zone.dragover{ border-color:#000; background-color:#f7f7f7; }
+
+  .thumb{ position:relative; }
+  .thumb button{
+    position:absolute; top:4px; right:4px;
+    width:20px; height:20px; border-radius:9999px;
+    background:rgba(0,0,0,0.75); color:#fff; font-size:12px;
+    display:flex; align-items:center; justify-content:center; line-height:1;
+  }
+
+  input[type=range]{ accent-color:#000; }
+
+  ::-webkit-scrollbar{ width:8px; }
+  ::-webkit-scrollbar-thumb{ background:#ddd; border-radius:9999px; }
+</style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+<!-- ============ HERO ============ -->
+<section class="relative w-full min-h-screen flex flex-col justify-between overflow-hidden">
+
+  <!-- background -->
+  <div class="anim-bg absolute inset-0 z-0 hero-gradient-bg"></div>
+
+  <!-- navbar -->
+  <nav class="anim-navbar relative z-50 flex items-center justify-between px-4 py-4 md:px-8 md:py-6" style="pointer-events:none;">
+    <div class="flex items-center gap-3 md:gap-5" style="pointer-events:auto;">
+      <!-- logo -->
+      <div class="flex items-center gap-2">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+          <rect x="2" y="8" width="12" height="8" rx="2" transform="rotate(-35 8 12)" fill="black"/>
+          <rect x="10" y="8" width="12" height="8" rx="2" transform="rotate(-35 16 12)" fill="black"/>
+        </svg>
+        <span class="hidden md:inline text-sm font-medium tracking-tight">GIF Studio</span>
+      </div>
+
+      <!-- tags pill -->
+      <div class="hidden md:flex items-center gap-3 rounded-full px-4 py-2" style="background:#F4F4F6;">
+        <span class="text-[11px] text-black/70">In-Browser</span>
+        <span class="text-[11px] text-black/70">No Uploads</span>
+      </div>
+    </div>
+
+    <div class="hidden md:flex items-center gap-3" style="pointer-events:auto;">
+      <div class="flex items-center gap-2 rounded-full pl-2 pr-4 py-1.5" style="background:#F4F4F6;">
+        <span class="flex items-center justify-center bg-black rounded-full" style="width:28px;height:28px;">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="white">
+            <rect x="2" y="2" width="7" height="7" rx="1.5"/><rect x="15" y="2" width="7" height="7" rx="1.5"/>
+            <rect x="2" y="15" width="7" height="7" rx="1.5"/><rect x="15" y="15" width="7" height="7" rx="1.5"/>
+          </svg>
+        </span>
+        <span class="text-[11px] text-black/70">100% Client-Side</span>
+      </div>
+    </div>
+  </nav>
+
+  <!-- footer content -->
+  <div class="anim-footer relative z-30 hero-fade px-4 pb-8 pt-24 md:px-8 md:pb-10">
+    <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-8">
+      <div>
+        <div class="anim-subtitle flex items-center gap-2 mb-4">
+          <span class="rounded-full bg-black" style="width:8px;height:8px;"></span>
+          <span class="text-[13px]" style="color:rgba(0,0,0,0.55);">Turn images into animated GIFs, right here</span>
+        </div>
+        <h1 class="anim-heading hero-heading mb-6">
+          Images In,<br/>Zero Uploads.<br/>GIFs Out.
+        </h1>
+        <div class="anim-buttons flex items-center gap-3">
+          <a href="#how-it-works" class="bg-black text-white text-[13px] rounded-full px-5 py-2.5">How It Works</a>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-2 md:justify-end flex-wrap">
+        <span class="text-[11px] rounded-full px-3 py-1.5 bg-white border" style="border-color:rgba(0,0,0,0.12);">Drag &amp; Drop</span>
+        <span class="text-[11px] rounded-full px-3 py-1.5 bg-white border" style="border-color:rgba(0,0,0,0.12);">Frame Control</span>
+        <span class="text-[11px] rounded-full px-3 py-1.5 bg-white border" style="border-color:rgba(0,0,0,0.12);">Instant Download</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ TOOL ============ -->
+<section id="tool" class="w-full max-w-6xl mx-auto px-4 md:px-8 py-16">
+
+  <div class="mb-10">
+    <h2 class="text-2xl md:text-3xl font-light tracking-tight mb-2">Build your GIF</h2>
+    <p class="text-sm text-black/50">Upload a series of images, tune the timing and size, preview it live, then download — nothing ever leaves your browser.</p>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
+
+    <!-- LEFT: upload + adjustments -->
+    <div class="flex flex-col gap-8">
+
+      <!-- upload zone -->
+      <div>
+        <h3 class="text-sm font-medium mb-3">1. Upload images</h3>
+        <div id="dropZone" class="drop-zone border-2 border-dashed border-black/20 rounded-2xl flex flex-col items-center justify-center text-center py-14 px-6 cursor-pointer">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="1.5" class="mb-3 opacity-60">
+            <path d="M12 16V4M12 4l-4 4M12 4l4 4" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <p class="text-sm font-medium">Drag &amp; drop images, or click to browse</p>
+          <p class="text-xs text-black/40 mt-1">Upload 2+ DIFFERENT images — each one becomes one animation frame, in upload order</p>
+          <input id="fileInput" type="file" accept="image/*" multiple class="hidden">
+        </div>
+
+        <div id="thumbGrid" class="grid grid-cols-4 sm:grid-cols-5 gap-2 mt-4"></div>
+        <p id="frameCount" class="text-xs text-black/40 mt-2">0 frames loaded</p>
+      </div>
+
+      <!-- adjustments -->
+      <div>
+        <h3 class="text-sm font-medium mb-3">2. Adjust</h3>
+        <div class="border border-black/10 rounded-2xl p-5 flex flex-col gap-5">
+
+          <div>
+            <div class="flex items-center justify-between mb-1">
+              <label class="text-xs text-black/60">Frame delay</label>
+              <span id="delayValue" class="text-xs font-medium">200 ms</span>
+            </div>
+            <input id="delayRange" type="range" min="20" max="1000" step="10" value="200" class="w-full">
+          </div>
+
+          <div>
+            <div class="flex items-center justify-between mb-1">
+              <label class="text-xs text-black/60">Output width</label>
+              <span id="widthValue" class="text-xs font-medium">400 px</span>
+            </div>
+            <input id="widthRange" type="range" min="80" max="1000" step="10" value="400" class="w-full">
+          </div>
+
+          <div class="flex items-center justify-between">
+            <label class="text-xs text-black/60">Loop forever</label>
+            <input id="loopCheckbox" type="checkbox" checked class="accent-black w-4 h-4">
+          </div>
+
+          <div>
+            <div class="flex items-center justify-between mb-1">
+              <label class="text-xs text-black/60">Quality (1 best – 20 fastest)</label>
+              <span id="qualityValue" class="text-xs font-medium">10</span>
+            </div>
+            <input id="qualityRange" type="range" min="1" max="20" step="1" value="10" class="w-full">
+          </div>
+
+          <button id="generateBtn" class="bg-black text-white text-[13px] rounded-full px-5 py-2.5 disabled:opacity-30 disabled:cursor-not-allowed" disabled>
+            Generate GIF
+          </button>
+          <div id="progressWrap" class="hidden">
+            <div class="w-full h-1.5 bg-black/10 rounded-full overflow-hidden">
+              <div id="progressBar" class="h-full bg-black" style="width:0%;"></div>
+            </div>
+            <p id="progressLabel" class="text-xs text-black/40 mt-1">Encoding…</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: preview + download -->
+    <div class="flex flex-col gap-8">
+      <div>
+        <h3 class="text-sm font-medium mb-3">3. Preview</h3>
+        <div class="border border-black/10 rounded-2xl aspect-square flex items-center justify-center bg-black/[0.02] overflow-hidden">
+          <img id="previewImg" class="max-w-full max-h-full hidden" alt="GIF preview">
+          <span id="previewPlaceholder" class="text-xs text-black/30">Your GIF will appear here</span>
+        </div>
+      </div>
+
+      <div>
+        <h3 class="text-sm font-medium mb-3">4. Download</h3>
+        <div class="border border-black/10 rounded-2xl p-5 flex flex-col gap-3">
+          <a id="downloadBtn" download="animation.gif" class="pointer-events-none opacity-30 bg-black text-white text-[13px] rounded-full px-5 py-2.5 text-center">
+            Download GIF
+          </a>
+          <p class="text-xs text-black/40">Everything is encoded locally with an open-source JavaScript library (gifenc) running on the main thread — no images are ever uploaded anywhere.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ HOW IT WORKS ============ -->
+<section id="how-it-works" class="w-full bg-black/[0.02] border-t border-black/10">
+  <div class="max-w-6xl mx-auto px-4 md:px-8 py-16">
+    <div class="mb-10">
+      <h2 class="text-2xl md:text-3xl font-light tracking-tight mb-2">How it works</h2>
+      <p class="text-sm text-black/50 max-w-2xl">GIF Studio turns a series of still images into one looping animated GIF, entirely inside your browser. No files are ever sent to a server — everything below happens on your own device.</p>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div>
+        <div class="flex items-center justify-center rounded-full bg-black text-white text-sm font-medium mb-4" style="width:32px;height:32px;">1</div>
+        <h3 class="text-sm font-medium mb-2">Upload your images</h3>
+        <p class="text-xs text-black/50 leading-relaxed">Drag and drop, or click to browse, 2 or more images. Each image becomes one animation frame, and the order you upload them in is the order they'll play back.</p>
+      </div>
+      <div>
+        <div class="flex items-center justify-center rounded-full bg-black text-white text-sm font-medium mb-4" style="width:32px;height:32px;">2</div>
+        <h3 class="text-sm font-medium mb-2">Adjust the timing &amp; size</h3>
+        <p class="text-xs text-black/50 leading-relaxed">Set the frame delay to control playback speed, choose the output width (height scales automatically), pick whether it loops forever, and balance quality against file size.</p>
+      </div>
+      <div>
+        <div class="flex items-center justify-center rounded-full bg-black text-white text-sm font-medium mb-4" style="width:32px;height:32px;">3</div>
+        <h3 class="text-sm font-medium mb-2">Generate &amp; preview</h3>
+        <p class="text-xs text-black/50 leading-relaxed">Hit "Generate GIF" and your browser encodes every frame locally using an open-source GIF encoder — no upload, no waiting on a server. The finished animation plays instantly in the preview panel.</p>
+      </div>
+      <div>
+        <div class="flex items-center justify-center rounded-full bg-black text-white text-sm font-medium mb-4" style="width:32px;height:32px;">4</div>
+        <h3 class="text-sm font-medium mb-2">Download</h3>
+        <p class="text-xs text-black/50 leading-relaxed">Once it's ready, the Download button saves the finished .gif straight to your device. Your original images and the final file never leave your computer.</p>
+      </div>
+    </div>
+
+    <div class="mt-10">
+      <a href="#tool" class="bg-black text-white text-[13px] rounded-full px-5 py-2.5 inline-block">Get Started</a>
+    </div>
+  </div>
+</section>
+
+<footer class="text-center text-xs text-black/30 py-8">
+  Built entirely client-side — your images never leave this browser.
+</footer>
+
+<script>
+(function(){
+  const dropZone = document.getElementById('dropZone');
+  const fileInput = document.getElementById('fileInput');
+  const thumbGrid = document.getElementById('thumbGrid');
+  const frameCount = document.getElementById('frameCount');
+  const delayRange = document.getElementById('delayRange');
+  const delayValue = document.getElementById('delayValue');
+  const widthRange = document.getElementById('widthRange');
+  const widthValue = document.getElementById('widthValue');
+  const qualityRange = document.getElementById('qualityRange');
+  const qualityValue = document.getElementById('qualityValue');
+  const loopCheckbox = document.getElementById('loopCheckbox');
+  const generateBtn = document.getElementById('generateBtn');
+  const progressWrap = document.getElementById('progressWrap');
+  const progressBar = document.getElementById('progressBar');
+  const progressLabel = document.getElementById('progressLabel');
+  const previewImg = document.getElementById('previewImg');
+  const previewPlaceholder = document.getElementById('previewPlaceholder');
+  const downloadBtn = document.getElementById('downloadBtn');
+
+  let images = []; // { file, url, img (HTMLImageElement) }
+
+  function updateFrameCount(){
+    frameCount.textContent = images.length + ' frame' + (images.length===1?'':'s') + ' loaded'
+      + (images.length === 1 ? ' — upload at least one more DIFFERENT image to animate' : '');
+    generateBtn.disabled = images.length < 2;
+  }
+
+  function renderThumbs(){
+    thumbGrid.innerHTML = '';
+    images.forEach((item, idx) => {
+      const wrap = document.createElement('div');
+      wrap.className = 'thumb rounded-lg overflow-hidden border border-black/10 aspect-square';
+      const img = document.createElement('img');
+      img.src = item.url;
+      img.className = 'w-full h-full object-cover';
+      const btn = document.createElement('button');
+      btn.textContent = '×';
+      btn.onclick = () => { images.splice(idx,1); renderThumbs(); updateFrameCount(); };
+      wrap.appendChild(img);
+      wrap.appendChild(btn);
+      thumbGrid.appendChild(wrap);
+    });
+    updateFrameCount();
+  }
+
+  function addFiles(fileList){
+    const files = Array.from(fileList).filter(f => f.type.startsWith('image/'));
+    files.forEach(file => {
+      const url = URL.createObjectURL(file);
+      const img = new Image();
+      img.src = url;
+      images.push({ file, url, img });
+    });
+    renderThumbs();
+  }
+
+  dropZone.addEventListener('click', () => fileInput.click());
+  fileInput.addEventListener('change', e => addFiles(e.target.files));
+
+  ['dragenter','dragover'].forEach(evt => {
+    dropZone.addEventListener(evt, e => { e.preventDefault(); dropZone.classList.add('dragover'); });
+  });
+  ['dragleave','drop'].forEach(evt => {
+    dropZone.addEventListener(evt, e => { e.preventDefault(); dropZone.classList.remove('dragover'); });
+  });
+  dropZone.addEventListener('drop', e => {
+    if (e.dataTransfer.files) addFiles(e.dataTransfer.files);
+  });
+
+  delayRange.addEventListener('input', () => delayValue.textContent = delayRange.value + ' ms');
+  widthRange.addEventListener('input', () => widthValue.textContent = widthRange.value + ' px');
+  qualityRange.addEventListener('input', () => qualityValue.textContent = qualityRange.value);
+
+  generateBtn.addEventListener('click', async () => {
+    if (images.length < 2) {
+      alert('Please upload at least 2 different images. A GIF animates BETWEEN frames, so one image (or the same image uploaded twice) will always look static.');
+      return;
+    }
+
+    generateBtn.disabled = true;
+    progressWrap.classList.remove('hidden');
+    progressBar.style.width = '0%';
+    progressLabel.textContent = 'Loading frames…';
+    downloadBtn.classList.add('pointer-events-none', 'opacity-30');
+
+    try {
+      // wait for all images to finish loading
+      await Promise.all(images.map(item => new Promise(res => {
+        if (item.img.complete) res();
+        else item.img.onload = () => res();
+      })));
+
+      const targetWidth = parseInt(widthRange.value, 10);
+      const firstImg = images[0].img;
+      const aspect = firstImg.naturalHeight / firstImg.naturalWidth;
+      const targetHeight = Math.round(targetWidth * aspect);
+
+      progressLabel.textContent = 'Loading encoder…';
+      const { GIFEncoder, quantize, applyPalette } = await import('https://unpkg.com/gifenc@1.0.3/dist/gifenc.esm.js');
+
+      const delay = parseInt(delayRange.value, 10);
+      // map quality slider (1 best .. 20 fastest) to a palette color format
+      const q = parseInt(qualityRange.value, 10);
+      const format = q <= 7 ? 'rgb565' : (q <= 14 ? 'rgb444' : 'rgba4444');
+
+      const gif = GIFEncoder();
+      let firstFrameData = null;
+      let allIdentical = true;
+
+      progressLabel.textContent = 'Encoding…';
+      for (let i = 0; i < images.length; i++) {
+        const item = images[i];
+
+        // each frame gets its own fresh canvas so pixel data can't be
+        // accidentally shared/overwritten between frames
+        const frameCanvas = document.createElement('canvas');
+        frameCanvas.width = targetWidth;
+        frameCanvas.height = targetHeight;
+        const fctx = frameCanvas.getContext('2d');
+        fctx.drawImage(item.img, 0, 0, targetWidth, targetHeight);
+
+        const { data } = fctx.getImageData(0, 0, targetWidth, targetHeight);
+
+        // cheap identical-frame detector: sample every 251st byte
+        let sample = '';
+        for (let s = 0; s < data.length; s += 251) sample += data[s];
+        if (i === 0) firstFrameData = sample;
+        else if (sample !== firstFrameData) allIdentical = false;
+
+        const palette = quantize(data, 256, { format });
+        const index = applyPalette(data, palette, format);
+
+        const frameOpts = { palette, delay };
+        if (i === 0) frameOpts.repeat = loopCheckbox.checked ? 0 : -1;
+
+        gif.writeFrame(index, targetWidth, targetHeight, frameOpts);
+
+        progressBar.style.width = Math.round(((i + 1) / images.length) * 100) + '%';
+        progressLabel.textContent = 'Encoding… ' + (i + 1) + ' / ' + images.length + ' frames';
+
+        // yield to the browser so the progress bar actually repaints
+        await new Promise(r => setTimeout(r, 0));
+      }
+
+      gif.finish();
+      const bytes = gif.bytes();
+      const blob = new Blob([bytes], { type: 'image/gif' });
+      const url = URL.createObjectURL(blob);
+
+      previewImg.src = url;
+      previewImg.classList.remove('hidden');
+      previewPlaceholder.classList.add('hidden');
+      downloadBtn.href = url;
+      downloadBtn.classList.remove('pointer-events-none', 'opacity-30');
+
+      if (allIdentical) {
+        progressLabel.textContent = '⚠ All ' + images.length + ' uploaded images look identical, so the GIF has ' + images.length + ' frames but appears static. Upload genuinely different images to see motion.';
+      } else {
+        progressLabel.textContent = 'Done! ' + images.length + ' distinct frames, ' + Math.round(blob.size / 1024) + ' KB.';
+      }
+      generateBtn.disabled = false;
+    } catch (err) {
+      console.error(err);
+      progressLabel.textContent = 'Error: ' + err.message;
+      generateBtn.disabled = false;
+    }
+  });
+})();
+</script>
+
+</body>
+</html>
