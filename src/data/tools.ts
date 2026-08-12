@@ -1,4 +1,4 @@
-import { LucideIcon, Wrench, Code, FileText, Image, Zap, Cpu, Sparkles, Layers, Film, QrCode } from "lucide-react";
+import { LucideIcon, Wrench, Code, FileText, Image, Zap, Cpu, Sparkles, Layers, Film, QrCode, Shield } from "lucide-react";
 
 export interface ToolItem {
   id: string;
@@ -61,6 +61,16 @@ export const TOOLS_LIST: ToolItem[] = [
     htmlPath: "/tools/pdf-merger-splitter.html",
     iconName: "FileText",
     category: "Documents",
+    badge: "Live Tool"
+  },
+  {
+    id: "password-generator",
+    title: "Password Generator",
+    description: "Generate strong, secure passwords and passphrase combinations with instant entropy rating.",
+    path: "/tools/password-generator.html",
+    htmlPath: "/tools/password-generator.html",
+    iconName: "Shield",
+    category: "Utilities",
     badge: "Live Tool"
   },
   {
