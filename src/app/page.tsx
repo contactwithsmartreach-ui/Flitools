@@ -30,7 +30,7 @@ export default function Home() {
       {/* Hero Section Container (Full Viewport) */}
       <section className="relative min-h-screen w-full flex flex-col justify-between pt-24 pb-8 px-4 md:px-12 z-10 overflow-hidden">
         
-        {/* Absolutely positioned full-screen background video with dark overlay */}
+        {/* Absolutely positioned full-screen background video with smooth edge fading */}
         <motion.div
           initial={{ opacity: 0, scale: 1.05 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -38,16 +38,23 @@ export default function Home() {
           className="absolute inset-0 z-0 flex items-center justify-center pointer-events-none"
         >
           {/* Video Wrapper */}
-          <div className="w-[80%] h-[80%] md:w-full md:h-full relative overflow-hidden md:rounded-none rounded-3xl">
+          <div className="w-full h-full relative overflow-hidden">
             <video
               src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260508_215831_c6a8989c-d716-4d8d-8745-e972a2eec711.mp4"
               autoPlay
               muted
               loop
               playsInline
-              className="w-full h-full object-cover opacity-60"
+              className="w-full h-full object-cover opacity-50"
             />
-            <div className="absolute inset-0 bg-gradient-to-b from-[#080314]/70 via-transparent to-[#080314]" />
+            {/* Left and Right Side Fading */}
+            <div className="absolute inset-0 bg-gradient-to-r from-[#080314] via-transparent via-30% via-70% to-[#080314] pointer-events-none" />
+            
+            {/* Top and Bottom Fading */}
+            <div className="absolute inset-0 bg-gradient-to-b from-[#080314]/80 via-transparent via-40% to-[#080314] pointer-events-none" />
+            
+            {/* Radial Vignette to soften all corner edges */}
+            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_20%,#080314_85%)] pointer-events-none" />
           </div>
         </motion.div>
 
