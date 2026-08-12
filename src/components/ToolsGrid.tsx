@@ -68,7 +68,7 @@ export default function ToolsGrid({ onSelectTool }: ToolsGridProps) {
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search tools..."
-              className="w-full bg-purple-950/40 border border-purple-300/20 rounded-full pl-10 pr-4 py-2.5 text-xs text-purple-100 placeholder-purple-300/40 focus:outline-none focus:ring-2 focus:ring-purple-500/40 focus:border-purple-400 transition-all"
+              className="w-full bg-purple-950/40 border border-purple-300/20 rounded-full pl-10 pr-4 py-2.5 text-xs text-purple-100 placeholder-purple-300/40 focus:outline-none focus:ring-2 focus:ring-purple-500/40 focus:border-purple-400 transition-all transform-gpu"
             />
           </div>
         </div>
@@ -79,7 +79,7 @@ export default function ToolsGrid({ onSelectTool }: ToolsGridProps) {
             <button
               key={cat}
               onClick={() => setSelectedCategory(cat)}
-              className={`px-4 py-2 rounded-full text-xs font-medium transition-all whitespace-nowrap cursor-pointer border ${
+              className={`px-4 py-2 rounded-full text-xs font-medium transition-all whitespace-nowrap cursor-pointer border transform-gpu ${
                 selectedCategory === cat
                   ? "border-[rgba(75,30,133,0.8)] bg-gradient-to-r from-[rgba(75,30,133,1)] via-purple-700 to-[rgba(75,30,133,0.9)] text-white shadow-md shadow-purple-950/50"
                   : "border-purple-300/20 bg-purple-950/30 text-purple-200 hover:bg-purple-900/30"
@@ -100,24 +100,20 @@ export default function ToolsGrid({ onSelectTool }: ToolsGridProps) {
             </p>
           </div>
         ) : (
-          <motion.div 
-            layout
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
-          >
-            <AnimatePresence>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <AnimatePresence mode="popLayout">
               {filteredTools.map((tool) => (
                 <motion.div
                   key={tool.id}
-                  layout
+                  layout="position"
                   initial={{ opacity: 0, scale: 0.96 }}
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.96 }}
-                  transition={{ duration: 0.3 }}
+                  transition={{ duration: 0.2 }}
                   onClick={() => onSelectTool?.(tool)}
-                  className="relative min-h-[19em] w-full border-2 border-[rgba(75,30,133,0.5)] rounded-[1.5em] bg-gradient-to-br from-[rgba(75,30,133,1)] via-purple-700/80 to-[rgba(75,30,133,0.2)] text-white p-[1.5em] flex justify-between flex-col gap-[1em] backdrop-blur-[12px] hover:shadow-2xl hover:shadow-purple-500/30 transition-all duration-500 group/card hover:-translate-y-1 cursor-pointer overflow-hidden"
+                  className="relative min-h-[19em] w-full border-2 border-[rgba(75,30,133,0.5)] rounded-[1.5em] bg-gradient-to-br from-[rgba(75,30,133,1)] via-purple-700/80 to-[rgba(75,30,133,0.2)] text-white p-[1.5em] flex justify-between flex-col gap-[1em] backdrop-blur-[12px] hover:shadow-2xl hover:shadow-purple-500/30 transition-all duration-300 group/card hover:-translate-y-1 cursor-pointer overflow-hidden transform-gpu"
                 >
-                  <div className="absolute inset-0 bg-gradient-to-br from-purple-600/30 via-fuchsia-500/20 to-transparent opacity-0 group-hover/card:opacity-100 transition-opacity duration-500 rounded-[1.5em] pointer-events-none"></div>
-                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(120,50,190,0.1),transparent_60%)] group-hover/card:animate-pulse pointer-events-none"></div>
+                  <div className="absolute inset-0 bg-gradient-to-br from-purple-600/30 via-fuchsia-500/20 to-transparent opacity-0 group-hover/card:opacity-100 transition-opacity duration-300 rounded-[1.5em] pointer-events-none"></div>
 
                   <div className="absolute top-4 right-4 flex items-center gap-2 z-20">
                     {tool.badge && (
@@ -153,7 +149,7 @@ export default function ToolsGrid({ onSelectTool }: ToolsGridProps) {
 
                   <div className="relative z-10 pt-2">
                     <button
-                      className="relative h-fit w-fit px-[1.4em] py-[0.7em] border-[1px] border-purple-300/30 rounded-full flex justify-center items-center gap-[0.7em] overflow-hidden group/btn hover:border-purple-300/50 hover:shadow-lg hover:shadow-purple-500/20 active:scale-95 transition-all duration-300 backdrop-blur-[12px] bg-purple-500/10 text-white cursor-pointer"
+                      className="relative h-fit w-fit px-[1.4em] py-[0.7em] border-[1px] border-purple-300/30 rounded-full flex justify-center items-center gap-[0.7em] overflow-hidden group/btn hover:border-purple-300/50 hover:shadow-lg hover:shadow-purple-500/20 active:scale-95 transition-all duration-300 backdrop-blur-[12px] bg-purple-500/10 text-white cursor-pointer transform-gpu"
                     >
                       <div className="absolute inset-0 bg-gradient-to-r from-purple-600/40 via-fuchsia-500/40 to-purple-600/40 translate-x-[-100%] group-hover/btn:translate-x-[100%] transition-transform duration-700"></div>
 
@@ -175,11 +171,11 @@ export default function ToolsGrid({ onSelectTool }: ToolsGridProps) {
                     </button>
                   </div>
 
-                  <div className="absolute bottom-4 left-4 w-8 h-8 rounded-full bg-gradient-to-br from-purple-400/20 to-transparent blur-sm group-hover/card:animate-pulse pointer-events-none"></div>
+                  <div className="absolute bottom-4 left-4 w-8 h-8 rounded-full bg-gradient-to-br from-purple-400/20 to-transparent blur-sm pointer-events-none"></div>
                 </motion.div>
               ))}
             </AnimatePresence>
-          </motion.div>
+          </div>
         )}
       </div>
     </section>

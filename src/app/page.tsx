@@ -30,12 +30,12 @@ export default function Home() {
       {/* Hero Section Container (Full Viewport) */}
       <section className="relative min-h-screen w-full flex flex-col justify-between pt-24 pb-8 px-4 md:px-12 z-10 overflow-hidden">
         
-        {/* Absolutely positioned full-screen background video with smooth edge fading */}
+        {/* Hardware-accelerated full-screen background video */}
         <motion.div
-          initial={{ opacity: 0, scale: 1.05 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 1.8, ease: [0.16, 1, 0.3, 1] }}
-          className="absolute inset-0 z-0 flex items-center justify-center pointer-events-none"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
+          className="absolute inset-0 z-0 flex items-center justify-center pointer-events-none transform-gpu"
         >
           {/* Video Wrapper */}
           <div className="w-full h-full relative overflow-hidden">
@@ -45,7 +45,8 @@ export default function Home() {
               muted
               loop
               playsInline
-              className="w-full h-full object-cover opacity-50"
+              preload="metadata"
+              className="w-full h-full object-cover opacity-50 transform-gpu"
             />
             {/* Left and Right Side Fading */}
             <div className="absolute inset-0 bg-gradient-to-r from-[#080314] via-transparent via-30% via-70% to-[#080314] pointer-events-none" />
@@ -63,20 +64,20 @@ export default function Home() {
 
         {/* Footer Content pinned to bottom over dark gradient fade-up */}
         <motion.div
-          initial={{ y: 20, opacity: 0 }}
+          initial={{ y: 16, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.5, duration: 1, ease: [0.16, 1, 0.3, 1] }}
-          className="relative z-30 w-full pt-16 pb-4 bg-gradient-to-t from-[#080314] via-[#080314]/90 to-transparent flex flex-col md:flex-row md:items-end justify-between gap-8"
+          transition={{ delay: 0.2, duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+          className="relative z-30 w-full pt-16 pb-4 bg-gradient-to-t from-[#080314] via-[#080314]/90 to-transparent flex flex-col md:flex-row md:items-end justify-between gap-8 transform-gpu"
         >
           {/* Left block */}
           <div className="flex flex-col gap-4 max-w-3xl">
 
             {/* Heading */}
             <motion.h1
-              initial={{ y: 20, opacity: 0 }}
+              initial={{ y: 16, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 0.8, duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-              className="font-light text-[clamp(2rem,8vw,4.5rem)] md:text-[clamp(2.5rem,5.5vw,4.5rem)] tracking-[-0.03em] leading-none text-white"
+              transition={{ delay: 0.3, duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+              className="font-light text-[clamp(2rem,8vw,4.5rem)] md:text-[clamp(2.5rem,5.5vw,4.5rem)] tracking-[-0.03em] leading-none text-white transform-gpu"
             >
               One Hub, Zero <br />
               Limits. Worldwide.
@@ -84,15 +85,15 @@ export default function Home() {
 
             {/* Buttons styled like purple glass cards */}
             <motion.div
-              initial={{ y: 16, opacity: 0 }}
+              initial={{ y: 12, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 1.0, duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-              className="flex items-center gap-3 pt-2"
+              transition={{ delay: 0.4, duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+              className="flex items-center gap-3 pt-2 transform-gpu"
             >
               {/* Primary Purple Button */}
               <button
                 onClick={scrollToTools}
-                className="relative h-fit w-fit px-6 py-3 border-2 border-[rgba(75,30,133,0.6)] rounded-full flex justify-center items-center gap-2.5 overflow-hidden group/btn hover:border-purple-300/80 hover:shadow-xl hover:shadow-purple-500/30 active:scale-95 transition-all duration-300 backdrop-blur-[12px] bg-gradient-to-r from-[rgba(75,30,133,1)] via-purple-700 to-[rgba(75,30,133,0.8)] text-white shadow-md cursor-pointer"
+                className="relative h-fit w-fit px-6 py-3 border-2 border-[rgba(75,30,133,0.6)] rounded-full flex justify-center items-center gap-2.5 overflow-hidden group/btn hover:border-purple-300/80 hover:shadow-xl hover:shadow-purple-500/30 active:scale-95 transition-all duration-300 backdrop-blur-[12px] bg-gradient-to-r from-[rgba(75,30,133,1)] via-purple-700 to-[rgba(75,30,133,0.8)] text-white shadow-md cursor-pointer transform-gpu"
               >
                 <div className="absolute inset-0 bg-gradient-to-r from-purple-600/40 via-fuchsia-500/40 to-purple-600/40 translate-x-[-100%] group-hover/btn:translate-x-[100%] transition-transform duration-700"></div>
                 <p className="relative z-10 font-medium tracking-wide text-xs">Explore Directory</p>
@@ -102,7 +103,7 @@ export default function Home() {
               {/* Secondary Purple Border Glass Button */}
               <button
                 onClick={() => setIsHowItWorksOpen(true)}
-                className="relative h-fit w-fit px-6 py-3 border-2 border-purple-300/30 rounded-full flex justify-center items-center gap-2 overflow-hidden group/btn hover:border-purple-300/60 hover:bg-purple-900/30 active:scale-95 transition-all duration-300 backdrop-blur-[12px] text-purple-200 font-medium cursor-pointer text-xs"
+                className="relative h-fit w-fit px-6 py-3 border-2 border-purple-300/30 rounded-full flex justify-center items-center gap-2 overflow-hidden group/btn hover:border-purple-300/60 hover:bg-purple-900/30 active:scale-95 transition-all duration-300 backdrop-blur-[12px] text-purple-200 font-medium cursor-pointer text-xs transform-gpu"
               >
                 <span>How It Works</span>
               </button>
@@ -113,8 +114,8 @@ export default function Home() {
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 1.2, duration: 0.8 }}
-            className="flex items-center gap-2 flex-wrap md:flex-nowrap"
+            transition={{ delay: 0.5, duration: 0.5 }}
+            className="flex items-center gap-2 flex-wrap md:flex-nowrap transform-gpu"
           >
             {["Neuromorphic", "AGI", "Cybernetics"].map((tag) => (
               <span
