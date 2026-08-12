@@ -2,7 +2,7 @@
 
 import React from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Search, Cpu, ShieldCheck, ArrowRight, Zap, HardDrive } from "lucide-react";
+import { X, Search, Cpu, ShieldCheck, ArrowRight } from "lucide-react";
 
 interface HowItWorksModalProps {
   isOpen: boolean;
@@ -100,18 +100,8 @@ export default function HowItWorksModal({ isOpen, onClose, onExplore }: HowItWor
             ))}
           </div>
 
-          {/* Banner note */}
-          <div className="p-4 rounded-2xl bg-black text-white flex items-center justify-between gap-4 mb-6">
-            <div className="flex items-center gap-3">
-              <Zap className="w-5 h-5 text-yellow-400 shrink-0" />
-              <p className="text-xs font-medium text-neutral-200">
-                Works completely offline once loaded. Zero server lag.
-              </p>
-            </div>
-          </div>
-
           {/* Action buttons */}
-          <div className="flex items-center justify-end gap-3 pt-2 border-t border-neutral-100">
+          <div className="flex items-center justify-end gap-3 pt-4 border-t border-neutral-100">
             <button
               onClick={onClose}
               className="px-5 py-2.5 rounded-full text-xs font-medium text-neutral-600 hover:bg-neutral-100 transition-colors cursor-pointer"
