@@ -9,28 +9,28 @@ import {
   Image as ImageIcon, 
   Sparkles, 
   Wrench, 
-  ExternalLink,
   ArrowRight,
   Layers,
   Film,
   QrCode,
   Shield,
   Mic,
-  FileCode
+  FileCode,
+  Zap
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 const iconMap: Record<string, React.ReactNode> = {
-  FileText: <FileText className="w-5 h-5 text-neutral-800" />,
-  Code: <Code className="w-5 h-5 text-neutral-800" />,
-  FileCode: <FileCode className="w-5 h-5 text-neutral-800" />,
-  Image: <ImageIcon className="w-5 h-5 text-neutral-800" />,
-  Film: <Film className="w-5 h-5 text-neutral-800" />,
-  QrCode: <QrCode className="w-5 h-5 text-neutral-800" />,
-  Shield: <Shield className="w-5 h-5 text-neutral-800" />,
-  Mic: <Mic className="w-5 h-5 text-neutral-800" />,
-  Sparkles: <Sparkles className="w-5 h-5 text-neutral-800" />,
-  Wrench: <Wrench className="w-5 h-5 text-neutral-800" />
+  FileText: <FileText className="w-5 h-5 transition-transform duration-300 group-hover:scale-110" />,
+  Code: <Code className="w-5 h-5 transition-transform duration-300 group-hover:scale-110" />,
+  FileCode: <FileCode className="w-5 h-5 transition-transform duration-300 group-hover:scale-110" />,
+  Image: <ImageIcon className="w-5 h-5 transition-transform duration-300 group-hover:scale-110" />,
+  Film: <Film className="w-5 h-5 transition-transform duration-300 group-hover:scale-110" />,
+  QrCode: <QrCode className="w-5 h-5 transition-transform duration-300 group-hover:scale-110" />,
+  Shield: <Shield className="w-5 h-5 transition-transform duration-300 group-hover:scale-110" />,
+  Mic: <Mic className="w-5 h-5 transition-transform duration-300 group-hover:scale-110" />,
+  Sparkles: <Sparkles className="w-5 h-5 transition-transform duration-300 group-hover:scale-110" />,
+  Wrench: <Wrench className="w-5 h-5 transition-transform duration-300 group-hover:scale-110" />
 };
 
 interface ToolsGridProps {
@@ -102,7 +102,7 @@ export default function ToolsGrid({ onSelectTool }: ToolsGridProps) {
             <Layers className="w-10 h-10 text-neutral-300 mx-auto mb-3" />
             <h3 className="text-base font-medium text-neutral-700">No tools found</h3>
             <p className="text-xs text-neutral-400 mt-1 max-w-sm mx-auto">
-              We couldn't find any tools matching your criteria. Attach your HTML tool files or adjust search filters.
+              We couldn't find any tools matching your criteria. Try adjusting your search query or selected category.
             </p>
           </div>
         ) : (
@@ -118,36 +118,51 @@ export default function ToolsGrid({ onSelectTool }: ToolsGridProps) {
                   initial={{ opacity: 0, scale: 0.96 }}
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.96 }}
-                  transition={{ duration: 0.3 }}
+                  transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
                   onClick={() => onSelectTool?.(tool)}
-                  className="group relative bg-white rounded-2xl p-6 border border-neutral-200/80 hover:border-black/30 hover:shadow-xl transition-all duration-300 cursor-pointer flex flex-col justify-between"
+                  className="group relative bg-neutral-50/60 hover:bg-white rounded-3xl p-6 border border-neutral-200/80 hover:border-black hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 cursor-pointer flex flex-col justify-between overflow-hidden"
                 >
+                  {/* Subtle top subtle accent line on hover */}
+                  <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-neutral-900 via-neutral-700 to-black opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+
                   <div>
-                    <div className="flex items-start justify-between gap-3 mb-4">
-                      <div className="w-12 h-12 rounded-xl bg-neutral-100 flex items-center justify-center group-hover:bg-black group-hover:text-white transition-colors duration-300">
-                        {iconMap[tool.iconName] || <Wrench className="w-5 h-5 text-neutral-800 group-hover:text-white" />}
+                    {/* Top Row: Icon & Badge */}
+                    <div className="flex items-start justify-between gap-3 mb-5">
+                      <div className="w-12 h-12 rounded-2xl bg-white border border-neutral-200/80 shadow-sm flex items-center justify-center text-neutral-900 group-hover:bg-black group-hover:text-white group-hover:border-black transition-all duration-300">
+                        {iconMap[tool.iconName] || <Wrench className="w-5 h-5 transition-transform duration-300 group-hover:scale-110" />}
                       </div>
-                      {tool.badge && (
-                        <span className="bg-neutral-900 text-white text-[10px] uppercase font-semibold tracking-wider px-2.5 py-0.5 rounded-full">
-                          {tool.badge}
+
+                      {tool.badge ? (
+                        <span className="inline-flex items-center gap-1 bg-black text-white text-[10px] uppercase font-bold tracking-wider px-2.5 py-1 rounded-full shadow-sm">
+                          <Zap className="w-3 h-3 text-yellow-400 fill-yellow-400" />
+                          <span>{tool.badge}</span>
+                        </span>
+                      ) : (
+                        <span className="text-[10px] font-mono font-medium text-neutral-400 bg-white border border-neutral-200/80 px-2.5 py-1 rounded-full">
+                          Ready
                         </span>
                       )}
                     </div>
 
-                    <h3 className="text-lg font-medium text-neutral-900 group-hover:text-black mb-1.5 flex items-center gap-2">
-                      {tool.title}
+                    {/* Tool Title & Description */}
+                    <h3 className="text-lg font-medium text-neutral-900 group-hover:text-black mb-2 flex items-center justify-between">
+                      <span>{tool.title}</span>
                     </h3>
-                    <p className="text-xs text-neutral-500 line-clamp-2 leading-relaxed">
+                    
+                    <p className="text-xs text-neutral-500 group-hover:text-neutral-600 line-clamp-2 leading-relaxed transition-colors">
                       {tool.description}
                     </p>
                   </div>
 
-                  <div className="mt-6 pt-4 border-t border-neutral-100 flex items-center justify-between text-xs text-neutral-600 font-medium">
-                    <span className="bg-neutral-100 px-2.5 py-1 rounded-md text-[11px] font-normal text-neutral-600">
+                  {/* Card Footer */}
+                  <div className="mt-6 pt-4 border-t border-neutral-200/60 flex items-center justify-between text-xs font-medium">
+                    <span className="bg-white border border-neutral-200/80 px-3 py-1 rounded-full text-[11px] font-normal text-neutral-600 shadow-2xs">
                       {tool.category}
                     </span>
-                    <span className="flex items-center gap-1 group-hover:translate-x-1 transition-transform duration-200 text-black font-semibold">
-                      Open Tool <ArrowRight className="w-3.5 h-3.5" />
+
+                    <span className="flex items-center gap-1.5 text-black font-semibold text-xs group-hover:translate-x-1 transition-transform duration-200">
+                      <span>Launch</span>
+                      <ArrowRight className="w-3.5 h-3.5" />
                     </span>
                   </div>
                 </motion.div>
