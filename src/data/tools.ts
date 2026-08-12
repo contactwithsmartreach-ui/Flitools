@@ -54,13 +54,14 @@ export const TOOLS_LIST: ToolItem[] = [
     badge: "Live Tool"
   },
   {
-    id: "sample-1",
-    title: "PDF Converter & Merger",
-    description: "Fast in-browser PDF manipulation and page reordering.",
-    path: "/tools/pdf-converter",
+    id: "pdf-merger-splitter",
+    title: "PDF Merger & Splitter",
+    description: "Merge multiple PDFs or extract specific page ranges securely in your browser.",
+    path: "/tools/pdf-merger-splitter.html",
+    htmlPath: "/tools/pdf-merger-splitter.html",
     iconName: "FileText",
     category: "Documents",
-    badge: "Popular"
+    badge: "Live Tool"
   },
   {
     id: "sample-2",
@@ -82,4 +83,4 @@ export const TOOLS_LIST: ToolItem[] = [
   }
 ];
 
-export const CATEGORIES = ["All", "Media", "Utilities", "Developer", "Documents", "AI Tools"];
+export const CATEGORIES = ["All", "Media", "Documents", "Utilities", "Developer", "AI Tools"];

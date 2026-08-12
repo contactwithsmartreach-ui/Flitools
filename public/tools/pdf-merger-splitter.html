@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PDF Studio — Merge &amp; Split PDFs Locally</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<!-- PDF manipulation is done with the open-source "pdf-lib" library (github.com/Hopding/pdf-lib)
+     for merging/splitting, and page count is read the same way. Batch downloads are zipped with
+     the open-source "JSZip" library. Both are loaded dynamically via ESM import at process-time. -->
+<style>
+  :root{ --ease: cubic-bezier(0.16, 1, 0.3, 1); }
+  *{ font-family: 'Inter', sans-serif; }
+  body{ background:#fff; color:#000; }
+
+  @keyframes fadeSlideDown{ from{ opacity:0; transform: translateY(-16px); } to{ opacity:1; transform: translateY(0); } }
+  @keyframes fadeSlideUp{ from{ opacity:0; transform: translateY(20px); } to{ opacity:1; transform: translateY(0); } }
+  @keyframes fadeScaleIn{ from{ opacity:0; transform: scale(1.05); } to{ opacity:1; transform: scale(1); } }
+  .anim-navbar{ animation: fadeSlideDown 0.8s var(--ease) both; }
+  .anim-bg{ animation: fadeScaleIn 1.8s var(--ease) both; }
+  .anim-footer{ animation: fadeSlideUp 1s var(--ease) both; animation-delay: .5s; }
+  .anim-subtitle{ animation: fadeSlideUp .8s var(--ease) both; animation-delay: .6s; }
+  .anim-heading{ animation: fadeSlideUp .8s var(--ease) both; animation-delay: .8s; }
+  .anim-buttons{ animation: fadeSlideUp .8s var(--ease) both; animation-delay: 1s; }
+
+  .hero-heading{ font-weight:300; letter-spacing:-0.03em; line-height:1; font-size: clamp(2rem, 8vw, 4.5rem); }
+  @media (min-width:768px){ .hero-heading{ font-size: clamp(2.5rem, 5.5vw, 4.5rem); } }
+
+  .hero-gradient-bg{
+    background:
+      radial-gradient(circle at 20% 20%, rgba(0,0,0,0.06), transparent 45%),
+      radial-gradient(circle at 80% 30%, rgba(0,0,0,0.04), transparent 50%),
+      linear-gradient(135deg, #fafafa 0%, #f0f0f2 100%);
+  }
+  .hero-fade{ background: linear-gradient(to top, #ffffff 0%, rgba(255,255,255,0.85) 55%, transparent 100%); }
+
+  .drop-zone{ transition: border-color .2s ease, background-color .2s ease; }
+  .drop-zone.dragover{ border-color:#000; background-color:#f7f7f7; }
+
+  input[type=text], input[type=number]{ transition: border-color .15s ease; }
+  input[type=text]:focus, input[type=number]:focus{ outline:none; border-color:#000; }
+
+  ::-webkit-scrollbar{ width:8px; }
+  ::-webkit-scrollbar-thumb{ background:#ddd; border-radius:9999px; }
+
+  .tab-btn{ transition: background-color .15s ease, color .15s ease; }
+  .seg-btn{ transition: background-color .15s ease, color .15s ease; }
+
+  .file-row{ transition: background-color .15s ease; }
+  .file-row:hover{ background-color:#fafafa; }
+  .drag-handle{ cursor: grab; }
+  .file-row.dragging{ opacity:.4; }
+</style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+<!-- ============ HERO ============ -->
+<section class="relative w-full min-h-screen flex flex-col justify-between overflow-hidden">
+  <div class="anim-bg absolute inset-0 z-0 hero-gradient-bg"></div>
+
+  <nav class="anim-navbar relative z-50 flex items-center justify-between px-4 py-4 md:px-8 md:py-6" style="pointer-events:none;">
+    <div class="flex items-center gap-3 md:gap-5" style="pointer-events:auto;">
+      <div class="flex items-center gap-2">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+          <path d="M6 2h9l5 5v15a1 1 0 01-1 1H6a1 1 0 01-1-1V3a1 1 0 011-1z" stroke="black" stroke-width="1.6" stroke-linejoin="round"/>
+          <path d="M15 2v5h5" stroke="black" stroke-width="1.6" stroke-linejoin="round"/>
+        </svg>
+        <span class="hidden md:inline text-sm font-medium tracking-tight">PDF Studio</span>
+      </div>
+      <div class="hidden md:flex items-center gap-3 rounded-full px-4 py-2" style="background:#F4F4F6;">
+        <span class="text-[11px] text-black/70">In-Browser</span>
+        <span class="text-[11px] text-black/70">No Uploads</span>
+      </div>
+    </div>
+    <div class="hidden md:flex items-center gap-3" style="pointer-events:auto;">
+      <div class="flex items-center gap-2 rounded-full pl-2 pr-4 py-1.5" style="background:#F4F4F6;">
+        <span class="flex items-center justify-center bg-black rounded-full" style="width:28px;height:28px;">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="white">
+            <rect x="2" y="2" width="7" height="7" rx="1.5"/><rect x="15" y="2" width="7" height="7" rx="1.5"/>
+            <rect x="2" y="15" width="7" height="7" rx="1.5"/><rect x="15" y="15" width="7" height="7" rx="1.5"/>
+          </svg>
+        </span>
+        <span class="text-[11px] text-black/70">100% Client-Side</span>
+      </div>
+    </div>
+  </nav>
+
+  <div class="anim-footer relative z-30 hero-fade px-4 pb-8 pt-24 md:px-8 md:pb-10">
+    <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-8">
+      <div>
+        <div class="anim-subtitle flex items-center gap-2 mb-4">
+          <span class="rounded-full bg-black" style="width:8px;height:8px;"></span>
+          <span class="text-[13px]" style="color:rgba(0,0,0,0.55);">Combine or break apart PDFs, right here</span>
+        </div>
+        <h1 class="anim-heading hero-heading mb-6">
+          PDFs In,<br/>Zero Uploads.<br/>Rearranged Out.
+        </h1>
+        <div class="anim-buttons flex items-center gap-3">
+          <a href="#how-it-works" class="bg-black text-white text-[13px] rounded-full px-5 py-2.5">How It Works</a>
+        </div>
+      </div>
+      <div class="flex items-center gap-2 md:justify-end flex-wrap">
+        <span class="text-[11px] rounded-full px-3 py-1.5 bg-white border" style="border-color:rgba(0,0,0,0.12);">Merge</span>
+        <span class="text-[11px] rounded-full px-3 py-1.5 bg-white border" style="border-color:rgba(0,0,0,0.12);">Split</span>
+        <span class="text-[11px] rounded-full px-3 py-1.5 bg-white border" style="border-color:rgba(0,0,0,0.12);">Reorder</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ TOOL ============ -->
+<section id="tool" class="w-full max-w-6xl mx-auto px-4 md:px-8 py-16">
+
+  <div class="mb-10">
+    <h2 class="text-2xl md:text-3xl font-light tracking-tight mb-2">Merge or split your PDFs</h2>
+    <p class="text-sm text-black/50">Combine several PDFs into one, or pull pages out of a single file — nothing ever leaves your browser.</p>
+  </div>
+
+  <div class="flex rounded-full overflow-hidden border border-black/10 text-xs mb-10 w-fit">
+    <button data-panel="merge" class="tab-btn panel-tab px-6 py-2.5 bg-black text-white">Merge PDFs</button>
+    <button data-panel="split" class="tab-btn panel-tab px-6 py-2.5">Split a PDF</button>
+  </div>
+
+  <!-- ===== MERGE PANEL ===== -->
+  <div id="panelMerge" class="grid grid-cols-1 lg:grid-cols-2 gap-10">
+    <div class="flex flex-col gap-8">
+      <div>
+        <h3 class="text-sm font-medium mb-3">1. Upload PDFs</h3>
+        <div id="mergeDropZone" class="drop-zone border-2 border-dashed border-black/20 rounded-2xl flex flex-col items-center justify-center text-center py-14 px-6 cursor-pointer">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="1.5" class="mb-3 opacity-60">
+            <path d="M12 16V4M12 4l-4 4M12 4l4 4" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <p class="text-sm font-medium">Drag &amp; drop PDFs, or click to browse</p>
+          <p class="text-xs text-black/40 mt-1">Upload 2 or more PDF files — they'll merge in the order shown below</p>
+          <input id="mergeFileInput" type="file" accept="application/pdf" multiple class="hidden">
+        </div>
+      </div>
+
+      <div>
+        <h3 class="text-sm font-medium mb-3">2. Order the files</h3>
+        <div class="border border-black/10 rounded-2xl overflow-hidden">
+          <div id="mergeFileList" class="divide-y divide-black/5"></div>
+          <p id="mergeEmptyMsg" class="text-xs text-black/30 text-center py-8">No files yet — files you upload will be listed here</p>
+        </div>
+        <p class="text-[11px] text-black/30 mt-2">Drag rows by the handle, or use the arrows, to reorder.</p>
+      </div>
+
+      <button id="mergeBtn" class="bg-black text-white text-[13px] rounded-full px-5 py-2.5 disabled:opacity-30 disabled:cursor-not-allowed w-fit" disabled>
+        Merge PDFs
+      </button>
+      <div id="mergeProgressWrap" class="hidden -mt-4">
+        <div class="w-full h-1.5 bg-black/10 rounded-full overflow-hidden">
+          <div id="mergeProgressBar" class="h-full bg-black" style="width:0%;"></div>
+        </div>
+        <p id="mergeProgressLabel" class="text-xs text-black/40 mt-1">Merging…</p>
+      </div>
+    </div>
+
+    <div class="flex flex-col gap-8">
+      <div>
+        <h3 class="text-sm font-medium mb-3">3. Result</h3>
+        <div class="border border-black/10 rounded-2xl min-h-[12rem] flex items-center justify-center bg-black/[0.02] p-6 text-center">
+          <p id="mergeResultText" class="text-xs text-black/30">Your merged PDF summary will appear here</p>
+        </div>
+      </div>
+      <div>
+        <h3 class="text-sm font-medium mb-3">4. Download</h3>
+        <div class="border border-black/10 rounded-2xl p-5 flex flex-col gap-3">
+          <a id="mergeDownloadBtn" download="merged.pdf" class="pointer-events-none opacity-30 bg-black text-white text-[13px] rounded-full px-5 py-2.5 text-center">
+            Download Merged PDF
+          </a>
+          <p class="text-xs text-black/40">Everything is combined locally with the open-source library pdf-lib — no files are ever uploaded anywhere.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== SPLIT PANEL ===== -->
+  <div id="panelSplit" class="hidden grid grid-cols-1 lg:grid-cols-2 gap-10">
+    <div class="flex flex-col gap-8">
+      <div>
+        <h3 class="text-sm font-medium mb-3">1. Upload a PDF</h3>
+        <div id="splitDropZone" class="drop-zone border-2 border-dashed border-black/20 rounded-2xl flex flex-col items-center justify-center text-center py-14 px-6 cursor-pointer">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="1.5" class="mb-3 opacity-60">
+            <path d="M12 16V4M12 4l-4 4M12 4l4 4" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <p class="text-sm font-medium">Drag &amp; drop a PDF, or click to browse</p>
+          <p class="text-xs text-black/40 mt-1">Upload a single PDF file to split apart</p>
+          <input id="splitFileInput" type="file" accept="application/pdf" class="hidden">
+        </div>
+        <p id="splitFileInfo" class="text-xs text-black/40 mt-2">No file loaded</p>
+      </div>
+
+      <div>
+        <h3 class="text-sm font-medium mb-3">2. Choose a split method</h3>
+        <div class="border border-black/10 rounded-2xl p-5 flex flex-col gap-5">
+
+          <div class="flex rounded-full overflow-hidden border border-black/10 text-xs">
+            <button data-split-mode="ranges" class="seg-btn split-mode-btn flex-1 py-2 bg-black text-white">Page ranges</button>
+            <button data-split-mode="every" class="seg-btn split-mode-btn flex-1 py-2">Every page</button>
+          </div>
+
+          <div id="rangesWrap">
+            <label class="text-xs text-black/60 block mb-2">Page ranges to extract</label>
+            <input id="rangesInput" type="text" placeholder="e.g. 1-3, 5, 8-10" class="w-full border border-black/10 rounded-xl px-4 py-3 text-sm">
+            <p class="text-[11px] text-black/30 mt-1">Comma-separate ranges or single pages. Produces one PDF with just these pages, in this order.</p>
+          </div>
+          <div id="everyWrap" class="hidden">
+            <p class="text-xs text-black/50">Every page of the document becomes its own single-page PDF, delivered together as a .zip.</p>
+          </div>
+        </div>
+      </div>
+
+      <button id="splitBtn" class="bg-black text-white text-[13px] rounded-full px-5 py-2.5 disabled:opacity-30 disabled:cursor-not-allowed w-fit" disabled>
+        Split PDF
+      </button>
+      <div id="splitProgressWrap" class="hidden -mt-4">
+        <div class="w-full h-1.5 bg-black/10 rounded-full overflow-hidden">
+          <div id="splitProgressBar" class="h-full bg-black" style="width:0%;"></div>
+        </div>
+        <p id="splitProgressLabel" class="text-xs text-black/40 mt-1">Splitting…</p>
+      </div>
+    </div>
+
+    <div class="flex flex-col gap-8">
+      <div>
+        <h3 class="text-sm font-medium mb-3">3. Result</h3>
+        <div class="border border-black/10 rounded-2xl min-h-[12rem] flex items-center justify-center bg-black/[0.02] p-6 text-center">
+          <p id="splitResultText" class="text-xs text-black/30">Your split result summary will appear here</p>
+        </div>
+      </div>
+      <div>
+        <h3 class="text-sm font-medium mb-3">4. Download</h3>
+        <div class="border border-black/10 rounded-2xl p-5 flex flex-col gap-3">
+          <a id="splitDownloadBtn" download="split.pdf" class="pointer-events-none opacity-30 bg-black text-white text-[13px] rounded-full px-5 py-2.5 text-center">
+            Download Result
+          </a>
+          <p class="text-xs text-black/40">Everything is split locally with the open-source library pdf-lib. Multi-file results are zipped with JSZip — no files are ever uploaded anywhere.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ HOW IT WORKS ============ -->
+<section id="how-it-works" class="w-full bg-black/[0.02] border-t border-black/10">
+  <div class="max-w-6xl mx-auto px-4 md:px-8 py-16">
+    <div class="mb-10">
+      <h2 class="text-2xl md:text-3xl font-light tracking-tight mb-2">How it works</h2>
+      <p class="text-sm text-black/50 max-w-2xl">PDF Studio combines and splits documents entirely inside your browser. No files are ever sent to a server — everything below happens on your own device.</p>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div>
+        <div class="flex items-center justify-center rounded-full bg-black text-white text-sm font-medium mb-4" style="width:32px;height:32px;">1</div>
+        <h3 class="text-sm font-medium mb-2">Upload your PDFs</h3>
+        <p class="text-xs text-black/50 leading-relaxed">Drag and drop, or click to browse. Merge takes two or more files; Split takes one file you want to break apart.</p>
+      </div>
+      <div>
+        <div class="flex items-center justify-center rounded-full bg-black text-white text-sm font-medium mb-4" style="width:32px;height:32px;">2</div>
+        <h3 class="text-sm font-medium mb-2">Arrange or choose pages</h3>
+        <p class="text-xs text-black/50 leading-relaxed">Reorder files before merging, or specify page ranges — or split into one file per page — before splitting.</p>
+      </div>
+      <div>
+        <div class="flex items-center justify-center rounded-full bg-black text-white text-sm font-medium mb-4" style="width:32px;height:32px;">3</div>
+        <h3 class="text-sm font-medium mb-2">Process locally</h3>
+        <p class="text-xs text-black/50 leading-relaxed">Your browser rebuilds the PDF structure using an open-source library — no upload, no waiting on a server.</p>
+      </div>
+      <div>
+        <div class="flex items-center justify-center rounded-full bg-black text-white text-sm font-medium mb-4" style="width:32px;height:32px;">4</div>
+        <h3 class="text-sm font-medium mb-2">Download</h3>
+        <p class="text-xs text-black/50 leading-relaxed">Download the merged PDF, or the split result as a single file or a .zip. Your originals never leave your computer.</p>
+      </div>
+    </div>
+
+    <div class="mt-10">
+      <a href="#tool" class="bg-black text-white text-[13px] rounded-full px-5 py-2.5 inline-block">Get Started</a>
+    </div>
+  </div>
+</section>
+
+<footer class="text-center text-xs text-black/30 py-8">
+  Built entirely client-side — your documents never leave this browser.
+</footer>
+
+<script>
+(function(){
+  // ---------- tab switching ----------
+  const panelTabs = document.querySelectorAll('.panel-tab');
+  const panelMerge = document.getElementById('panelMerge');
+  const panelSplit = document.getElementById('panelSplit');
+  panelTabs.forEach(btn => {
+    btn.addEventListener('click', () => {
+      panelTabs.forEach(b => b.classList.remove('bg-black','text-white'));
+      btn.classList.add('bg-black','text-white');
+      const panel = btn.dataset.panel;
+      panelMerge.classList.toggle('hidden', panel !== 'merge');
+      panelSplit.classList.toggle('hidden', panel !== 'split');
+    });
+  });
+
+  function fmtBytes(n){
+    if (n < 1024) return n + ' B';
+    if (n < 1024*1024) return (n/1024).toFixed(1) + ' KB';
+    return (n/1024/1024).toFixed(2) + ' MB';
+  }
+
+  let pdfLibMod = null;
+  async function getPdfLib(){
+    if (!pdfLibMod) pdfLibMod = await import('https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/+esm');
+    return pdfLibMod;
+  }
+  let jsZipMod = null;
+  async function getJSZip(){
+    if (!jsZipMod) jsZipMod = await import('https://cdn.jsdelivr.net/npm/jszip@3.10.1/+esm');
+    return jsZipMod.default || jsZipMod;
+  }
+
+  // ============================================================
+  // MERGE PANEL
+  // ============================================================
+  const mergeDropZone = document.getElementById('mergeDropZone');
+  const mergeFileInput = document.getElementById('mergeFileInput');
+  const mergeFileList = document.getElementById('mergeFileList');
+  const mergeEmptyMsg = document.getElementById('mergeEmptyMsg');
+  const mergeBtn = document.getElementById('mergeBtn');
+  const mergeProgressWrap = document.getElementById('mergeProgressWrap');
+  const mergeProgressBar = document.getElementById('mergeProgressBar');
+  const mergeProgressLabel = document.getElementById('mergeProgressLabel');
+  const mergeResultText = document.getElementById('mergeResultText');
+  const mergeDownloadBtn = document.getElementById('mergeDownloadBtn');
+
+  let mergeFiles = []; // { file }
+  let dragIdx = null;
+
+  function renderMergeList(){
+    mergeFileList.innerHTML = '';
+    mergeEmptyMsg.classList.toggle('hidden', mergeFiles.length > 0);
+    mergeFiles.forEach((item, idx) => {
+      const row = document.createElement('div');
+      row.className = 'file-row flex items-center gap-3 px-4 py-3';
+      row.draggable = true;
+      row.dataset.idx = idx;
+      row.innerHTML = `
+        <span class="drag-handle text-black/30 select-none">⠿</span>
+        <span class="text-xs w-5 text-black/40">${idx + 1}</span>
+        <span class="text-xs font-medium flex-1 truncate">${item.file.name}</span>
+        <span class="text-[11px] text-black/40">${fmtBytes(item.file.size)}</span>
+        <div class="flex items-center gap-1">
+          <button class="up-btn text-xs w-6 h-6 rounded-full hover:bg-black/5" title="Move up">↑</button>
+          <button class="down-btn text-xs w-6 h-6 rounded-full hover:bg-black/5" title="Move down">↓</button>
+          <button class="remove-btn text-xs w-6 h-6 rounded-full hover:bg-black/5" title="Remove">×</button>
+        </div>
+      `;
+      row.querySelector('.up-btn').onclick = () => { if (idx > 0) { [mergeFiles[idx-1], mergeFiles[idx]] = [mergeFiles[idx], mergeFiles[idx-1]]; renderMergeList(); } };
+      row.querySelector('.down-btn').onclick = () => { if (idx < mergeFiles.length-1) { [mergeFiles[idx+1], mergeFiles[idx]] = [mergeFiles[idx], mergeFiles[idx+1]]; renderMergeList(); } };
+      row.querySelector('.remove-btn').onclick = () => { mergeFiles.splice(idx,1); renderMergeList(); };
+
+      row.addEventListener('dragstart', () => { dragIdx = idx; row.classList.add('dragging'); });
+      row.addEventListener('dragend', () => row.classList.remove('dragging'));
+      row.addEventListener('dragover', e => e.preventDefault());
+      row.addEventListener('drop', e => {
+        e.preventDefault();
+        if (dragIdx === null || dragIdx === idx) return;
+        const [moved] = mergeFiles.splice(dragIdx, 1);
+        mergeFiles.splice(idx, 0, moved);
+        dragIdx = null;
+        renderMergeList();
+      });
+
+      mergeFileList.appendChild(row);
+    });
+    mergeBtn.disabled = mergeFiles.length < 2;
+  }
+
+  function addMergeFiles(fileList){
+    const files = Array.from(fileList).filter(f => f.type === 'application/pdf' || f.name.toLowerCase().endsWith('.pdf'));
+    files.forEach(file => mergeFiles.push({ file }));
+    renderMergeList();
+  }
+
+  mergeDropZone.addEventListener('click', () => mergeFileInput.click());
+  mergeFileInput.addEventListener('change', e => addMergeFiles(e.target.files));
+  ['dragenter','dragover'].forEach(evt => mergeDropZone.addEventListener(evt, e => { e.preventDefault(); mergeDropZone.classList.add('dragover'); }));
+  ['dragleave','drop'].forEach(evt => mergeDropZone.addEventListener(evt, e => { e.preventDefault(); mergeDropZone.classList.remove('dragover'); }));
+  mergeDropZone.addEventListener('drop', e => { if (e.dataTransfer.files) addMergeFiles(e.dataTransfer.files); });
+
+  mergeBtn.addEventListener('click', async () => {
+    if (mergeFiles.length < 2) return;
+    mergeBtn.disabled = true;
+    mergeProgressWrap.classList.remove('hidden');
+    mergeProgressBar.style.width = '0%';
+    mergeProgressLabel.textContent = 'Loading library…';
+    mergeDownloadBtn.classList.add('pointer-events-none','opacity-30');
+
+    try {
+      const { PDFDocument } = await getPdfLib();
+      const mergedPdf = await PDFDocument.create();
+      let totalPages = 0;
+
+      for (let i = 0; i < mergeFiles.length; i++) {
+        mergeProgressLabel.textContent = 'Reading ' + mergeFiles[i].file.name + '…';
+        const bytes = await mergeFiles[i].file.arrayBuffer();
+        const srcPdf = await PDFDocument.load(bytes, { ignoreEncryption: true });
+        const pageIndices = srcPdf.getPageIndices();
+        const copiedPages = await mergedPdf.copyPages(srcPdf, pageIndices);
+        copiedPages.forEach(p => mergedPdf.addPage(p));
+        totalPages += pageIndices.length;
+        mergeProgressBar.style.width = Math.round(((i + 1) / mergeFiles.length) * 100) + '%';
+        await new Promise(r => setTimeout(r, 0));
+      }
+
+      const outBytes = await mergedPdf.save();
+      const blob = new Blob([outBytes], { type: 'application/pdf' });
+      const url = URL.createObjectURL(blob);
+
+      mergeResultText.innerHTML = `<span class="text-black/70">Merged ${mergeFiles.length} files into one PDF — ${totalPages} pages, ${fmtBytes(blob.size)}.</span>`;
+      mergeDownloadBtn.href = url;
+      mergeDownloadBtn.classList.remove('pointer-events-none','opacity-30');
+      mergeProgressLabel.textContent = 'Done!';
+    } catch (err) {
+      console.error(err);
+      mergeProgressLabel.textContent = 'Error: ' + err.message;
+      mergeResultText.textContent = 'Something went wrong while merging — please check your files and try again.';
+    } finally {
+      mergeBtn.disabled = false;
+    }
+  });
+
+  // ============================================================
+  // SPLIT PANEL
+  // ============================================================
+  const splitDropZone = document.getElementById('splitDropZone');
+  const splitFileInput = document.getElementById('splitFileInput');
+  const splitFileInfo = document.getElementById('splitFileInfo');
+  const splitModeBtns = document.querySelectorAll('.split-mode-btn');
+  const rangesWrap = document.getElementById('rangesWrap');
+  const everyWrap = document.getElementById('everyWrap');
+  const rangesInput = document.getElementById('rangesInput');
+  const splitBtn = document.getElementById('splitBtn');
+  const splitProgressWrap = document.getElementById('splitProgressWrap');
+  const splitProgressBar = document.getElementById('splitProgressBar');
+  const splitProgressLabel = document.getElementById('splitProgressLabel');
+  const splitResultText = document.getElementById('splitResultText');
+  const splitDownloadBtn = document.getElementById('splitDownloadBtn');
+
+  let splitFile = null;
+  let splitPageCount = 0;
+  let splitMode = 'ranges';
+
+  splitModeBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      splitModeBtns.forEach(b => b.classList.remove('bg-black','text-white'));
+      btn.classList.add('bg-black','text-white');
+      splitMode = btn.dataset.splitMode;
+      rangesWrap.classList.toggle('hidden', splitMode !== 'ranges');
+      everyWrap.classList.toggle('hidden', splitMode !== 'every');
+    });
+  });
+
+  async function loadSplitFile(file){
+    splitFile = file;
+    splitFileInfo.textContent = 'Reading ' + file.name + '…';
+    try {
+      const { PDFDocument } = await getPdfLib();
+      const bytes = await file.arrayBuffer();
+      const pdf = await PDFDocument.load(bytes, { ignoreEncryption: true });
+      splitPageCount = pdf.getPageCount();
+      splitFileInfo.textContent = file.name + ' — ' + splitPageCount + ' page' + (splitPageCount===1?'':'s') + ' — ' + fmtBytes(file.size);
+      splitBtn.disabled = false;
+    } catch (err) {
+      console.error(err);
+      splitFileInfo.textContent = 'Could not read this PDF: ' + err.message;
+      splitBtn.disabled = true;
+    }
+  }
+
+  splitDropZone.addEventListener('click', () => splitFileInput.click());
+  splitFileInput.addEventListener('change', e => { if (e.target.files[0]) loadSplitFile(e.target.files[0]); });
+  ['dragenter','dragover'].forEach(evt => splitDropZone.addEventListener(evt, e => { e.preventDefault(); splitDropZone.classList.add('dragover'); }));
+  ['dragleave','drop'].forEach(evt => splitDropZone.addEventListener(evt, e => { e.preventDefault(); splitDropZone.classList.remove('dragover'); }));
+  splitDropZone.addEventListener('drop', e => { if (e.dataTransfer.files && e.dataTransfer.files[0]) loadSplitFile(e.dataTransfer.files[0]); });
+
+  function parseRanges(str, maxPage){
+    const parts = str.split(',').map(s => s.trim()).filter(Boolean);
+    const pages = [];
+    for (const part of parts) {
+      const m = part.match(/^(\d+)\s*-\s*(\d+)$/);
+      if (m) {
+        let a = parseInt(m[1], 10), b = parseInt(m[2], 10);
+        if (a > b) [a, b] = [b, a];
+        for (let p = a; p <= b; p++) if (p >= 1 && p <= maxPage) pages.push(p - 1);
+      } else if (/^\d+$/.test(part)) {
+        const p = parseInt(part, 10);
+        if (p >= 1 && p <= maxPage) pages.push(p - 1);
+      }
+    }
+    return pages;
+  }
+
+  splitBtn.addEventListener('click', async () => {
+    if (!splitFile) return;
+    splitBtn.disabled = true;
+    splitProgressWrap.classList.remove('hidden');
+    splitProgressBar.style.width = '0%';
+    splitProgressLabel.textContent = 'Loading library…';
+    splitDownloadBtn.classList.add('pointer-events-none','opacity-30');
+
+    try {
+      const { PDFDocument } = await getPdfLib();
+      const bytes = await splitFile.arrayBuffer();
+      const srcPdf = await PDFDocument.load(bytes, { ignoreEncryption: true });
+      const baseName = splitFile.name.replace(/\.pdf$/i, '');
+
+      if (splitMode === 'ranges') {
+        const pageIndices = parseRanges(rangesInput.value, splitPageCount);
+        if (pageIndices.length === 0) {
+          splitResultText.textContent = 'Enter at least one valid page or range, e.g. "1-3, 5".';
+          splitProgressLabel.textContent = '';
+          splitBtn.disabled = false;
+          return;
+        }
+        splitProgressLabel.textContent = 'Extracting pages…';
+        const outPdf = await PDFDocument.create();
+        const copied = await outPdf.copyPages(srcPdf, pageIndices);
+        copied.forEach(p => outPdf.addPage(p));
+        splitProgressBar.style.width = '100%';
+        const outBytes = await outPdf.save();
+        const blob = new Blob([outBytes], { type: 'application/pdf' });
+        const url = URL.createObjectURL(blob);
+        splitResultText.innerHTML = `<span class="text-black/70">Extracted ${pageIndices.length} page${pageIndices.length===1?'':'s'} into one PDF — ${fmtBytes(blob.size)}.</span>`;
+        splitDownloadBtn.href = url;
+        splitDownloadBtn.download = baseName + '-extracted.pdf';
+        splitDownloadBtn.textContent = 'Download Result';
+        splitDownloadBtn.classList.remove('pointer-events-none','opacity-30');
+        splitProgressLabel.textContent = 'Done!';
+      } else {
+        splitProgressLabel.textContent = 'Splitting pages…';
+        const JSZip = await getJSZip();
+        const zip = new JSZip();
+        const padLen = String(splitPageCount).length;
+        for (let i = 0; i < splitPageCount; i++) {
+          const outPdf = await PDFDocument.create();
+          const [copied] = await outPdf.copyPages(srcPdf, [i]);
+          outPdf.addPage(copied);
+          const outBytes = await outPdf.save();
+          const num = String(i + 1).padStart(padLen, '0');
+          zip.file(baseName + '-page-' + num + '.pdf', outBytes);
+          splitProgressBar.style.width = Math.round(((i + 1) / splitPageCount) * 100) + '%';
+          splitProgressLabel.textContent = 'Splitting… ' + (i + 1) + ' / ' + splitPageCount;
+          await new Promise(r => setTimeout(r, 0));
+        }
+        const zipBlob = await zip.generateAsync({ type: 'blob' });
+        const url = URL.createObjectURL(zipBlob);
+        splitResultText.innerHTML = `<span class="text-black/70">Split into ${splitPageCount} single-page PDFs, zipped — ${fmtBytes(zipBlob.size)}.</span>`;
+        splitDownloadBtn.href = url;
+        splitDownloadBtn.download = baseName + '-pages.zip';
+        splitDownloadBtn.textContent = 'Download .zip';
+        splitDownloadBtn.classList.remove('pointer-events-none','opacity-30');
+        splitProgressLabel.textContent = 'Done!';
+      }
+    } catch (err) {
+      console.error(err);
+      splitProgressLabel.textContent = 'Error: ' + err.message;
+      splitResultText.textContent = 'Something went wrong while splitting — please check your file and try again.';
+    } finally {
+      splitBtn.disabled = false;
+    }
+  });
+})();
+</script>
+
+</body>
+</html>
