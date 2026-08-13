@@ -55,7 +55,14 @@ export const metadata: Metadata = {
     siteName: "FliTools",
     images: [
       {
-        url: "/og-image.svg",
+        url: "https://flitools.cyou/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "FliTools — Client-Side Digital Utilities & Media Directory",
+        type: "image/png",
+      },
+      {
+        url: "https://flitools.cyou/og-image.svg",
         width: 1200,
         height: 630,
         alt: "FliTools — Client-Side Digital Utilities & Media Directory",
@@ -70,7 +77,7 @@ export const metadata: Metadata = {
     title: "FliTools — Free Client-Side Digital Utilities",
     description:
       "Convert GIFs, compress photos, merge PDFs, trim waveforms, and format JSON locally in your browser. No files leave your device.",
-    images: ["/og-image.svg"],
+    images: ["https://flitools.cyou/og-image.png"],
   },
   icons: {
     icon: [
