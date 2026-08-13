@@ -1,15 +1,23 @@
 "use client";
 
 import React, { useState } from "react";
+import dynamic from "next/dynamic";
 import { motion } from "framer-motion";
 import Navbar from "@/components/Navbar";
 import ToolsGrid from "@/components/ToolsGrid";
-import ToolModal from "@/components/ToolModal";
-import HowItWorksModal from "@/components/HowItWorksModal";
 import FAQSection from "@/components/FAQSection";
 import Footer from "@/components/Footer";
 import { ToolItem } from "@/data/tools";
 import { ArrowRight } from "lucide-react";
+
+// Code-split heavy interactive modals so they load dynamically on demand
+const ToolModal = dynamic(() => import("@/components/ToolModal"), {
+  ssr: false,
+});
+
+const HowItWorksModal = dynamic(() => import("@/components/HowItWorksModal"), {
+  ssr: false,
+});
 
 export default function Home() {
   const [selectedTool, setSelectedTool] = useState<ToolItem | null>(null);
@@ -136,18 +144,22 @@ export default function Home() {
       {/* FAQ Section with JSON-LD backing */}
       <FAQSection />
 
-      {/* Selected Tool Runner Modal */}
-      <ToolModal
-        tool={selectedTool}
-        onClose={() => setSelectedTool(null)}
-      />
+      {/* Lazy-loaded Tool Runner Modal (only imported & mounted when active) */}
+      {selectedTool && (
+        <ToolModal
+          tool={selectedTool}
+          onClose={() => setSelectedTool(null)}
+        />
+      )}
 
-      {/* How It Works Modal */}
-      <HowItWorksModal
-        isOpen={isHowItWorksOpen}
-        onClose={() => setIsHowItWorksOpen(false)}
-        onExplore={scrollToTools}
-      />
+      {/* Lazy-loaded How It Works Modal (only imported & mounted when active) */}
+      {isHowItWorksOpen && (
+        <HowItWorksModal
+          isOpen={isHowItWorksOpen}
+          onClose={() => setIsHowItWorksOpen(false)}
+          onExplore={scrollToTools}
+        />
+      )}
 
       {/* Footer Branding & Legal Links */}
       <Footer />
