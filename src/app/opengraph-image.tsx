@@ -1,5 +1,7 @@
 import { ImageResponse } from "next/og";
 
+export const dynamic = "force-static";
+
 export const alt = "FliTools — 100% Client-Side Free Digital Utilities Directory";
 export const size = {
   width: 1200,
