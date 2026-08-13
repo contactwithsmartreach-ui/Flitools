@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import { FAQ_DATA } from "@/components/FAQSection";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -32,6 +33,8 @@ export const metadata: Metadata = {
     "qr code generator",
     "password generator",
     "privacy digital tools",
+    "markdown to html",
+    "free online converter",
   ],
   authors: [{ name: "FliTools", url: "https://flitools.cyou" }],
   creator: "FliTools",
@@ -64,7 +67,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "FliTools — Free Client-Side Utilities",
+    title: "FliTools — Free Client-Side Digital Utilities",
     description:
       "Convert GIFs, compress photos, merge PDFs, trim waveforms, and format JSON locally in your browser. No files leave your device.",
     images: ["/og-image.svg"],
@@ -101,8 +104,48 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // Construct FAQPage structured JSON-LD schema
+  const faqSchema = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": FAQ_DATA.map((item) => ({
+      "@type": "Question",
+      "name": item.question,
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": item.answer,
+      },
+    })),
+  };
+
+  // Construct WebSite & WebApplication structured JSON-LD schema
+  const websiteSchema = {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "FliTools",
+    "url": "https://flitools.cyou",
+    "description": "100% Client-Side Free Digital Utilities Directory & Media Converters",
+    "applicationCategory": "UtilitiesApplication",
+    "operatingSystem": "Any",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD",
+    },
+  };
+
   return (
     <html lang="en" className="dark">
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema) }}
+        />
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-[#080314] text-white selection:bg-purple-500 selection:text-white`}
       >

@@ -6,6 +6,7 @@ import Navbar from "@/components/Navbar";
 import ToolsGrid from "@/components/ToolsGrid";
 import ToolModal from "@/components/ToolModal";
 import HowItWorksModal from "@/components/HowItWorksModal";
+import FAQSection from "@/components/FAQSection";
 import Footer from "@/components/Footer";
 import { ToolItem } from "@/data/tools";
 import { ArrowRight } from "lucide-react";
@@ -131,6 +132,9 @@ export default function Home() {
 
       {/* Tool Directory Section */}
       <ToolsGrid onSelectTool={(tool) => setSelectedTool(tool)} />
+
+      {/* FAQ Section with JSON-LD backing */}
+      <FAQSection />
 
       {/* Selected Tool Runner Modal */}
       <ToolModal

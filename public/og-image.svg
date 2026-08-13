@@ -1,48 +1,86 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" fill="none">
+<svg width="1200" height="630" viewBox="0 0 1200 630" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
   <rect width="1200" height="630" fill="#080314"/>
   
-  <!-- Radial Background Glow -->
-  <circle cx="600" cy="315" r="420" fill="#4b1e85" opacity="0.4"/>
-  <circle cx="600" cy="315" r="260" fill="#7e22ce" opacity="0.25"/>
+  <!-- Subtle Glowing Gradients -->
+  <circle cx="200" cy="150" r="300" fill="#4b1e85" opacity="0.35" filter="blur(80px)"/>
+  <circle cx="1000" cy="450" r="350" fill="#2d0f55" opacity="0.45" filter="blur(90px)"/>
+  <circle cx="600" cy="315" r="250" fill="#7832be" opacity="0.2" filter="blur(70px)"/>
 
-  <!-- Subtle grid lines -->
-  <path d="M0 100H1200M0 200H1200M0 300H1200M0 400H1200M0 500H1200" stroke="#7e22ce" stroke-opacity="0.1" stroke-width="1"/>
-  <path d="M200 0V630M400 0V630M600 0V630M800 0V630M1000 0V630" stroke="#7e22ce" stroke-opacity="0.1" stroke-width="1"/>
-
-  <!-- Content Container -->
-  <g transform="translate(100, 130)">
-    <!-- Brand Logo -->
-    <g transform="translate(0, 0)">
-      <rect width="64" height="64" rx="18" fill="#2d0f55" stroke="#a855f7" stroke-width="2"/>
-      <rect x="18" y="14" width="10" height="28" rx="4" fill="#e9d5ff" transform="rotate(-35 23 28)" />
-      <rect x="32" y="14" width="10" height="28" rx="4" fill="#c084fc" transform="rotate(-35 37 28)" />
-      <text x="84" y="44" font-family="system-ui, -apple-system, sans-serif" font-weight="700" font-size="34" fill="#ffffff" letter-spacing="-0.02em">FliTools</text>
-      <text x="215" y="44" font-family="system-ui, -apple-system, sans-serif" font-weight="500" font-size="22" fill="#c084fc">.cyou</text>
-    </g>
-
-    <!-- Main Headline -->
-    <text x="0" y="150" font-family="system-ui, -apple-system, sans-serif" font-weight="300" font-size="54" fill="#ffffff" letter-spacing="-0.03em">
-      Free, 100% Client-Side
-    </text>
-    <text x="0" y="220" font-family="system-ui, -apple-system, sans-serif" font-weight="700" font-size="54" fill="#e9d5ff" letter-spacing="-0.03em">
-      Digital Utilities & Media Hub
-    </text>
-
-    <!-- Subtext -->
-    <text x="0" y="280" font-family="system-ui, -apple-system, sans-serif" font-weight="400" font-size="22" fill="#d8b4fe">
-      Convert GIF • Compress Images • Merge PDFs • Trim Audio • Format JSON • Generate QR
-    </text>
-
-    <!-- Feature Badges -->
-    <g transform="translate(0, 335)">
-      <rect x="0" y="0" width="180" height="42" rx="21" fill="#2d0f55" stroke="#7e22ce" stroke-width="1.5"/>
-      <text x="90" y="26" font-family="system-ui, -apple-system, sans-serif" font-weight="600" font-size="15" fill="#e9d5ff" text-anchor="middle">🔒 Zero Uploads</text>
-
-      <rect x="195" y="0" width="190" height="42" rx="21" fill="#2d0f55" stroke="#7e22ce" stroke-width="1.5"/>
-      <text x="290" y="26" font-family="system-ui, -apple-system, sans-serif" font-weight="600" font-size="15" fill="#e9d5ff" text-anchor="middle">⚡ Instant Execution</text>
-
-      <rect x="400" y="0" width="180" height="42" rx="21" fill="#2d0f55" stroke="#7e22ce" stroke-width="1.5"/>
-      <text x="490" y="26" font-family="system-ui, -apple-system, sans-serif" font-weight="600" font-size="15" fill="#e9d5ff" text-anchor="middle">🌐 100% In-Browser</text>
-    </g>
+  <!-- Subtle Radial Grid Pattern -->
+  <g opacity="0.12" stroke="#ffffff" stroke-width="0.5">
+    <line x1="0" y1="100" x2="1200" y2="100"/>
+    <line x1="0" y1="200" x2="1200" y2="200"/>
+    <line x1="0" y1="300" x2="1200" y2="300"/>
+    <line x1="0" y1="400" x2="1200" y2="400"/>
+    <line x1="0" y1="500" x2="1200" y2="500"/>
+    <line x1="200" y1="0" x2="200" y2="630"/>
+    <line x1="400" y1="0" x2="400" y2="630"/>
+    <line x1="600" y1="0" x2="600" y2="630"/>
+    <line x1="800" y1="0" x2="800" y2="630"/>
+    <line x1="1000" y1="0" x2="1000" y2="630"/>
   </g>
+
+  <!-- Glass Card Container -->
+  <rect x="80" y="70" width="1040" height="490" rx="32" fill="url(#card_grad)" stroke="url(#border_grad)" stroke-width="2"/>
+
+  <!-- Logo & Branding -->
+  <g transform="translate(130, 130)">
+    <!-- Icon -->
+    <rect x="0" y="0" width="56" height="56" rx="16" fill="url(#logo_bg)"/>
+    <rect x="15" y="11" width="14" height="32" rx="6" fill="#e9d5ff" transform="rotate(-35 22 27)"/>
+    <rect x="29" y="11" width="14" height="32" rx="6" fill="#c084fc" transform="rotate(-35 36 27)"/>
+    
+    <!-- Brand Title -->
+    <text x="76" y="38" fill="#ffffff" font-family="Inter, system-ui, sans-serif" font-weight="700" font-size="32" letter-spacing="-0.02em">FliTools</text>
+    <text x="210" y="38" fill="#c084fc" font-family="Inter, system-ui, sans-serif" font-weight="500" font-size="20">.cyou</text>
+  </g>
+
+  <!-- Main Headline -->
+  <text x="130" y="275" fill="#ffffff" font-family="Inter, system-ui, sans-serif" font-weight="300" font-size="52" letter-spacing="-0.03em" line-height="1.1">
+    100% Client-Side Digital Utilities
+  </text>
+  
+  <text x="130" y="335" fill="#e9d5ff" font-family="Inter, system-ui, sans-serif" font-weight="600" font-size="44" letter-spacing="-0.02em">
+    Zero Server Uploads. Total Privacy.
+  </text>
+
+  <!-- Feature Tags -->
+  <g transform="translate(130, 420)">
+    <!-- Tag 1 -->
+    <rect x="0" y="0" width="230" height="48" rx="24" fill="#2a134a" stroke="#7832be" stroke-width="1"/>
+    <text x="115" y="29" fill="#e9d5ff" font-family="Inter, system-ui, sans-serif" font-weight="500" font-size="16" text-anchor="middle">GIF & Video Studio</text>
+
+    <!-- Tag 2 -->
+    <rect x="246" y="0" width="220" height="48" rx="24" fill="#2a134a" stroke="#7832be" stroke-width="1"/>
+    <text x="356" y="29" fill="#e9d5ff" font-family="Inter, system-ui, sans-serif" font-weight="500" font-size="16" text-anchor="middle">Image Compressor</text>
+
+    <!-- Tag 3 -->
+    <rect x="482" y="0" width="190" height="48" rx="24" fill="#2a134a" stroke="#7832be" stroke-width="1"/>
+    <text x="577" y="29" fill="#e9d5ff" font-family="Inter, system-ui, sans-serif" font-weight="500" font-size="16" text-anchor="middle">PDF & Audio Tools</text>
+
+    <!-- Tag 4 -->
+    <rect x="688" y="0" width="210" height="48" rx="24" fill="#2a134a" stroke="#7832be" stroke-width="1"/>
+    <text x="793" y="29" fill="#e9d5ff" font-family="Inter, system-ui, sans-serif" font-weight="500" font-size="16" text-anchor="middle">JSON & QR Utilities</text>
+  </g>
+
+  <!-- Definitions -->
+  <defs>
+    <linearGradient id="card_grad" x1="80" y1="70" x2="1120" y2="560" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#1d0b36" stop-opacity="0.85"/>
+      <stop offset="0.5" stop-color="#2d0f55" stop-opacity="0.7"/>
+      <stop offset="1" stop-color="#120524" stop-opacity="0.9"/>
+    </linearGradient>
+
+    <linearGradient id="border_grad" x1="80" y1="70" x2="1120" y2="560" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#a855f7" stop-opacity="0.6"/>
+      <stop offset="0.5" stop-color="#4b1e85" stop-opacity="0.3"/>
+      <stop offset="1" stop-color="#7832be" stop-opacity="0.5"/>
+    </linearGradient>
+
+    <linearGradient id="logo_bg" x1="0" y1="0" x2="56" y2="56" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#4b1e85"/>
+      <stop offset="1" stop-color="#1e0a38"/>
+    </linearGradient>
+  </defs>
 </svg>
