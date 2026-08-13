@@ -30,6 +30,7 @@ export default function OgImage() {
         {/* Background Ambient Radial Glows */}
         <div
           style={{
+            display: "flex",
             position: "absolute",
             top: "-120px",
             left: "-120px",
@@ -41,6 +42,7 @@ export default function OgImage() {
         />
         <div
           style={{
+            display: "flex",
             position: "absolute",
             bottom: "-120px",
             right: "-120px",
@@ -64,7 +66,7 @@ export default function OgImage() {
               borderRadius: "999px",
             }}
           >
-            <div style={{ width: "10px", height: "10px", borderRadius: "50%", backgroundColor: "#38bdf8" }} />
+            <div style={{ display: "flex", width: "10px", height: "10px", borderRadius: "50%", backgroundColor: "#38bdf8" }} />
             <span style={{ fontSize: "14px", fontWeight: 700, color: "#e0f2fe", letterSpacing: "1px" }}>
               100% CLIENT-SIDE • ZERO SERVER UPLOADS
             </span>
@@ -81,14 +83,14 @@ export default function OgImage() {
           <div style={{ display: "flex", alignItems: "center", gap: "20px" }}>
             <div
               style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
                 width: "68px",
                 height: "68px",
                 borderRadius: "20px",
                 backgroundColor: "#2e1065",
                 border: "2px solid rgba(192, 132, 252, 0.6)",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
                 fontSize: "36px",
               }}
             >
@@ -99,24 +101,25 @@ export default function OgImage() {
             </span>
           </div>
 
-          <div style={{ fontSize: "44px", fontWeight: 300, color: "#f3e8ff", letterSpacing: "-1px", lineHeight: 1.15 }}>
-            Free Browser Digital <span style={{ fontWeight: 800, color: "#ffffff" }}>Utilities & Media Tools</span>
+          <div style={{ display: "flex", fontSize: "44px", fontWeight: 300, color: "#f3e8ff", letterSpacing: "-1px", lineHeight: 1.15 }}>
+            <span>Free Browser Digital&nbsp;</span>
+            <span style={{ fontWeight: 800, color: "#ffffff" }}>Utilities & Media Tools</span>
           </div>
 
-          <div style={{ fontSize: "20px", color: "#d8b4fe", opacity: 0.9, lineHeight: 1.45 }}>
+          <div style={{ display: "flex", fontSize: "20px", color: "#d8b4fe", opacity: 0.9, lineHeight: 1.45 }}>
             Process GIFs, compress photos, split PDFs, trim waveforms, format JSON & generate QR codes — 100% locally in your browser.
           </div>
         </div>
 
         {/* Bottom Feature Badges */}
         <div style={{ display: "flex", gap: "16px", zIndex: 10 }}>
-          <div style={{ backgroundColor: "#2e1065", border: "1px solid rgba(192, 132, 252, 0.4)", padding: "10px 24px", borderRadius: "999px", fontSize: "15px", fontWeight: 600, color: "#f3e8ff" }}>
+          <div style={{ display: "flex", backgroundColor: "#2e1065", border: "1px solid rgba(192, 132, 252, 0.4)", padding: "10px 24px", borderRadius: "999px", fontSize: "15px", fontWeight: 600, color: "#f3e8ff" }}>
             🔒 100% Private
           </div>
-          <div style={{ backgroundColor: "#2e1065", border: "1px solid rgba(192, 132, 252, 0.4)", padding: "10px 24px", borderRadius: "999px", fontSize: "15px", fontWeight: 600, color: "#f3e8ff" }}>
+          <div style={{ display: "flex", backgroundColor: "#2e1065", border: "1px solid rgba(192, 132, 252, 0.4)", padding: "10px 24px", borderRadius: "999px", fontSize: "15px", fontWeight: 600, color: "#f3e8ff" }}>
             ⚡ High Speed Execution
           </div>
-          <div style={{ backgroundColor: "#2e1065", border: "1px solid rgba(192, 132, 252, 0.4)", padding: "10px 24px", borderRadius: "999px", fontSize: "15px", fontWeight: 600, color: "#f3e8ff" }}>
+          <div style={{ display: "flex", backgroundColor: "#2e1065", border: "1px solid rgba(192, 132, 252, 0.4)", padding: "10px 24px", borderRadius: "999px", fontSize: "15px", fontWeight: 600, color: "#f3e8ff" }}>
             ✨ Free & Unlimited
           </div>
         </div>
