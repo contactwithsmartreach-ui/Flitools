@@ -135,20 +135,20 @@ export default function RootLayout({
   };
 
   return (
-    <html lang="en" className="dark">
-      <head>
+    <html lang="en" className="dark" suppressHydrationWarning>
+      <body
+        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-[#080314] text-white selection:bg-purple-500 selection:text-white`}
+      >
         <script
+          id="faq-jsonld"
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
         />
         <script
+          id="website-jsonld"
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema) }}
         />
-      </head>
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-[#080314] text-white selection:bg-purple-500 selection:text-white`}
-      >
         {children}
       </body>
     </html>

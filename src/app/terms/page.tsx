@@ -26,7 +26,7 @@ export default function TermsPage() {
           </div>
           <div>
             <h1 className="text-3xl font-light tracking-tight text-white">Terms of Service</h1>
-            <p className="text-xs text-purple-300/60 mt-0.5">Last updated: {new Date().toLocaleDateString("en-US", { month: "long", year: "numeric" })}</p>
+            <p className="text-xs text-purple-300/60 mt-0.5">Last updated: February 2025</p>
           </div>
         </div>
 
