@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { TOOLS_LIST, CATEGORIES, ToolItem } from "@/data/tools";
 import { 
   Search, 
@@ -39,17 +39,22 @@ export default function ToolsGrid({ onSelectTool }: ToolsGridProps) {
   const [search, setSearch] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
 
-  const filteredTools = TOOLS_LIST.filter((tool) => {
-    const matchesCategory =
-      selectedCategory === "All" || tool.category === selectedCategory;
-    const matchesSearch =
-      tool.title.toLowerCase().includes(search.toLowerCase()) ||
-      tool.description.toLowerCase().includes(search.toLowerCase());
-    return matchesCategory && matchesSearch;
-  });
+  // Memoize search filtering to prevent re-computation on unrelated state updates
+  const filteredTools = useMemo(() => {
+    const query = search.trim().toLowerCase();
+    return TOOLS_LIST.filter((tool) => {
+      const matchesCategory =
+        selectedCategory === "All" || tool.category === selectedCategory;
+      const matchesSearch =
+        !query ||
+        tool.title.toLowerCase().includes(query) ||
+        tool.description.toLowerCase().includes(query);
+      return matchesCategory && matchesSearch;
+    });
+  }, [search, selectedCategory]);
 
   return (
-    <section id="tools-directory" className="w-full py-16 px-4 md:px-12 bg-[#080314]/90 text-white relative z-30">
+    <section id="tools-directory" className="w-full py-16 px-4 md:px-12 bg-[#080314]/90 text-white relative z-30 transform-gpu">
       <div className="max-w-6xl mx-auto space-y-8">
         
         {/* Header */}
@@ -62,7 +67,7 @@ export default function ToolsGrid({ onSelectTool }: ToolsGridProps) {
 
           {/* Search input with purple glass glow */}
           <div className="relative w-full md:w-80">
-            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-purple-300/60" />
+            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-purple-300/60 pointer-events-none" />
             <input
               type="text"
               value={search}
@@ -100,24 +105,21 @@ export default function ToolsGrid({ onSelectTool }: ToolsGridProps) {
             </p>
           </div>
         ) : (
-          <motion.div 
-            layout
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
-          >
-            <AnimatePresence>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <AnimatePresence mode="popLayout">
               {filteredTools.map((tool) => (
                 <motion.div
                   key={tool.id}
-                  layout
-                  initial={{ opacity: 0, scale: 0.96 }}
+                  layout="position"
+                  initial={{ opacity: 0, scale: 0.97 }}
                   animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.96 }}
-                  transition={{ duration: 0.3 }}
+                  exit={{ opacity: 0, scale: 0.97 }}
+                  transition={{ duration: 0.2, ease: "easeOut" }}
                   onClick={() => onSelectTool?.(tool)}
-                  className="relative min-h-[19em] w-full border-2 border-[rgba(75,30,133,0.5)] rounded-[1.5em] bg-gradient-to-br from-[rgba(75,30,133,1)] via-purple-700/80 to-[rgba(75,30,133,0.2)] text-white p-[1.5em] flex justify-between flex-col gap-[1em] backdrop-blur-[12px] hover:shadow-2xl hover:shadow-purple-500/30 transition-all duration-500 group/card hover:-translate-y-1 cursor-pointer overflow-hidden"
+                  className="relative min-h-[19em] w-full border-2 border-[rgba(75,30,133,0.5)] rounded-[1.5em] bg-gradient-to-br from-[rgba(75,30,133,1)] via-purple-700/80 to-[rgba(75,30,133,0.2)] text-white p-[1.5em] flex justify-between flex-col gap-[1em] backdrop-blur-[12px] hover:shadow-2xl hover:shadow-purple-500/30 transition-all duration-300 group/card hover:-translate-y-1 cursor-pointer overflow-hidden transform-gpu"
                 >
-                  <div className="absolute inset-0 bg-gradient-to-br from-purple-600/30 via-fuchsia-500/20 to-transparent opacity-0 group-hover/card:opacity-100 transition-opacity duration-500 rounded-[1.5em] pointer-events-none"></div>
-                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(120,50,190,0.1),transparent_60%)] group-hover/card:animate-pulse pointer-events-none"></div>
+                  <div className="absolute inset-0 bg-gradient-to-br from-purple-600/30 via-fuchsia-500/20 to-transparent opacity-0 group-hover/card:opacity-100 transition-opacity duration-300 rounded-[1.5em] pointer-events-none"></div>
+                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(120,50,190,0.1),transparent_60%)] pointer-events-none"></div>
 
                   <div className="absolute top-4 right-4 flex items-center gap-2 z-20">
                     {tool.badge && (
@@ -132,7 +134,7 @@ export default function ToolsGrid({ onSelectTool }: ToolsGridProps) {
                     </div>
                   </div>
 
-                  <div className="relative z-10 transition-transform duration-300 group-hover/card:translate-y-[-2px] space-y-3 pt-2">
+                  <div className="relative z-10 space-y-3 pt-2">
                     <div className="flex items-center gap-2.5">
                       <div className="p-2 rounded-xl bg-purple-950/60 border border-purple-300/20 shadow-inner">
                         {iconMap[tool.iconName] || <Wrench className="w-5 h-5 text-purple-200" />}
@@ -175,11 +177,11 @@ export default function ToolsGrid({ onSelectTool }: ToolsGridProps) {
                     </button>
                   </div>
 
-                  <div className="absolute bottom-4 left-4 w-8 h-8 rounded-full bg-gradient-to-br from-purple-400/20 to-transparent blur-sm group-hover/card:animate-pulse pointer-events-none"></div>
+                  <div className="absolute bottom-4 left-4 w-8 h-8 rounded-full bg-gradient-to-br from-purple-400/20 to-transparent blur-sm pointer-events-none"></div>
                 </motion.div>
               ))}
             </AnimatePresence>
-          </motion.div>
+          </div>
         )}
       </div>
     </section>
