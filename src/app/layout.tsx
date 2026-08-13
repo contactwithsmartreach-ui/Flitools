@@ -55,18 +55,11 @@ export const metadata: Metadata = {
     siteName: "FliTools",
     images: [
       {
-        url: "https://flitools.cyou/og-image.png",
+        url: "https://flitools.cyou/opengraph-image",
         width: 1200,
         height: 630,
-        alt: "FliTools — Client-Side Digital Utilities & Media Directory",
+        alt: "FliTools — Client-Side Digital Utilities Directory",
         type: "image/png",
-      },
-      {
-        url: "https://flitools.cyou/og-image.svg",
-        width: 1200,
-        height: 630,
-        alt: "FliTools — Client-Side Digital Utilities & Media Directory",
-        type: "image/svg+xml",
       },
     ],
     locale: "en_US",
@@ -77,7 +70,7 @@ export const metadata: Metadata = {
     title: "FliTools — Free Client-Side Digital Utilities",
     description:
       "Convert GIFs, compress photos, merge PDFs, trim waveforms, and format JSON locally in your browser. No files leave your device.",
-    images: ["https://flitools.cyou/og-image.png"],
+    images: ["https://flitools.cyou/opengraph-image"],
   },
   icons: {
     icon: [
@@ -143,6 +136,26 @@ export default function RootLayout({
 
   return (
     <html lang="en" className="dark" suppressHydrationWarning>
+      <head>
+        {/* Direct Open Graph meta tags for WhatsApp, Telegram, iMessage & Facebook crawlers */}
+        <meta property="og:title" content="FliTools — 100% Client-Side Free Digital Utilities" />
+        <meta property="og:description" content="Process images, videos, audio, PDFs, and code directly in your browser with zero server uploads." />
+        <meta property="og:image" content="https://flitools.cyou/opengraph-image" />
+        <meta property="og:image:secure_url" content="https://flitools.cyou/opengraph-image" />
+        <meta property="og:image:type" content="image/png" />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
+        <meta property="og:image:alt" content="FliTools — Client-Side Digital Utilities Directory" />
+        <meta property="og:url" content="https://flitools.cyou" />
+        <meta property="og:type" content="website" />
+        <meta property="og:site_name" content="FliTools" />
+
+        {/* Twitter Card tags */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="FliTools — 100% Client-Side Free Digital Utilities" />
+        <meta name="twitter:description" content="Convert GIFs, compress photos, merge PDFs, trim waveforms, and format JSON locally in your browser." />
+        <meta name="twitter:image" content="https://flitools.cyou/opengraph-image" />
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-[#080314] text-white selection:bg-purple-500 selection:text-white`}
       >
