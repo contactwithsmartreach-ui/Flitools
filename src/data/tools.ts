@@ -14,6 +14,16 @@ export interface ToolItem {
 
 export const TOOLS_LIST: ToolItem[] = [
   {
+    id: "image-to-pdf",
+    title: "Image to PDF Converter",
+    description: "Convert and combine multiple images into a single PDF document 100% locally.",
+    path: "/tools/image-to-pdf.html",
+    htmlPath: "/tools/image-to-pdf.html",
+    iconName: "FileText",
+    category: "Documents",
+    badge: "Live Tool"
+  },
+  {
     id: "image-to-text-ocr",
     title: "Image to Text (OCR)",
     description: "Extract readable text from photos, screenshots, and scanned documents 100% locally.",

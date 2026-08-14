@@ -25,6 +25,12 @@
     <priority>0.5</priority>
   </url>
   <url>
+    <loc>https://flitools.cyou/tools/image-to-pdf.html</loc>
+    <lastmod>2025-02-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://flitools.cyou/tools/image-to-text-ocr.html</loc>
     <lastmod>2025-02-23</lastmod>
     <changefreq>weekly</changefreq>
