@@ -14,6 +14,26 @@ export interface ToolItem {
 
 export const TOOLS_LIST: ToolItem[] = [
   {
+    id: "audio-studio",
+    title: "Audio Studio",
+    description: "Edit, process, analyze, and convert audio files completely inside your browser.",
+    path: "/tools/audio-studio.html",
+    htmlPath: "/tools/audio-studio.html",
+    iconName: "Mic",
+    category: "Media",
+    badge: "Live Tool"
+  },
+  {
+    id: "pdf-studio",
+    title: "PDF Studio",
+    description: "Complete client-side suite for viewing, editing, organizing, and converting PDF documents.",
+    path: "/tools/pdf-studio.html",
+    htmlPath: "/tools/pdf-studio.html",
+    iconName: "FileText",
+    category: "Documents",
+    badge: "Live Tool"
+  },
+  {
     id: "image-to-pdf",
     title: "Image to PDF Converter",
     description: "Convert and combine multiple images into a single PDF document 100% locally.",

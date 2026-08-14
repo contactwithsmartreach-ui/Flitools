@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Audio Studio — Trim, Mix &amp; Export Audio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<!-- All audio processing runs with the browser's native Web Audio API (decodeAudioData,
+     OfflineAudioContext, BiquadFilterNode). Nothing is uploaded — files are decoded,
+     rendered, and re-encoded to WAV entirely on your device. -->
+<style>
+  :root{ --ease: cubic-bezier(0.16, 1, 0.3, 1); }
+  *{ font-family: 'Inter', sans-serif; }
+  body{ background:#fff; color:#000; }
+
+  @keyframes fadeSlideDown{ from{opacity:0; transform:translateY(-16px);} to{opacity:1; transform:translateY(0);} }
+  @keyframes fadeSlideUp{ from{opacity:0; transform:translateY(20px);} to{opacity:1; transform:translateY(0);} }
+  @keyframes fadeScaleIn{ from{opacity:0; transform:scale(1.05);} to{opacity:1; transform:scale(1);} }
+  .anim-navbar{ animation: fadeSlideDown 0.8s var(--ease) both; }
+  .anim-bg{ animation: fadeScaleIn 1.8s var(--ease) both; }
+  .anim-footer{ animation: fadeSlideUp 1s var(--ease) both; animation-delay:.5s; }
+  .anim-subtitle{ animation: fadeSlideUp .8s var(--ease) both; animation-delay:.6s; }
+  .anim-heading{ animation: fadeSlideUp .8s var(--ease) both; animation-delay:.8s; }
+  .anim-buttons{ animation: fadeSlideUp .8s var(--ease) both; animation-delay:1s; }
+
+  .hero-heading{ font-weight:300; letter-spacing:-0.03em; line-height:1; font-size:clamp(2rem, 8vw, 4.5rem); }
+  @media (min-width:768px){ .hero-heading{ font-size:clamp(2.5rem, 5.5vw, 4.5rem); } }
+
+  .hero-gradient-bg{
+    background:
+      radial-gradient(circle at 20% 20%, rgba(0,0,0,0.06), transparent 45%),
+      radial-gradient(circle at 80% 30%, rgba(0,0,0,0.04), transparent 50%),
+      linear-gradient(135deg, #fafafa 0%, #f0f0f2 100%);
+  }
+  .hero-fade{ background: linear-gradient(to top, #ffffff 0%, rgba(255,255,255,0.85) 55%, transparent 100%); }
+
+  .drop-zone{ transition: border-color .2s ease, background-color .2s ease; }
+  .drop-zone.dragover{ border-color:#000; background-color:#f7f7f7; }
+
+  .file-row{ transition: background-color .15s ease; }
+  .file-row.active{ background:#F4F4F6; }
+  .file-row button.icon-btn{
+    width:22px; height:22px; border-radius:9999px; font-size:11px;
+    display:flex; align-items:center; justify-content:center; line-height:1;
+    background:#fff; box-shadow:0 0 0 1px rgba(0,0,0,0.12);
+  }
+  .file-row button.icon-btn:disabled{ opacity:.3; }
+
+  input[type=range]{ accent-color:#000; }
+  .edit-tool-btn{ font-size:12px; border:1px solid rgba(0,0,0,0.15); border-radius:9999px; padding:6px 14px; background:#fff; }
+  .edit-tool-btn.active{ background:#000; color:#fff; }
+  .edit-tool-btn:disabled{ opacity:.3; cursor:not-allowed; }
+
+  ::-webkit-scrollbar{ width:8px; }
+  ::-webkit-scrollbar-thumb{ background:#ddd; border-radius:9999px; }
+</style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+<!-- ============ HERO ============ -->
+<section class="relative w-full min-h-screen flex flex-col justify-between overflow-hidden">
+  <div class="anim-bg absolute inset-0 z-0 hero-gradient-bg"></div>
+
+  <nav class="anim-navbar relative z-50 flex items-center justify-between px-4 py-4 md:px-8 md:py-6" style="pointer-events:none;">
+    <div class="flex items-center gap-3 md:gap-5" style="pointer-events:auto;">
+      <div class="flex items-center gap-2">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+          <path d="M4 12h2l2-6 3 14 2-9 2 5 2-4h3" stroke="black" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <span class="hidden md:inline text-sm font-medium tracking-tight">Audio Studio</span>
+      </div>
+      <div class="hidden md:flex items-center gap-3 rounded-full px-4 py-2" style="background:#F4F4F6;">
+        <span class="text-[11px] text-black/70">In-Browser</span>
+        <span class="text-[11px] text-black/70">No Uploads</span>
+      </div>
+    </div>
+    <div class="hidden md:flex items-center gap-3" style="pointer-events:auto;">
+      <div class="flex items-center gap-2 rounded-full pl-2 pr-4 py-1.5" style="background:#F4F4F6;">
+        <span class="flex items-center justify-center bg-black rounded-full" style="width:28px;height:28px;">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="white">
+            <rect x="2" y="2" width="7" height="7" rx="1.5"/><rect x="15" y="2" width="7" height="7" rx="1.5"/>
+            <rect x="2" y="15" width="7" height="7" rx="1.5"/><rect x="15" y="15" width="7" height="7" rx="1.5"/>
+          </svg>
+        </span>
+        <span class="text-[11px] text-black/70">100% Client-Side</span>
+      </div>
+    </div>
+  </nav>
+
+  <div class="anim-footer relative z-30 hero-fade px-4 pb-8 pt-24 md:px-8 md:pb-10">
+    <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-8">
+      <div>
+        <div class="anim-subtitle flex items-center gap-2 mb-4">
+          <span class="rounded-full bg-black" style="width:8px;height:8px;"></span>
+          <span class="text-[13px]" style="color:rgba(0,0,0,0.55);">Trim, mix, and export audio, right here</span>
+        </div>
+        <h1 class="anim-heading hero-heading mb-6">
+          Audio In,<br/>Zero Uploads.<br/>Mix Out.
+        </h1>
+        <div class="anim-buttons flex items-center gap-3">
+          <a href="#how-it-works" class="bg-black text-white text-[13px] rounded-full px-5 py-2.5">How It Works</a>
+        </div>
+      </div>
+      <div class="flex items-center gap-2 md:justify-end flex-wrap">
+        <span class="text-[11px] rounded-full px-3 py-1.5 bg-white border" style="border-color:rgba(0,0,0,0.12);">Trim &amp; Join</span>
+        <span class="text-[11px] rounded-full px-3 py-1.5 bg-white border" style="border-color:rgba(0,0,0,0.12);">Volume &amp; EQ</span>
+        <span class="text-[11px] rounded-full px-3 py-1.5 bg-white border" style="border-color:rgba(0,0,0,0.12);">Speed &amp; Reverse</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ TOOL ============ -->
+<section id="tool" class="w-full max-w-6xl mx-auto px-4 md:px-8 py-16">
+
+  <div class="mb-10">
+    <h2 class="text-2xl md:text-3xl font-light tracking-tight mb-2">Edit your audio</h2>
+    <p class="text-sm text-black/50">Upload one or more audio files, trim and mix each one, then export as WAV — nothing ever leaves your browser.</p>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
+
+    <!-- LEFT: upload + effects -->
+    <div class="flex flex-col gap-8">
+
+      <div>
+        <h3 class="text-sm font-medium mb-3">1. Upload audio</h3>
+        <div id="dropZone" class="drop-zone border-2 border-dashed border-black/20 rounded-2xl flex flex-col items-center justify-center text-center py-14 px-6 cursor-pointer">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="1.5" class="mb-3 opacity-60">
+            <path d="M12 16V4M12 4l-4 4M12 4l4 4" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <p class="text-sm font-medium">Drag &amp; drop audio files, or click to browse</p>
+          <p class="text-xs text-black/40 mt-1">MP3, WAV, M4A, OGG and most other formats your browser can decode</p>
+          <input id="fileInput" type="file" accept="audio/*" multiple class="hidden">
+        </div>
+        <div id="fileList" class="flex flex-col gap-1 mt-4"></div>
+        <p id="frameCount" class="text-xs text-black/40 mt-2">0 files added</p>
+      </div>
+
+      <div>
+        <h3 class="text-sm font-medium mb-3">2. Effects</h3>
+        <div class="border border-black/10 rounded-2xl p-5 flex flex-col gap-5">
+
+          <div>
+            <div class="flex items-center justify-between mb-1">
+              <label class="text-xs text-black/60">Volume</label>
+              <span id="volumeVal" class="text-xs text-black/40">0 dB</span>
+            </div>
+            <input id="volumeRange" type="range" min="-20" max="20" step="1" value="0" class="w-full">
+          </div>
+
+          <div>
+            <div class="flex items-center justify-between mb-1">
+              <label class="text-xs text-black/60">Speed <span class="text-black/30">(also shifts pitch)</span></label>
+              <span id="speedVal" class="text-xs text-black/40">1.0x</span>
+            </div>
+            <input id="speedRange" type="range" min="0.5" max="2" step="0.05" value="1" class="w-full">
+          </div>
+
+          <div class="grid grid-cols-3 gap-3">
+            <div>
+              <div class="flex items-center justify-between mb-1"><label class="text-xs text-black/60">Bass</label></div>
+              <input id="bassRange" type="range" min="-12" max="12" step="1" value="0" class="w-full">
+            </div>
+            <div>
+              <div class="flex items-center justify-between mb-1"><label class="text-xs text-black/60">Mid</label></div>
+              <input id="midRange" type="range" min="-12" max="12" step="1" value="0" class="w-full">
+            </div>
+            <div>
+              <div class="flex items-center justify-between mb-1"><label class="text-xs text-black/60">Treble</label></div>
+              <input id="trebleRange" type="range" min="-12" max="12" step="1" value="0" class="w-full">
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="text-xs text-black/60 block mb-1">Fade in (s)</label>
+              <input id="fadeInInput" type="number" min="0" step="0.1" value="0" class="w-full text-[13px] border border-black/15 rounded-lg px-3 py-1.5">
+            </div>
+            <div>
+              <label class="text-xs text-black/60 block mb-1">Fade out (s)</label>
+              <input id="fadeOutInput" type="number" min="0" step="0.1" value="0" class="w-full text-[13px] border border-black/15 rounded-lg px-3 py-1.5">
+            </div>
+          </div>
+
+          <div class="flex items-center justify-between">
+            <label class="text-xs text-black/60">Reverse audio</label>
+            <input id="reverseCheckbox" type="checkbox" class="accent-black w-4 h-4">
+          </div>
+
+          <p class="text-xs text-black/40">Effects apply to every file when you export.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: preview/trim + export -->
+    <div class="flex flex-col gap-8">
+      <div>
+        <div class="flex items-center justify-between mb-3">
+          <h3 class="text-sm font-medium">3. Preview &amp; trim</h3>
+        </div>
+        <div class="border border-black/10 rounded-2xl p-5 flex flex-col gap-4">
+          <audio id="previewPlayer" controls class="w-full"></audio>
+          <p id="previewHint" class="text-xs text-black/30">Select a file on the left to preview and trim it.</p>
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="text-xs text-black/60 block mb-1">Start (s)</label>
+              <input id="trimStartInput" type="number" min="0" step="0.1" class="w-full text-[13px] border border-black/15 rounded-lg px-3 py-1.5" disabled>
+            </div>
+            <div>
+              <label class="text-xs text-black/60 block mb-1">End (s)</label>
+              <input id="trimEndInput" type="number" min="0" step="0.1" class="w-full text-[13px] border border-black/15 rounded-lg px-3 py-1.5" disabled>
+            </div>
+          </div>
+          <div class="flex items-center gap-2 flex-wrap">
+            <button id="previewRenderBtn" class="edit-tool-btn" disabled>▶ Preview With Effects</button>
+            <button id="resetTrimBtn" class="edit-tool-btn" disabled>Reset Trim</button>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="flex items-center justify-between mb-3">
+          <h3 class="text-sm font-medium">4. Export</h3>
+        </div>
+        <div class="border border-black/10 rounded-2xl p-5 flex flex-col gap-4">
+          <div>
+            <label class="text-xs text-black/60 block mb-1">Export mode</label>
+            <select id="exportModeSelect" class="w-full text-[13px] border border-black/15 rounded-lg px-3 py-2 bg-white">
+              <option value="separate" selected>Export each file separately</option>
+              <option value="join">Join all files into one</option>
+            </select>
+          </div>
+          <button id="exportBtn" class="bg-black text-white text-[13px] rounded-full px-5 py-2.5 disabled:opacity-30 disabled:cursor-not-allowed" disabled>
+            Render &amp; Download WAV
+          </button>
+          <div id="progressWrap" class="hidden">
+            <div class="w-full h-1.5 bg-black/10 rounded-full overflow-hidden">
+              <div id="progressBar" class="h-full bg-black" style="width:0%;"></div>
+            </div>
+            <p id="progressLabel" class="text-xs text-black/40 mt-1">Rendering…</p>
+          </div>
+          <p class="text-xs text-black/40">Rendering runs locally with the browser's Web Audio API — files are decoded and re-encoded on your device, never uploaded.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ HOW IT WORKS ============ -->
+<section id="how-it-works" class="w-full bg-black/[0.02] border-t border-black/10">
+  <div class="max-w-6xl mx-auto px-4 md:px-8 py-16">
+    <div class="mb-10">
+      <h2 class="text-2xl md:text-3xl font-light tracking-tight mb-2">How it works</h2>
+      <p class="text-sm text-black/50 max-w-2xl">Audio Studio decodes, edits, and re-encodes your audio entirely inside your browser. No files are ever sent to a server — everything below happens on your own device.</p>
+    </div>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div>
+        <div class="flex items-center justify-center rounded-full bg-black text-white text-sm font-medium mb-4" style="width:32px;height:32px;">1</div>
+        <h3 class="text-sm font-medium mb-2">Upload your audio</h3>
+        <p class="text-xs text-black/50 leading-relaxed">Drag and drop, or click to browse, one or more audio files. Each is decoded locally the moment it's added.</p>
+      </div>
+      <div>
+        <div class="flex items-center justify-center rounded-full bg-black text-white text-sm font-medium mb-4" style="width:32px;height:32px;">2</div>
+        <h3 class="text-sm font-medium mb-2">Trim &amp; mix</h3>
+        <p class="text-xs text-black/50 leading-relaxed">Select a file to preview and trim it, then dial in volume, speed, a 3-band EQ, fades, or reverse.</p>
+      </div>
+      <div>
+        <div class="flex items-center justify-center rounded-full bg-black text-white text-sm font-medium mb-4" style="width:32px;height:32px;">3</div>
+        <h3 class="text-sm font-medium mb-2">Preview the result</h3>
+        <p class="text-xs text-black/50 leading-relaxed">Hit "Preview With Effects" to hear exactly what your export will sound like before you download anything.</p>
+      </div>
+      <div>
+        <div class="flex items-center justify-center rounded-full bg-black text-white text-sm font-medium mb-4" style="width:32px;height:32px;">4</div>
+        <h3 class="text-sm font-medium mb-2">Export</h3>
+        <p class="text-xs text-black/50 leading-relaxed">Download each file separately, or join them all into a single WAV, in the order shown in your file list.</p>
+      </div>
+    </div>
+    <div class="mt-10">
+      <a href="#tool" class="bg-black text-white text-[13px] rounded-full px-5 py-2.5 inline-block">Get Started</a>
+    </div>
+  </div>
+</section>
+
+<footer class="text-center text-xs text-black/30 py-8">
+  Built entirely client-side — your audio never leaves this browser.
+</footer>
+
+<script>
+(function(){
+  const dropZone = document.getElementById('dropZone');
+  const fileInput = document.getElementById('fileInput');
+  const fileList = document.getElementById('fileList');
+  const frameCount = document.getElementById('frameCount');
+
+  const volumeRange = document.getElementById('volumeRange');
+  const volumeVal = document.getElementById('volumeVal');
+  const speedRange = document.getElementById('speedRange');
+  const speedVal = document.getElementById('speedVal');
+  const bassRange = document.getElementById('bassRange');
+  const midRange = document.getElementById('midRange');
+  const trebleRange = document.getElementById('trebleRange');
+  const fadeInInput = document.getElementById('fadeInInput');
+  const fadeOutInput = document.getElementById('fadeOutInput');
+  const reverseCheckbox = document.getElementById('reverseCheckbox');
+
+  const previewPlayer = document.getElementById('previewPlayer');
+  const previewHint = document.getElementById('previewHint');
+  const trimStartInput = document.getElementById('trimStartInput');
+  const trimEndInput = document.getElementById('trimEndInput');
+  const previewRenderBtn = document.getElementById('previewRenderBtn');
+  const resetTrimBtn = document.getElementById('resetTrimBtn');
+
+  const exportModeSelect = document.getElementById('exportModeSelect');
+  const exportBtn = document.getElementById('exportBtn');
+  const progressWrap = document.getElementById('progressWrap');
+  const progressBar = document.getElementById('progressBar');
+  const progressLabel = document.getElementById('progressLabel');
+
+  const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+  let items = []; // { file, name, buffer, trimStart, trimEnd, duration }
+  let activeItem = null;
+
+  volumeRange.addEventListener('input', () => volumeVal.textContent = volumeRange.value + ' dB');
+  speedRange.addEventListener('input', () => speedVal.textContent = parseFloat(speedRange.value).toFixed(2) + 'x');
+
+  function activeIdx(){ return activeItem ? items.indexOf(activeItem) : -1; }
+
+  function updateFrameCount(){
+    frameCount.textContent = items.length + ' file' + (items.length===1?'':'s') + ' added';
+    exportBtn.disabled = items.length < 1;
+  }
+
+  function fmtTime(s){
+    if (!isFinite(s)) return '0:00';
+    const m = Math.floor(s/60), sec = Math.floor(s%60);
+    return m + ':' + String(sec).padStart(2,'0');
+  }
+
+  function renderFileList(){
+    fileList.innerHTML = '';
+    items.forEach((item, idx) => {
+      const row = document.createElement('div');
+      row.className = 'file-row flex items-center gap-2 rounded-lg px-2 py-2 cursor-pointer border border-black/10' + (item === activeItem ? ' active' : '');
+      row.innerHTML = `
+        <span class="text-xs text-black/30 w-4 text-center">${idx+1}</span>
+        <span class="flex-1 text-[13px] truncate">${item.name}</span>
+        <span class="text-xs text-black/40">${fmtTime(item.duration)}</span>
+      `;
+      const btns = document.createElement('div');
+      btns.className = 'flex items-center gap-1';
+
+      const up = document.createElement('button');
+      up.className = 'icon-btn'; up.textContent = '↑'; up.disabled = idx === 0;
+      up.onclick = (e) => { e.stopPropagation(); if (idx===0) return; [items[idx-1], items[idx]] = [items[idx], items[idx-1]]; renderFileList(); };
+
+      const down = document.createElement('button');
+      down.className = 'icon-btn'; down.textContent = '↓'; down.disabled = idx === items.length-1;
+      down.onclick = (e) => { e.stopPropagation(); if (idx===items.length-1) return; [items[idx+1], items[idx]] = [items[idx], items[idx+1]]; renderFileList(); };
+
+      const del = document.createElement('button');
+      del.className = 'icon-btn'; del.textContent = '×';
+      del.onclick = (e) => {
+        e.stopPropagation();
+        const wasActive = item === activeItem;
+        items.splice(idx,1);
+        if (wasActive) { activeItem = null; showActiveInPreview(); }
+        renderFileList();
+      };
+
+      btns.appendChild(up); btns.appendChild(down); btns.appendChild(del);
+      row.appendChild(btns);
+      row.addEventListener('click', () => { activeItem = item; renderFileList(); showActiveInPreview(); });
+      fileList.appendChild(row);
+    });
+    updateFrameCount();
+  }
+
+  function showActiveInPreview(){
+    const idx = activeIdx();
+    if (idx < 0) {
+      previewPlayer.removeAttribute('src');
+      previewHint.textContent = 'Select a file on the left to preview and trim it.';
+      previewHint.classList.remove('hidden');
+      [trimStartInput, trimEndInput, previewRenderBtn, resetTrimBtn].forEach(b => b.disabled = true);
+      return;
+    }
+    const item = items[idx];
+    previewPlayer.src = item.originalUrl;
+    previewHint.textContent = item.name + ' — ' + fmtTime(item.duration) + ' total';
+    trimStartInput.disabled = false;
+    trimEndInput.disabled = false;
+    previewRenderBtn.disabled = false;
+    resetTrimBtn.disabled = false;
+    trimStartInput.value = item.trimStart.toFixed(2);
+    trimEndInput.value = item.trimEnd.toFixed(2);
+    trimStartInput.max = item.duration;
+    trimEndInput.max = item.duration;
+  }
+
+  trimStartInput.addEventListener('change', () => {
+    const idx = activeIdx(); if (idx < 0) return;
+    const item = items[idx];
+    let v = parseFloat(trimStartInput.value) || 0;
+    v = Math.max(0, Math.min(v, item.trimEnd - 0.05));
+    item.trimStart = v;
+    trimStartInput.value = v.toFixed(2);
+  });
+  trimEndInput.addEventListener('change', () => {
+    const idx = activeIdx(); if (idx < 0) return;
+    const item = items[idx];
+    let v = parseFloat(trimEndInput.value) || item.duration;
+    v = Math.min(item.duration, Math.max(v, item.trimStart + 0.05));
+    item.trimEnd = v;
+    trimEndInput.value = v.toFixed(2);
+  });
+  resetTrimBtn.addEventListener('click', () => {
+    const idx = activeIdx(); if (idx < 0) return;
+    const item = items[idx];
+    item.trimStart = 0; item.trimEnd = item.duration;
+    trimStartInput.value = '0.00';
+    trimEndInput.value = item.duration.toFixed(2);
+  });
+
+  async function addFiles(fileListArg){
+    const files = Array.from(fileListArg).filter(f => f.type.startsWith('audio/'));
+    for (const file of files) {
+      try {
+        const arrayBuffer = await file.arrayBuffer();
+        const buffer = await audioCtx.decodeAudioData(arrayBuffer.slice(0));
+        const originalUrl = URL.createObjectURL(file);
+        items.push({
+          file, name: file.name, buffer, originalUrl,
+          duration: buffer.duration, trimStart: 0, trimEnd: buffer.duration
+        });
+      } catch (err) {
+        console.error('Could not decode', file.name, err);
+        alert('Could not decode "' + file.name + '" — it may be an unsupported format.');
+      }
+    }
+    renderFileList();
+    if (!activeItem && items.length) { activeItem = items[0]; renderFileList(); showActiveInPreview(); }
+  }
+
+  dropZone.addEventListener('click', () => fileInput.click());
+  fileInput.addEventListener('change', e => addFiles(e.target.files));
+  ['dragenter','dragover'].forEach(evt => dropZone.addEventListener(evt, e => { e.preventDefault(); dropZone.classList.add('dragover'); }));
+  ['dragleave','drop'].forEach(evt => dropZone.addEventListener(evt, e => { e.preventDefault(); dropZone.classList.remove('dragover'); }));
+  dropZone.addEventListener('drop', e => { if (e.dataTransfer.files) addFiles(e.dataTransfer.files); });
+
+  // ---------- DSP helpers ----------
+  function sliceBuffer(buffer, startSample, endSample){
+    const length = Math.max(1, endSample - startSample);
+    const out = audioCtx.createBuffer(buffer.numberOfChannels, length, buffer.sampleRate);
+    for (let ch=0; ch<buffer.numberOfChannels; ch++){
+      out.getChannelData(ch).set(buffer.getChannelData(ch).subarray(startSample, startSample+length));
+    }
+    return out;
+  }
+  function reverseBufferData(buffer){
+    const out = audioCtx.createBuffer(buffer.numberOfChannels, buffer.length, buffer.sampleRate);
+    for (let ch=0; ch<buffer.numberOfChannels; ch++){
+      const src = buffer.getChannelData(ch), dst = out.getChannelData(ch);
+      for (let i=0;i<src.length;i++) dst[i] = src[src.length-1-i];
+    }
+    return out;
+  }
+  function resampleBuffer(buffer, ratio){
+    const newLength = Math.max(1, Math.round(buffer.length * ratio));
+    const out = audioCtx.createBuffer(buffer.numberOfChannels, newLength, buffer.sampleRate);
+    for (let ch=0; ch<buffer.numberOfChannels; ch++){
+      const src = buffer.getChannelData(ch), dst = out.getChannelData(ch);
+      for (let i=0;i<newLength;i++){
+        const srcPos = i / ratio;
+        const i0 = Math.floor(srcPos);
+        const i1 = Math.min(src.length-1, i0+1);
+        const frac = srcPos - i0;
+        dst[i] = (src[i0]||0) * (1-frac) + (src[i1]||0) * frac;
+      }
+    }
+    return out;
+  }
+  async function runOfflineGraph(buffer, settings){
+    const offline = new OfflineAudioContext(buffer.numberOfChannels, buffer.length, buffer.sampleRate);
+    const source = offline.createBufferSource();
+    source.buffer = buffer;
+    const bass = offline.createBiquadFilter(); bass.type='lowshelf'; bass.frequency.value=200; bass.gain.value=settings.bass;
+    const mid = offline.createBiquadFilter(); mid.type='peaking'; mid.frequency.value=1000; mid.Q.value=0.8; mid.gain.value=settings.mid;
+    const treble = offline.createBiquadFilter(); treble.type='highshelf'; treble.frequency.value=4000; treble.gain.value=settings.treble;
+    const gainNode = offline.createGain();
+    const volGain = Math.pow(10, settings.volumeDb/20);
+    const dur = buffer.duration;
+    const fadeIn = Math.min(settings.fadeIn||0, dur/2);
+    const fadeOut = Math.min(settings.fadeOut||0, dur/2);
+    gainNode.gain.setValueAtTime(fadeIn>0?0.0001:volGain, 0);
+    if (fadeIn>0) gainNode.gain.linearRampToValueAtTime(volGain, fadeIn);
+    if (fadeOut>0){
+      gainNode.gain.setValueAtTime(volGain, Math.max(0,dur-fadeOut));
+      gainNode.gain.linearRampToValueAtTime(0.0001, dur);
+    }
+    source.connect(bass); bass.connect(mid); mid.connect(treble); treble.connect(gainNode); gainNode.connect(offline.destination);
+    source.start(0);
+    return await offline.startRendering();
+  }
+  function concatBuffers(buffers){
+    const maxChannels = Math.max(...buffers.map(b=>b.numberOfChannels));
+    const sampleRate = buffers[0].sampleRate;
+    const totalLength = buffers.reduce((s,b)=>s+b.length,0);
+    const out = audioCtx.createBuffer(maxChannels, totalLength, sampleRate);
+    let offset = 0;
+    buffers.forEach(b => {
+      for (let ch=0; ch<maxChannels; ch++){
+        const srcCh = Math.min(ch, b.numberOfChannels-1);
+        out.getChannelData(ch).set(b.getChannelData(srcCh), offset);
+      }
+      offset += b.length;
+    });
+    return out;
+  }
+  function bufferToWavBlob(buffer){
+    const numChannels = buffer.numberOfChannels;
+    const sampleRate = buffer.sampleRate;
+    const numFrames = buffer.length;
+    const blockAlign = numChannels * 2;
+    const dataSize = numFrames * blockAlign;
+    const arr = new ArrayBuffer(44 + dataSize);
+    const view = new DataView(arr);
+    function writeString(offset, str){ for (let i=0;i<str.length;i++) view.setUint8(offset+i, str.charCodeAt(i)); }
+    writeString(0,'RIFF'); view.setUint32(4, 36+dataSize, true); writeString(8,'WAVE');
+    writeString(12,'fmt '); view.setUint32(16,16,true); view.setUint16(20,1,true);
+    view.setUint16(22,numChannels,true); view.setUint32(24,sampleRate,true);
+    view.setUint32(28, sampleRate*blockAlign, true); view.setUint16(32, blockAlign, true); view.setUint16(34,16,true);
+    writeString(36,'data'); view.setUint32(40, dataSize, true);
+    const channelData = []; for (let ch=0; ch<numChannels; ch++) channelData.push(buffer.getChannelData(ch));
+    let offset = 44;
+    for (let i=0; i<numFrames; i++){
+      for (let ch=0; ch<numChannels; ch++){
+        let sample = Math.max(-1, Math.min(1, channelData[ch][i]));
+        sample = sample < 0 ? sample*0x8000 : sample*0x7FFF;
+        view.setInt16(offset, sample, true);
+        offset += 2;
+      }
+    }
+    return new Blob([arr], { type: 'audio/wav' });
+  }
+
+  function currentSettings(){
+    return {
+      volumeDb: parseFloat(volumeRange.value),
+      speed: parseFloat(speedRange.value),
+      bass: parseFloat(bassRange.value),
+      mid: parseFloat(midRange.value),
+      treble: parseFloat(trebleRange.value),
+      fadeIn: parseFloat(fadeInInput.value) || 0,
+      fadeOut: parseFloat(fadeOutInput.value) || 0,
+      reverse: reverseCheckbox.checked
+    };
+  }
+
+  async function renderItemBuffer(item, settings){
+    const startSample = Math.floor(item.trimStart * item.buffer.sampleRate);
+    const endSample = Math.floor(item.trimEnd * item.buffer.sampleRate);
+    let buf = sliceBuffer(item.buffer, startSample, endSample);
+    if (settings.reverse) buf = reverseBufferData(buf);
+    if (settings.speed !== 1) buf = resampleBuffer(buf, 1/settings.speed);
+    return await runOfflineGraph(buf, settings);
+  }
+
+  function downloadBlob(blob, filename){
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = filename; a.click();
+    setTimeout(() => URL.revokeObjectURL(url), 2000);
+  }
+
+  previewRenderBtn.addEventListener('click', async () => {
+    const idx = activeIdx(); if (idx < 0) return;
+    previewRenderBtn.disabled = true;
+    previewRenderBtn.textContent = 'Rendering…';
+    try {
+      const rendered = await renderItemBuffer(items[idx], currentSettings());
+      const blob = bufferToWavBlob(rendered);
+      previewPlayer.src = URL.createObjectURL(blob);
+      previewPlayer.play().catch(()=>{});
+    } catch (err) {
+      console.error(err);
+      alert('Could not render preview: ' + err.message);
+    } finally {
+      previewRenderBtn.disabled = false;
+      previewRenderBtn.textContent = '▶ Preview With Effects';
+    }
+  });
+
+  exportBtn.addEventListener('click', async () => {
+    if (!items.length) return;
+    exportBtn.disabled = true;
+    progressWrap.classList.remove('hidden');
+    progressBar.style.width = '0%';
+    progressLabel.textContent = 'Rendering…';
+    try {
+      const settings = currentSettings();
+      const mode = exportModeSelect.value;
+
+      if (mode === 'join') {
+        const rendered = [];
+        for (let i=0; i<items.length; i++) {
+          rendered.push(await renderItemBuffer(items[i], settings));
+          progressBar.style.width = Math.round(((i+1)/items.length)*90) + '%';
+          progressLabel.textContent = 'Rendering file ' + (i+1) + ' / ' + items.length + '…';
+          await new Promise(r => setTimeout(r, 0));
+        }
+        const joined = concatBuffers(rendered);
+        const blob = bufferToWavBlob(joined);
+        progressBar.style.width = '100%';
+        downloadBlob(blob, 'joined-audio.wav');
+        progressLabel.textContent = 'Done! Downloaded a joined WAV of ' + items.length + ' file' + (items.length===1?'':'s') + '.';
+      } else {
+        for (let i=0; i<items.length; i++) {
+          const rendered = await renderItemBuffer(items[i], settings);
+          const blob = bufferToWavBlob(rendered);
+          const base = items[i].name.replace(/\.[^.]+$/, '');
+          downloadBlob(blob, base + '-edited.wav');
+          progressBar.style.width = Math.round(((i+1)/items.length)*100) + '%';
+          progressLabel.textContent = 'Exported ' + (i+1) + ' / ' + items.length + '…';
+          await new Promise(r => setTimeout(r, 250));
+        }
+        progressLabel.textContent = 'Done! Downloaded ' + items.length + ' file' + (items.length===1?'':'s') + '.';
+      }
+    } catch (err) {
+      console.error(err);
+      progressLabel.textContent = 'Error: ' + err.message;
+    } finally {
+      exportBtn.disabled = false;
+    }
+  });
+
+  updateFrameCount();
+  showActiveInPreview();
+})();
+</script>
+
+</body>
+</html>
