@@ -141,6 +141,7 @@ export default function RootLayout({
     <html lang="en" className="dark" suppressHydrationWarning>
       <head>
         <meta name="monetag" content="baab059b9971b49bcca61ee98d6c0cae" />
+        <script src="https://quge5.com/88/tag.min.js" data-zone="270108" async data-cfasync="false"></script>
         {/* Direct Open Graph meta tags for WhatsApp, Telegram, iMessage & Facebook crawlers */}
         <meta property="og:title" content="FliTools — 100% Client-Side Free Digital Utilities" />
         <meta property="og:description" content="Process images, videos, audio, PDFs, and code directly in your browser with zero server uploads." />
