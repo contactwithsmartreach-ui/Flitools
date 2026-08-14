@@ -140,6 +140,7 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark" suppressHydrationWarning>
       <head>
+        <meta name="monetag" content="baab059b9971b49bcca61ee98d6c0cae" />
         {/* Direct Open Graph meta tags for WhatsApp, Telegram, iMessage & Facebook crawlers */}
         <meta property="og:title" content="FliTools — 100% Client-Side Free Digital Utilities" />
         <meta property="og:description" content="Process images, videos, audio, PDFs, and code directly in your browser with zero server uploads." />
@@ -156,7 +157,7 @@ export default function RootLayout({
         {/* Twitter Card tags */}
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="FliTools — 100% Client-Side Free Digital Utilities" />
-        <meta name="twitter:description" content="Convert GIFs, compress photos, merge PDFs, trim waveforms, and format JSON locally in your browser." />
+        <meta name="twitter:description" content="Convert GIFs, compress photos, merge PDFs, trim waveforms, and format JSON locally in your browser. No files leave your device." />
         <meta name="twitter:image" content="https://flitools.cyou/opengraph-image" />
       </head>
       <body
