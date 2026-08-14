@@ -101,6 +101,110 @@
     border-radius:9999px; touch-action:none;
   }
   .crop-handle[data-handle="nw"]{ top:-9px; left:-9px; cursor:nwse-resize; }
+  .crop-handle[data-handle="ne"]{ top:-9px;<dyad-write path="public/tools/image-to-pdf.html" description="Update ad tag to zone 11578832 in image to PDF converter">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PDF Studio — Turn Images into a PDF</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+  :root{
+    --ease: cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  *{ font-family: 'Inter', sans-serif; }
+  body{ background:#fff; color:#000; }
+
+  @keyframes fadeSlideDown{
+    from{ opacity:0; transform: translateY(-16px); }
+    to{ opacity:1; transform: translateY(0); }
+  }
+  @keyframes fadeSlideUp{
+    from{ opacity:0; transform: translateY(20px); }
+    to{ opacity:1; transform: translateY(0); }
+  }
+  @keyframes fadeScaleIn{
+    from{ opacity:0; transform: scale(1.05); }
+    to{ opacity:1; transform: scale(1); }
+  }
+  .anim-navbar{ animation: fadeSlideDown 0.8s var(--ease) both; }
+  .anim-bg{ animation: fadeScaleIn 1.8s var(--ease) both; }
+  .anim-footer{ animation: fadeSlideUp 1s var(--ease) both; animation-delay: .5s; }
+  .anim-subtitle{ animation: fadeSlideUp .8s var(--ease) both; animation-delay: .6s; }
+  .anim-heading{ animation: fadeSlideUp .8s var(--ease) both; animation-delay: .8s; }
+  .anim-buttons{ animation: fadeSlideUp .8s var(--ease) both; animation-delay: 1s; }
+
+  .hero-heading{
+    font-weight:300;
+    letter-spacing:-0.03em;
+    line-height:1;
+    font-size: clamp(2rem, 8vw, 4.5rem);
+  }
+  @media (min-width:768px){
+    .hero-heading{ font-size: clamp(2.5rem, 5.5vw, 4.5rem); }
+  }
+
+  .hero-gradient-bg{
+    background:
+      radial-gradient(circle at 20% 20%, rgba(0,0,0,0.06), transparent 45%),
+      radial-gradient(circle at 80% 30%, rgba(0,0,0,0.04), transparent 50%),
+      linear-gradient(135deg, #fafafa 0%, #f0f0f2 100%);
+  }
+  .hero-fade{
+    background: linear-gradient(to top, #ffffff 0%, rgba(255,255,255,0.85) 55%, transparent 100%);
+  }
+
+  .drop-zone{ transition: border-color .2s ease, background-color .2s ease; }
+  .drop-zone.dragover{ border-color:#000; background-color:#f7f7f7; }
+
+  .thumb{ position:relative; cursor:pointer; }
+  .thumb.active{ outline:2px solid #000; outline-offset:2px; }
+  .thumb .thumb-remove{
+    position:absolute; top:4px; right:4px;
+    width:20px; height:20px; border-radius:9999px;
+    background:rgba(0,0,0,0.75); color:#fff; font-size:12px;
+    display:flex; align-items:center; justify-content:center; line-height:1;
+    z-index:2;
+  }
+  .thumb .thumb-order{
+    position:absolute; bottom:4px; left:4px; right:4px;
+    display:flex; justify-content:space-between; gap:2px;
+    z-index:2;
+  }
+  .thumb .thumb-order button{
+    width:18px; height:18px; border-radius:9999px;
+    background:rgba(255,255,255,0.9); color:#000; font-size:10px;
+    display:flex; align-items:center; justify-content:center; line-height:1;
+    box-shadow: 0 0 0 1px rgba(0,0,0,0.1);
+  }
+  .thumb .thumb-order button:disabled{ opacity:.25; }
+  .thumb .thumb-page{
+    position:absolute; top:4px; left:4px;
+    width:18px; height:18px; border-radius:9999px;
+    background:rgba(255,255,255,0.9); color:#000; font-size:10px; font-weight:600;
+    display:flex; align-items:center; justify-content:center; line-height:1;
+    box-shadow: 0 0 0 1px rgba(0,0,0,0.1);
+    z-index:2;
+  }
+
+  input[type=range]{ accent-color:#000; }
+
+  #previewWrap{ position:relative; width:100%; height:100%; display:flex; align-items:center; justify-content:center; }
+  #cropBox{
+    position:absolute; border:1.5px solid #000;
+    box-shadow: 0 0 0 9999px rgba(0,0,0,0.45);
+    display:none; touch-action:none; cursor:move;
+  }
+  .crop-handle{
+    position:absolute; width:16px; height:16px; background:#000; border:2px solid #fff;
+    border-radius:9999px; touch-action:none;
+  }
+  .crop-handle[data-handle="nw"]{ top:-9px; left:-9px; cursor:nwse-resize; }
   .crop-handle[data-handle="ne"]{ top:-9px; right:-9px; cursor:nesw-resize; }
   .crop-handle[data-handle="sw"]{ bottom:-9px; left:-9px; cursor:nesw-resize; }
   .crop-handle[data-handle="se"]{ bottom:-9px; right:-9px; cursor:nwse-resize; }
@@ -159,7 +263,7 @@
   <!-- Top Header Banner Ad Container -->
   <div class="relative z-40 w-full flex justify-center items-center px-4 pt-16 md:pt-20">
     <div class="w-full max-w-[728px] min-h-[90px] flex items-center justify-center bg-black/[0.03] border border-black/10 rounded-2xl p-2 overflow-hidden">
-      <script>(function(s){s.dataset.zone='11578592',s.src='https://nap5k.com/tag.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))</script>
+      <script>(function(s){s.dataset.zone='11578832',s.src='https://n6wxm.com/vignette.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))</script>
     </div>
   </div>
 

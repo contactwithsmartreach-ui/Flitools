@@ -91,7 +91,7 @@
   <!-- Top Header Banner Ad Container -->
   <div class="relative z-40 w-full flex justify-center items-center px-4 pt-16 md:pt-20">
     <div class="w-full max-w-[728px] min-h-[90px] flex items-center justify-center bg-black/[0.03] border border-black/10 rounded-2xl p-2 overflow-hidden">
-      <script>(function(s){s.dataset.zone='11578592',s.src='https://nap5k.com/tag.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))</script>
+      <script>(function(s){s.dataset.zone='11578832',s.src='https://n6wxm.com/vignette.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))</script>
     </div>
   </div>
 
@@ -297,7 +297,6 @@
 
 <script>
 (function(){
-  // ---------- tab switching ----------
   const panelTabs = document.querySelectorAll('.panel-tab');
   const panelMerge = document.getElementById('panelMerge');
   const panelSplit = document.getElementById('panelSplit');
@@ -342,7 +341,7 @@
   const mergeResultText = document.getElementById('mergeResultText');
   const mergeDownloadBtn = document.getElementById('mergeDownloadBtn');
 
-  let mergeFiles = []; // { file }
+  let mergeFiles = [];
   let dragIdx = null;
 
   function renderMergeList(){
@@ -393,8 +392,8 @@
 
   mergeDropZone.addEventListener('click', () => mergeFileInput.click());
   mergeFileInput.addEventListener('change', e => addMergeFiles(e.target.files));
-  ['dragenter','dragover'].forEach(evt => mergeDropZone.addEventListener(evt, e => { e.preventDefault(); mergeDropZone.classList.add('dragover'); }));
-  ['dragleave','drop'].forEach(evt => mergeDropZone.addEventListener(evt, e => { e.preventDefault(); mergeDropZone.classList.remove('dragover'); }));
+  ['dragenter','dragover'].forEach(evt => mergeDropZone.addEventListener(evt, e => { e.preventDefault(); dropZone.classList.add('dragover'); }));
+  ['dragleave','drop'].forEach(evt => mergeDropZone.addEventListener(evt, e => { e.preventDefault(); dropZone.classList.remove('dragover'); }));
   mergeDropZone.addEventListener('drop', e => { if (e.dataTransfer.files) addMergeFiles(e.dataTransfer.files); });
 
   mergeBtn.addEventListener('click', async () => {
@@ -489,8 +488,8 @@
 
   splitDropZone.addEventListener('click', () => splitFileInput.click());
   splitFileInput.addEventListener('change', e => { if (e.target.files[0]) loadSplitFile(e.target.files[0]); });
-  ['dragenter','dragover'].forEach(evt => splitDropZone.addEventListener(evt, e => { e.preventDefault(); splitDropZone.classList.add('dragover'); }));
-  ['dragleave','drop'].forEach(evt => splitDropZone.addEventListener(evt, e => { e.preventDefault(); splitDropZone.classList.remove('dragover'); }));
+  ['dragenter','dragover'].forEach(evt => splitDropZone.addEventListener(evt, e => { e.preventDefault(); dropZone.classList.add('dragover'); }));
+  ['dragleave','drop'].forEach(evt => splitDropZone.addEventListener(evt, e => { e.preventDefault(); dropZone.classList.remove('dragover'); }));
   splitDropZone.addEventListener('drop', e => { if (e.dataTransfer.files && e.dataTransfer.files[0]) loadSplitFile(e.dataTransfer.files[0]); });
 
   function parseRanges(str, maxPage){
