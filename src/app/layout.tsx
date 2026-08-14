@@ -21,6 +21,9 @@ export const metadata: Metadata = {
   },
   description:
     "Free, browser-native digital utilities for converting videos to GIFs, compressing images, trimming voice memos, merging PDFs, generating QR codes, and formatting JSON. 100% private with zero server uploads.",
+  verification: {
+    google: "8f5oGnTurIKaIFnVOX8xhKQfUOsuSMFkb8DcoY-5OBg",
+  },
   keywords: [
     "FliTools",
     "flitools.cyou",
@@ -140,6 +143,7 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark" suppressHydrationWarning>
       <head>
+        <meta name="google-site-verification" content="8f5oGnTurIKaIFnVOX8xhKQfUOsuSMFkb8DcoY-5OBg" />
         <meta name="monetag" content="baab059b9971b49bcca61ee98d6c0cae" />
         <script src="https://quge5.com/88/tag.min.js" data-zone="270108" async data-cfasync="false"></script>
         {/* Direct Open Graph meta tags for WhatsApp, Telegram, iMessage & Facebook crawlers */}
