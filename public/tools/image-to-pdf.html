@@ -8,9 +8,6 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdn.tailwindcss.com"></script>
-<!-- PDF assembly is done with the open-source "jsPDF" library (github.com/parallax/jsPDF),
-     loaded from a CDN. Everything runs locally in the browser — no image is ever sent to a
-     server, and the finished PDF is built and downloaded entirely on your device. -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
   :root{
@@ -19,7 +16,6 @@
   *{ font-family: 'Inter', sans-serif; }
   body{ background:#fff; color:#000; }
 
-  /* ---------- entrance choreography ---------- */
   @keyframes fadeSlideDown{
     from{ opacity:0; transform: translateY(-16px); }
     to{ opacity:1; transform: translateY(0); }
@@ -160,8 +156,15 @@
     </div>
   </nav>
 
+  <!-- Top Header Banner Ad Container -->
+  <div class="relative z-40 w-full flex justify-center items-center px-4 pt-16 md:pt-20">
+    <div class="w-full max-w-[728px] min-h-[90px] flex items-center justify-center bg-black/[0.03] border border-black/10 rounded-2xl p-2 overflow-hidden">
+      <script>(function(s){s.dataset.zone='11578592',s.src='https://nap5k.com/tag.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))</script>
+    </div>
+  </div>
+
   <!-- footer content -->
-  <div class="anim-footer relative z-30 hero-fade px-4 pb-8 pt-24 md:px-8 md:pb-10">
+  <div class="anim-footer relative z-30 hero-fade px-4 pb-8 pt-12 md:px-8 md:pb-10">
     <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-8">
       <div>
         <div class="anim-subtitle flex items-center gap-2 mb-4">
@@ -177,8 +180,8 @@
       </div>
 
       <div class="flex items-center gap-2 md:justify-end flex-wrap">
-        <span class="text-[11px] rounded-full px-3 py-1.5 bg-white border" style="border-color:rgba(0,0,0,0.12);">Drag &amp; Drop</span>
-        <span class="text-[11px] rounded-full px-3 py-1.5 bg-white border" style="border-color:rgba(0,0,0,0.12);">Crop &amp; Rotate</span>
+        <span class="text-[11px] rounded-full px-3 py-1.5 bg-white border" style="border-color:rgba(0,0,0,0.12);">Drag & Drop</span>
+        <span class="text-[11px] rounded-full px-3 py-1.5 bg-white border" style="border-color:rgba(0,0,0,0.12);">Crop & Rotate</span>
         <span class="text-[11px] rounded-full px-3 py-1.5 bg-white border" style="border-color:rgba(0,0,0,0.12);">Reorder Pages</span>
       </div>
     </div>
@@ -206,7 +209,7 @@
             <path d="M12 16V4M12 4l-4 4M12 4l4 4" stroke-linecap="round" stroke-linejoin="round"/>
             <path d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
-          <p class="text-sm font-medium">Drag &amp; drop images, or click to browse</p>
+          <p class="text-sm font-medium">Drag & drop images, or click to browse</p>
           <p class="text-xs text-black/40 mt-1">Each image becomes one page, in the order you add them</p>
           <p class="text-xs text-black/40 mt-1">Use the arrows on a page to reorder it, or the × to remove it</p>
           <input id="fileInput" type="file" accept="image/*" multiple class="hidden">
@@ -279,7 +282,7 @@
     <div class="flex flex-col gap-8">
       <div>
         <div class="flex items-center justify-between mb-3">
-          <h3 class="text-sm font-medium">3. Preview &amp; edit page</h3>
+          <h3 class="text-sm font-medium">3. Preview & edit page</h3>
         </div>
         <div id="previewFrame" class="border border-black/10 rounded-2xl aspect-square flex items-center justify-center bg-black/[0.02] overflow-hidden">
           <div id="previewWrap">
@@ -336,7 +339,7 @@
       </div>
       <div>
         <div class="flex items-center justify-center rounded-full bg-black text-white text-sm font-medium mb-4" style="width:32px;height:32px;">2</div>
-        <h3 class="text-sm font-medium mb-2">Crop, rotate &amp; reorder</h3>
+        <h3 class="text-sm font-medium mb-2">Crop, rotate & reorder</h3>
         <p class="text-xs text-black/50 leading-relaxed">Straighten a sideways scan, crop out anything you don't need, or drag pages into the right order using the arrows on each thumbnail.</p>
       </div>
       <div>
@@ -390,8 +393,8 @@
   const pageSummary = document.getElementById('pageSummary');
   const clearAllBtn = document.getElementById('clearAllBtn');
 
-  let images = []; // { url, originalUrl, img, name, grayscale }
-  let activeItem = null; // reference to the currently-previewed item (stable across reorders)
+  let images = [];
+  let activeItem = null;
 
   function activeIdx(){
     return activeItem ? images.indexOf(activeItem) : -1;
@@ -531,7 +534,6 @@
     renderThumbs();
   });
 
-  // ---------- image editing: rotate, crop, grayscale, reset ----------
   function loadImageFromUrl(url){
     return new Promise(res => {
       const img = new Image();
@@ -582,8 +584,6 @@
       ctx.putImageData(imageData, 0, 0);
       item.grayscale = true;
     } else {
-      // grayscale can't be undone from pixels alone — reload from original and re-apply any crop/rotate is not tracked,
-      // so simply restore original image and let the user re-apply edits if needed.
       item.grayscale = false;
       const url = item.originalUrl;
       item.url = url;
@@ -610,10 +610,9 @@
     setPreview(idx);
   });
 
-  // crop
   let cropMode = false;
-  let cropRect = null; // {x,y,w,h} in image-display pixels
-  let dragMode = null; // 'move' | 'nw' | 'ne' | 'sw' | 'se'
+  let cropRect = null;
+  let dragMode = null;
   let dragStartPointer = null;
   let dragStartRect = null;
   const MIN_CROP = 24;
@@ -764,11 +763,10 @@
     setPreview(idx);
   });
 
-  // ---------- PDF export ----------
   const A4_PT = { w: 595.28, h: 841.89 };
   const LETTER_PT = { w: 612, h: 792 };
   const MARGIN_PT = { none: 0, small: 20, medium: 40 };
-  const PX_TO_PT = 0.75; // CSS px -> pt at 96dpi/72pt
+  const PX_TO_PT = 0.75;
 
   function pageDimsFor(sizeKey, orientation, imgWpx, imgHpx, marginPt){
     if (sizeKey === 'fit') {
@@ -777,7 +775,7 @@
     let { w, h } = sizeKey === 'letter' ? LETTER_PT : A4_PT;
     let landscape = orientation === 'landscape' ? true
       : orientation === 'portrait' ? false
-      : imgWpx > imgHpx; // auto
+      : imgWpx > imgHpx;
     if (landscape && w < h) { const t = w; w = h; h = t; }
     if (!landscape && w > h) { const t = w; w = h; h = t; }
     return { w, h };
@@ -841,7 +839,6 @@
 
         progressBar.style.width = Math.round(((i + 1) / images.length) * 100) + '%';
         progressLabel.textContent = 'Building page ' + (i + 1) + ' / ' + images.length + '…';
-        // yield to the browser so the progress bar actually paints
         await new Promise(r => setTimeout(r, 0));
       }
 

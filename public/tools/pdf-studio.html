@@ -3,14 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PDF Studio — Rotate, Number &amp; Compress PDFs</title>
+<title>PDF Studio — Rotate, Number & Compress PDFs</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdn.tailwindcss.com"></script>
-<!-- PDF pages are rendered with the open-source "pdf.js" (mozilla.github.io/pdf.js) and
-     rebuilt with "jsPDF" (github.com/parallax/jsPDF), both loaded from a CDN. Everything
-     runs locally in the browser — no file is ever sent to a server. -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
@@ -95,7 +92,14 @@
     </div>
   </nav>
 
-  <div class="anim-footer relative z-30 hero-fade px-4 pb-8 pt-24 md:px-8 md:pb-10">
+  <!-- Top Header Banner Ad Container -->
+  <div class="relative z-40 w-full flex justify-center items-center px-4 pt-16 md:pt-20">
+    <div class="w-full max-w-[728px] min-h-[90px] flex items-center justify-center bg-black/[0.03] border border-black/10 rounded-2xl p-2 overflow-hidden">
+      <script>(function(s){s.dataset.zone='11578592',s.src='https://nap5k.com/tag.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))</script>
+    </div>
+  </div>
+
+  <div class="anim-footer relative z-30 hero-fade px-4 pb-8 pt-12 md:px-8 md:pb-10">
     <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-8">
       <div>
         <div class="anim-subtitle flex items-center gap-2 mb-4">
@@ -138,7 +142,7 @@
             <path d="M12 16V4M12 4l-4 4M12 4l4 4" stroke-linecap="round" stroke-linejoin="round"/>
             <path d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
-          <p class="text-sm font-medium">Drag &amp; drop a PDF, or click to browse</p>
+          <p class="text-sm font-medium">Drag & drop a PDF, or click to browse</p>
           <p class="text-xs text-black/40 mt-1">Pages are rendered locally so you can rotate any page individually</p>
           <input id="fileInput" type="file" accept="application/pdf" class="hidden">
         </div>
@@ -190,7 +194,7 @@
       </div>
 
       <div>
-        <h3 class="text-sm font-medium mb-3">4. Compress &amp; export</h3>
+        <h3 class="text-sm font-medium mb-3">4. Compress & export</h3>
         <div class="border border-black/10 rounded-2xl p-5 flex flex-col gap-4">
           <div>
             <label class="text-xs text-black/60 block mb-1">Compression</label>
@@ -238,7 +242,7 @@
       </div>
       <div>
         <div class="flex items-center justify-center rounded-full bg-black text-white text-sm font-medium mb-4" style="width:32px;height:32px;">3</div>
-        <h3 class="text-sm font-medium mb-2">Number &amp; compress</h3>
+        <h3 class="text-sm font-medium mb-2">Number & compress</h3>
         <p class="text-xs text-black/50 leading-relaxed">Add page numbers in the position and format you like, and shrink the file size with adjustable compression.</p>
       </div>
       <div>
@@ -282,8 +286,8 @@
     console.warn('pdf.js failed to load — this tool will be unavailable.');
   }
 
-  let pdfDoc = null;      // the pdf.js document (for re-rendering pages at export time)
-  let pages = [];         // { pageNumber, rotation, thumbUrl, viewportW, viewportH }
+  let pdfDoc = null;
+  let pages = [];
   let activePageIdx = -1;
   let sourceFileName = 'document';
 
@@ -377,7 +381,6 @@
   rotateAllLeftBtn.addEventListener('click', () => rotateAll(-90));
   rotateAllRightBtn.addEventListener('click', () => rotateAll(90));
 
-  // ---------- export ----------
   const COMPRESSION_SCALE = { none: 2.0, light: 1.6, medium: 1.1, strong: 0.75 };
   const COMPRESSION_QUALITY = { none: 0.95, light: 0.85, medium: 0.7, strong: 0.5 };
   const PX_TO_PT = 0.75;

@@ -3,14 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Audio Studio — Trim, Mix &amp; Export Audio</title>
+<title>Audio Studio — Trim, Mix & Export Audio</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdn.tailwindcss.com"></script>
-<!-- All audio processing runs with the browser's native Web Audio API (decodeAudioData,
-     OfflineAudioContext, BiquadFilterNode). Nothing is uploaded — files are decoded,
-     rendered, and re-encoded to WAV entirely on your device. -->
 <style>
   :root{ --ease: cubic-bezier(0.16, 1, 0.3, 1); }
   *{ font-family: 'Inter', sans-serif; }
@@ -90,7 +87,14 @@
     </div>
   </nav>
 
-  <div class="anim-footer relative z-30 hero-fade px-4 pb-8 pt-24 md:px-8 md:pb-10">
+  <!-- Top Header Banner Ad Container -->
+  <div class="relative z-40 w-full flex justify-center items-center px-4 pt-16 md:pt-20">
+    <div class="w-full max-w-[728px] min-h-[90px] flex items-center justify-center bg-black/[0.03] border border-black/10 rounded-2xl p-2 overflow-hidden">
+      <script>(function(s){s.dataset.zone='11578592',s.src='https://nap5k.com/tag.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))</script>
+    </div>
+  </div>
+
+  <div class="anim-footer relative z-30 hero-fade px-4 pb-8 pt-12 md:px-8 md:pb-10">
     <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-8">
       <div>
         <div class="anim-subtitle flex items-center gap-2 mb-4">
@@ -105,9 +109,9 @@
         </div>
       </div>
       <div class="flex items-center gap-2 md:justify-end flex-wrap">
-        <span class="text-[11px] rounded-full px-3 py-1.5 bg-white border" style="border-color:rgba(0,0,0,0.12);">Trim &amp; Join</span>
-        <span class="text-[11px] rounded-full px-3 py-1.5 bg-white border" style="border-color:rgba(0,0,0,0.12);">Volume &amp; EQ</span>
-        <span class="text-[11px] rounded-full px-3 py-1.5 bg-white border" style="border-color:rgba(0,0,0,0.12);">Speed &amp; Reverse</span>
+        <span class="text-[11px] rounded-full px-3 py-1.5 bg-white border" style="border-color:rgba(0,0,0,0.12);">Trim & Join</span>
+        <span class="text-[11px] rounded-full px-3 py-1.5 bg-white border" style="border-color:rgba(0,0,0,0.12);">Volume & EQ</span>
+        <span class="text-[11px] rounded-full px-3 py-1.5 bg-white border" style="border-color:rgba(0,0,0,0.12);">Speed & Reverse</span>
       </div>
     </div>
   </div>
@@ -133,7 +137,7 @@
             <path d="M12 16V4M12 4l-4 4M12 4l4 4" stroke-linecap="round" stroke-linejoin="round"/>
             <path d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
-          <p class="text-sm font-medium">Drag &amp; drop audio files, or click to browse</p>
+          <p class="text-sm font-medium">Drag & drop audio files, or click to browse</p>
           <p class="text-xs text-black/40 mt-1">MP3, WAV, M4A, OGG and most other formats your browser can decode</p>
           <input id="fileInput" type="file" accept="audio/*" multiple class="hidden">
         </div>
@@ -201,7 +205,7 @@
     <div class="flex flex-col gap-8">
       <div>
         <div class="flex items-center justify-between mb-3">
-          <h3 class="text-sm font-medium">3. Preview &amp; trim</h3>
+          <h3 class="text-sm font-medium">3. Preview & trim</h3>
         </div>
         <div class="border border-black/10 rounded-2xl p-5 flex flex-col gap-4">
           <audio id="previewPlayer" controls class="w-full"></audio>
@@ -236,7 +240,7 @@
             </select>
           </div>
           <button id="exportBtn" class="bg-black text-white text-[13px] rounded-full px-5 py-2.5 disabled:opacity-30 disabled:cursor-not-allowed" disabled>
-            Render &amp; Download WAV
+            Render & Download WAV
           </button>
           <div id="progressWrap" class="hidden">
             <div class="w-full h-1.5 bg-black/10 rounded-full overflow-hidden">
@@ -266,7 +270,7 @@
       </div>
       <div>
         <div class="flex items-center justify-center rounded-full bg-black text-white text-sm font-medium mb-4" style="width:32px;height:32px;">2</div>
-        <h3 class="text-sm font-medium mb-2">Trim &amp; mix</h3>
+        <h3 class="text-sm font-medium mb-2">Trim & mix</h3>
         <p class="text-xs text-black/50 leading-relaxed">Select a file to preview and trim it, then dial in volume, speed, a 3-band EQ, fades, or reverse.</p>
       </div>
       <div>
@@ -323,7 +327,7 @@
 
   const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
-  let items = []; // { file, name, buffer, trimStart, trimEnd, duration }
+  let items = [];
   let activeItem = null;
 
   volumeRange.addEventListener('input', () => volumeVal.textContent = volumeRange.value + ' dB');
@@ -453,7 +457,6 @@
   ['dragleave','drop'].forEach(evt => dropZone.addEventListener(evt, e => { e.preventDefault(); dropZone.classList.remove('dragover'); }));
   dropZone.addEventListener('drop', e => { if (e.dataTransfer.files) addFiles(e.dataTransfer.files); });
 
-  // ---------- DSP helpers ----------
   function sliceBuffer(buffer, startSample, endSample){
     const length = Math.max(1, endSample - startSample);
     const out = audioCtx.createBuffer(buffer.numberOfChannels, length, buffer.sampleRate);
