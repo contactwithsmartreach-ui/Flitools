@@ -25,6 +25,24 @@
     <priority>0.5</priority>
   </url>
   <url>
+    <loc>https://flitools.cyou/tools/base64-url-encoder.html</loc>
+    <lastmod>2025-02-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://flitools.cyou/tools/hash-generator.html</loc>
+    <lastmod>2025-02-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://flitools.cyou/tools/color-studio.html</loc>
+    <lastmod>2025-02-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://flitools.cyou/tools/audio-studio.html</loc>
     <lastmod>2025-02-23</lastmod>
     <changefreq>weekly</changefreq>

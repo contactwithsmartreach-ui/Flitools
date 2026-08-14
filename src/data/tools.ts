@@ -14,6 +14,36 @@ export interface ToolItem {
 
 export const TOOLS_LIST: ToolItem[] = [
   {
+    id: "base64-url-encoder",
+    title: "Base64 & URL Encoder",
+    description: "Encode and decode Base64 strings, components, and URLs securely in your browser.",
+    path: "/tools/base64-url-encoder.html",
+    htmlPath: "/tools/base64-url-encoder.html",
+    iconName: "FileCode",
+    category: "Developer",
+    badge: "Live Tool"
+  },
+  {
+    id: "hash-generator",
+    title: "Hash & Checksum Generator",
+    description: "Generate SHA-256, SHA-512, and SHA-1 cryptographic hashes instantly client-side.",
+    path: "/tools/hash-generator.html",
+    htmlPath: "/tools/hash-generator.html",
+    iconName: "Shield",
+    category: "Developer",
+    badge: "Live Tool"
+  },
+  {
+    id: "color-studio",
+    title: "Color Studio & Contrast Checker",
+    description: "Test WCAG accessibility contrast ratios and generate harmonic color palettes.",
+    path: "/tools/color-studio.html",
+    htmlPath: "/tools/color-studio.html",
+    iconName: "Image",
+    category: "Utilities",
+    badge: "Live Tool"
+  },
+  {
     id: "audio-studio",
     title: "Audio Studio",
     description: "Edit, process, analyze, and convert audio files completely inside your browser.",
