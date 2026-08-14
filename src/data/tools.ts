@@ -14,6 +14,16 @@ export interface ToolItem {
 
 export const TOOLS_LIST: ToolItem[] = [
   {
+    id: "image-to-text-ocr",
+    title: "Image to Text (OCR)",
+    description: "Extract readable text from photos, screenshots, and scanned documents 100% locally.",
+    path: "/tools/image-to-text-ocr.html",
+    htmlPath: "/tools/image-to-text-ocr.html",
+    iconName: "FileText",
+    category: "Utilities",
+    badge: "Live Tool"
+  },
+  {
     id: "img-to-gif",
     title: "Image to GIF Converter",
     description: "Convert sequence of images into animated GIFs directly in your browser.",

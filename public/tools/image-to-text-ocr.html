@@ -1,0 +1,1087 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Text Studio — Extract Text From Images & Files</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Noto+Naskh+Arabic&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<!-- OCR is done with the open-source "Tesseract.js" library (github.com/naptha/tesseract.js),
+     loaded from a CDN. PDF pages are rasterized with "pdf.js" (mozilla.github.io/pdf.js) so
+     PDF files can be scanned page by page. Everything runs locally in the browser — no file
+     or extracted text is ever sent to a server. -->
+<script src="https://unpkg.com/tesseract.js@5.0.4/dist/tesseract.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+  :root{
+    --ease: cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  *{ font-family: 'Inter', sans-serif; }
+  body{ background:#fff; color:#000; }
+
+  /* ---------- entrance choreography ---------- */
+  @keyframes fadeSlideDown{
+    from{ opacity:0; transform: translateY(-16px); }
+    to{ opacity:1; transform: translateY(0); }
+  }
+  @keyframes fadeSlideUp{
+    from{ opacity:0; transform: translateY(20px); }
+    to{ opacity:1; transform: translateY(0); }
+  }
+  @keyframes fadeScaleIn{
+    from{ opacity:0; transform: scale(1.05); }
+    to{ opacity:1; transform: scale(1); }
+  }
+  .anim-navbar{ animation: fadeSlideDown 0.8s var(--ease) both; }
+  .anim-bg{ animation: fadeScaleIn 1.8s var(--ease) both; }
+  .anim-footer{ animation: fadeSlideUp 1s var(--ease) both; animation-delay: .5s; }
+  .anim-subtitle{ animation: fadeSlideUp .8s var(--ease) both; animation-delay: .6s; }
+  .anim-heading{ animation: fadeSlideUp .8s var(--ease) both; animation-delay: .8s; }
+  .anim-buttons{ animation: fadeSlideUp .8s var(--ease) both; animation-delay: 1s; }
+
+  .hero-heading{
+    font-weight:300;
+    letter-spacing:-0.03em;
+    line-height:1;
+    font-size: clamp(2rem, 8vw, 4.5rem);
+  }
+  @media (min-width:768px){
+    .hero-heading{ font-size: clamp(2.5rem, 5.5vw, 4.5rem); }
+  }
+
+  .hero-gradient-bg{
+    background:
+      radial-gradient(circle at 20% 20%, rgba(0,0,0,0.06), transparent 45%),
+      radial-gradient(circle at 80% 30%, rgba(0,0,0,0.04), transparent 50%),
+      linear-gradient(135deg, #fafafa 0%, #f0f0f2 100%);
+  }
+  .hero-fade{
+    background: linear-gradient(to top, #ffffff 0%, rgba(255,255,255,0.85) 55%, transparent 100%);
+  }
+
+  .drop-zone{ transition: border-color .2s ease, background-color .2s ease; }
+  .drop-zone.dragover{ border-color:#000; background-color:#f7f7f7; }
+
+  .thumb{ position:relative; cursor:pointer; }
+  .thumb.active{ outline:2px solid #000; outline-offset:2px; }
+  .thumb button{
+    position:absolute; top:4px; right:4px;
+    width:20px; height:20px; border-radius:9999px;
+    background:rgba(0,0,0,0.75); color:#fff; font-size:12px;
+    display:flex; align-items:center; justify-content:center; line-height:1;
+    z-index:2;
+  }
+
+  input[type=range]{ accent-color:#000; }
+
+  #previewWrap{ position:relative; width:100%; height:100%; display:flex; align-items:center; justify-content:center; }
+  #cropBox{
+    position:absolute; border:1.5px solid #000;
+    box-shadow: 0 0 0 9999px rgba(0,0,0,0.45);
+    display:none; touch-action:none; cursor:move;
+  }
+  .crop-handle{
+    position:absolute; width:16px; height:16px; background:#000; border:2px solid #fff;
+    border-radius:9999px; touch-action:none;
+  }
+  .crop-handle[data-handle="nw"]{ top:-9px; left:-9px; cursor:nwse-resize; }
+  .crop-handle[data-handle="ne"]{ top:-9px; right:-9px; cursor:nesw-resize; }
+  .crop-handle[data-handle="sw"]{ bottom:-9px; left:-9px; cursor:nesw-resize; }
+  .crop-handle[data-handle="se"]{ bottom:-9px; right:-9px; cursor:nwse-resize; }
+  .edit-tool-btn{
+    font-size:12px; border:1px solid rgba(0,0,0,0.15); border-radius:9999px;
+    padding:6px 14px; background:#fff;
+  }
+  .edit-tool-btn.active{ background:#000; color:#fff; }
+  .edit-tool-btn:disabled{ opacity:.3; cursor:not-allowed; }
+
+  textarea#outputText{
+    font-family: 'Inter', sans-serif;
+    resize: vertical;
+  }
+  textarea#outputText:focus{ outline:none; }
+
+  ::-webkit-scrollbar{ width:8px; }
+  ::-webkit-scrollbar-thumb{ background:#ddd; border-radius:9999px; }
+</style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+<!-- ============ HERO ============ -->
+<section class="relative w-full min-h-screen flex flex-col justify-between overflow-hidden">
+
+  <!-- background -->
+  <div class="anim-bg absolute inset-0 z-0 hero-gradient-bg"></div>
+
+  <!-- navbar -->
+  <nav class="anim-navbar relative z-50 flex items-center justify-between px-4 py-4 md:px-8 md:py-6" style="pointer-events:none;">
+    <div class="flex items-center gap-3 md:gap-5" style="pointer-events:auto;">
+      <!-- logo -->
+      <div class="flex items-center gap-2">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+          <rect x="3" y="2" width="18" height="20" rx="2" stroke="black" stroke-width="1.6"/>
+          <line x1="7" y1="8" x2="17" y2="8" stroke="black" stroke-width="1.6" stroke-linecap="round"/>
+          <line x1="7" y1="12" x2="17" y2="12" stroke="black" stroke-width="1.6" stroke-linecap="round"/>
+          <line x1="7" y1="16" x2="13" y2="16" stroke="black" stroke-width="1.6" stroke-linecap="round"/>
+        </svg>
+        <span class="hidden md:inline text-sm font-medium tracking-tight">Text Studio</span>
+      </div>
+
+      <!-- tags pill -->
+      <div class="hidden md:flex items-center gap-3 rounded-full px-4 py-2" style="background:#F4F4F6;">
+        <span class="text-[11px] text-black/70">In-Browser</span>
+        <span class="text-[11px] text-black/70">No Uploads</span>
+      </div>
+    </div>
+
+    <div class="hidden md:flex items-center gap-3" style="pointer-events:auto;">
+      <div class="flex items-center gap-2 rounded-full pl-2 pr-4 py-1.5" style="background:#F4F4F6;">
+        <span class="flex items-center justify-center bg-black rounded-full" style="width:28px;height:28px;">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="white">
+            <rect x="2" y="2" width="7" height="7" rx="1.5"/><rect x="15" y="2" width="7" height="7" rx="1.5"/>
+            <rect x="2" y="15" width="7" height="7" rx="1.5"/><rect x="15" y="15" width="7" height="7" rx="1.5"/>
+          </svg>
+        </span>
+        <span class="text-[11px] text-black/70">100% Client-Side</span>
+      </div>
+    </div>
+  </nav>
+
+  <!-- footer content -->
+  <div class="anim-footer relative z-30 hero-fade px-4 pb-8 pt-24 md:px-8 md:pb-10">
+    <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-8">
+      <div>
+        <div class="anim-subtitle flex items-center gap-2 mb-4">
+          <span class="rounded-full bg-black" style="width:8px;height:8px;"></span>
+          <span class="text-[13px]" style="color:rgba(0,0,0,0.55);">Turn images &amp; files into editable text, right here</span>
+        </div>
+        <h1 class="anim-heading hero-heading mb-6">
+          Images In,<br/>Zero Uploads.<br/>Text Out.
+        </h1>
+        <div class="anim-buttons flex items-center gap-3">
+          <a href="#how-it-works" class="bg-black text-white text-[13px] rounded-full px-5 py-2.5">How It Works</a>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-2 md:justify-end flex-wrap">
+        <span class="text-[11px] rounded-full px-3 py-1.5 bg-white border" style="border-color:rgba(0,0,0,0.12);">Drag &amp; Drop</span>
+        <span class="text-[11px] rounded-full px-3 py-1.5 bg-white border" style="border-color:rgba(0,0,0,0.12);">10+ Languages</span>
+        <span class="text-[11px] rounded-full px-3 py-1.5 bg-white border" style="border-color:rgba(0,0,0,0.12);">Instant Export</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ TOOL ============ -->
+<section id="tool" class="w-full max-w-6xl mx-auto px-4 md:px-8 py-16">
+
+  <div class="mb-10">
+    <h2 class="text-2xl md:text-3xl font-light tracking-tight mb-2">Extract your text</h2>
+    <p class="text-sm text-black/50">Upload images or PDFs, tune the scan settings, extract every letter, then edit and export — nothing ever leaves your browser.</p>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
+
+    <!-- LEFT: upload + settings -->
+    <div class="flex flex-col gap-8">
+
+      <!-- upload zone -->
+      <div>
+        <h3 class="text-sm font-medium mb-3">1. Upload images or files</h3>
+        <div id="dropZone" class="drop-zone border-2 border-dashed border-black/20 rounded-2xl flex flex-col items-center justify-center text-center py-14 px-6 cursor-pointer">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="1.5" class="mb-3 opacity-60">
+            <path d="M12 16V4M12 4l-4 4M12 4l4 4" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <p class="text-sm font-medium">Drag &amp; drop images or PDFs, or click to browse</p>
+          <p class="text-xs text-black/40 mt-1">Each file becomes one or more pages, scanned in the order you add them</p>
+          <p class="text-xs text-black/40 mt-1">Tip: for a phone screenshot, crop out the status bar and nav buttons below so only the document is scanned</p>
+          <input id="fileInput" type="file" accept="image/*,application/pdf" multiple class="hidden">
+        </div>
+
+        <div id="thumbGrid" class="grid grid-cols-4 sm:grid-cols-5 gap-2 mt-4"></div>
+        <p id="frameCount" class="text-xs text-black/40 mt-2">0 pages loaded</p>
+      </div>
+
+      <!-- settings -->
+      <div>
+        <h3 class="text-sm font-medium mb-3">2. Scan settings</h3>
+        <div class="border border-black/10 rounded-2xl p-5 flex flex-col gap-5">
+
+          <div>
+            <label class="text-xs text-black/60 block mb-1">Language</label>
+            <select id="langSelect" class="w-full text-[13px] border border-black/15 rounded-lg px-3 py-2 bg-white">
+              <option value="eng" selected>English</option>
+              <option value="ara">Arabic</option>
+              <option value="ara+eng">Arabic + numbers/Latin (mixed)</option>
+              <option value="fra">French</option>
+              <option value="spa">Spanish</option>
+              <option value="deu">German</option>
+              <option value="ita">Italian</option>
+              <option value="por">Portuguese</option>
+              <option value="rus">Russian</option>
+              <option value="chi_sim">Chinese (Simplified)</option>
+              <option value="jpn">Japanese</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="text-xs text-black/60 block mb-1">Page layout</label>
+            <select id="psmSelect" class="w-full text-[13px] border border-black/15 rounded-lg px-3 py-2 bg-white">
+              <option value="3" selected>Auto — mixed layout</option>
+              <option value="6">Single block of text</option>
+              <option value="11">Sparse text / scattered</option>
+              <option value="4">Single column, variable sizes</option>
+            </select>
+          </div>
+
+          <div class="flex items-center justify-between">
+            <label class="text-xs text-black/60">Enhance scan for accuracy</label>
+            <input id="enhanceCheckbox" type="checkbox" class="accent-black w-4 h-4">
+          </div>
+
+          <div class="flex items-center justify-between">
+            <label class="text-xs text-black/60">Upscale small images</label>
+            <input id="upscaleCheckbox" type="checkbox" checked class="accent-black w-4 h-4">
+          </div>
+
+          <div class="flex items-center justify-between">
+            <label class="text-xs text-black/60">Add page separators</label>
+            <input id="separatorCheckbox" type="checkbox" checked class="accent-black w-4 h-4">
+          </div>
+
+          <div class="flex items-center justify-between">
+            <label class="text-xs text-black/60">Preserve section headings</label>
+            <input id="headingCheckbox" type="checkbox" checked class="accent-black w-4 h-4">
+          </div>
+
+          <div class="flex items-center justify-between">
+            <label class="text-xs text-black/60">Preserve layout &amp; tables</label>
+            <input id="layoutCheckbox" type="checkbox" checked class="accent-black w-4 h-4">
+          </div>
+
+          <button id="extractBtn" class="bg-black text-white text-[13px] rounded-full px-5 py-2.5 disabled:opacity-30 disabled:cursor-not-allowed" disabled>
+            Extract Text
+          </button>
+          <div id="progressWrap" class="hidden">
+            <div class="w-full h-1.5 bg-black/10 rounded-full overflow-hidden">
+              <div id="progressBar" class="h-full bg-black" style="width:0%;"></div>
+            </div>
+            <p id="progressLabel" class="text-xs text-black/40 mt-1">Extracting…</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: preview + edit/export -->
+    <div class="flex flex-col gap-8">
+      <div>
+        <div class="flex items-center justify-between mb-3">
+          <h3 class="text-sm font-medium">3. Preview &amp; edit page</h3>
+        </div>
+        <div id="previewFrame" class="border border-black/10 rounded-2xl aspect-square flex items-center justify-center bg-black/[0.02] overflow-hidden">
+          <div id="previewWrap">
+            <img id="previewImg" class="max-w-full max-h-full hidden" alt="Page preview" draggable="false">
+            <div id="cropBox">
+              <div class="crop-handle" data-handle="nw"></div>
+              <div class="crop-handle" data-handle="ne"></div>
+              <div class="crop-handle" data-handle="sw"></div>
+              <div class="crop-handle" data-handle="se"></div>
+            </div>
+            <span id="previewPlaceholder" class="text-xs text-black/30">Uploaded pages will appear here</span>
+          </div>
+        </div>
+        <p id="cropHint" class="text-xs text-black/40 mt-2 hidden">Drag any corner to resize, or drag inside the box to move it.</p>
+        <div class="flex items-center gap-2 flex-wrap mt-3">
+          <button id="rotateLeftBtn" class="edit-tool-btn" disabled>⟲ Rotate Left</button>
+          <button id="rotateRightBtn" class="edit-tool-btn" disabled>⟳ Rotate Right</button>
+          <button id="cropToggleBtn" class="edit-tool-btn" disabled>▢ Crop</button>
+          <button id="applyCropBtn" class="edit-tool-btn hidden">Apply Crop</button>
+          <button id="resetPageBtn" class="edit-tool-btn" disabled>Reset Page</button>
+        </div>
+      </div>
+
+      <div>
+        <div class="flex items-center justify-between mb-3">
+          <h3 class="text-sm font-medium">4. Edit &amp; export</h3>
+          <span id="statsLabel" class="text-xs text-black/40">0 words · 0 characters</span>
+        </div>
+        <div class="border border-black/10 rounded-2xl p-5 flex flex-col gap-3">
+          <textarea id="outputText" class="w-full h-56 text-[13px] leading-relaxed border border-black/10 rounded-lg p-3" placeholder="Extracted text will appear here — fully editable."></textarea>
+
+          <div class="flex items-center gap-2 flex-wrap">
+            <button id="copyBtn" class="text-[12px] border border-black/15 rounded-full px-4 py-1.5">Copy</button>
+            <button id="downloadTxtBtn" class="text-[12px] border border-black/15 rounded-full px-4 py-1.5">Download .txt</button>
+            <button id="downloadMdBtn" class="text-[12px] border border-black/15 rounded-full px-4 py-1.5">Download .md</button>
+            <button id="downloadPdfBtn" class="text-[12px] border border-black/15 rounded-full px-4 py-1.5">Download .pdf</button>
+            <button id="clearBtn" class="text-[12px] border border-black/15 rounded-full px-4 py-1.5">Clear</button>
+          </div>
+
+          <div class="border-t border-black/10 pt-3 mt-1">
+            <label class="text-xs text-black/60 block mb-2">Find &amp; replace</label>
+            <div class="flex items-center gap-2 flex-wrap">
+              <input id="findInput" type="text" placeholder="Find" class="flex-1 min-w-[100px] text-[13px] border border-black/15 rounded-lg px-3 py-1.5">
+              <input id="replaceInput" type="text" placeholder="Replace with" class="flex-1 min-w-[100px] text-[13px] border border-black/15 rounded-lg px-3 py-1.5">
+              <button id="replaceBtn" class="text-[12px] border border-black/15 rounded-full px-4 py-1.5">Replace All</button>
+            </div>
+          </div>
+
+          <p class="text-xs text-black/40">Recognition runs locally with an open-source library (Tesseract.js) — no images or text are ever uploaded anywhere.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ HOW IT WORKS ============ -->
+<section id="how-it-works" class="w-full bg-black/[0.02] border-t border-black/10">
+  <div class="max-w-6xl mx-auto px-4 md:px-8 py-16">
+    <div class="mb-10">
+      <h2 class="text-2xl md:text-3xl font-light tracking-tight mb-2">How it works</h2>
+      <p class="text-sm text-black/50 max-w-2xl">Text Studio reads every letter out of your images and files and turns it into editable text, entirely inside your browser. No files are ever sent to a server — everything below happens on your own device.</p>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div>
+        <div class="flex items-center justify-center rounded-full bg-black text-white text-sm font-medium mb-4" style="width:32px;height:32px;">1</div>
+        <h3 class="text-sm font-medium mb-2">Upload your files</h3>
+        <p class="text-xs text-black/50 leading-relaxed">Drag and drop, or click to browse, any number of images or PDFs. Multi-page PDFs are automatically split into one page per scan, in the order you add them.</p>
+      </div>
+      <div>
+        <div class="flex items-center justify-center rounded-full bg-black text-white text-sm font-medium mb-4" style="width:32px;height:32px;">2</div>
+        <h3 class="text-sm font-medium mb-2">Choose language &amp; enhancement</h3>
+        <p class="text-xs text-black/50 leading-relaxed">Pick the language to scan for, toggle contrast enhancement to sharpen faint text, and upscale small images so tiny letters are still readable.</p>
+      </div>
+      <div>
+        <div class="flex items-center justify-center rounded-full bg-black text-white text-sm font-medium mb-4" style="width:32px;height:32px;">3</div>
+        <h3 class="text-sm font-medium mb-2">Extract &amp; preview</h3>
+        <p class="text-xs text-black/50 leading-relaxed">Hit "Extract Text" and your browser reads every page locally using an open-source OCR engine — no upload, no waiting on a server. Every letter lands in the editor.</p>
+      </div>
+      <div>
+        <div class="flex items-center justify-center rounded-full bg-black text-white text-sm font-medium mb-4" style="width:32px;height:32px;">4</div>
+        <h3 class="text-sm font-medium mb-2">Edit &amp; download</h3>
+        <p class="text-xs text-black/50 leading-relaxed">Fix any misreads right in the text box, use find &amp; replace for quick cleanup, then copy or download as .txt or .md. Your files never leave your computer.</p>
+      </div>
+    </div>
+
+    <div class="mt-10">
+      <a href="#tool" class="bg-black text-white text-[13px] rounded-full px-5 py-2.5 inline-block">Get Started</a>
+    </div>
+  </div>
+</section>
+
+<footer class="text-center text-xs text-black/30 py-8">
+  Built entirely client-side — your images and files never leave this browser.
+</footer>
+
+<script>
+(function(){
+  const dropZone = document.getElementById('dropZone');
+  const fileInput = document.getElementById('fileInput');
+  const thumbGrid = document.getElementById('thumbGrid');
+  const frameCount = document.getElementById('frameCount');
+  const langSelect = document.getElementById('langSelect');
+  const psmSelect = document.getElementById('psmSelect');
+  const enhanceCheckbox = document.getElementById('enhanceCheckbox');
+  const upscaleCheckbox = document.getElementById('upscaleCheckbox');
+  const separatorCheckbox = document.getElementById('separatorCheckbox');
+  const headingCheckbox = document.getElementById('headingCheckbox');
+  const layoutCheckbox = document.getElementById('layoutCheckbox');
+  const extractBtn = document.getElementById('extractBtn');
+  const progressWrap = document.getElementById('progressWrap');
+  const progressBar = document.getElementById('progressBar');
+  const progressLabel = document.getElementById('progressLabel');
+  const previewWrap = document.getElementById('previewWrap');
+  const previewImg = document.getElementById('previewImg');
+  const previewPlaceholder = document.getElementById('previewPlaceholder');
+  const cropBox = document.getElementById('cropBox');
+  const rotateLeftBtn = document.getElementById('rotateLeftBtn');
+  const rotateRightBtn = document.getElementById('rotateRightBtn');
+  const cropToggleBtn = document.getElementById('cropToggleBtn');
+  const applyCropBtn = document.getElementById('applyCropBtn');
+  const resetPageBtn = document.getElementById('resetPageBtn');
+  const outputText = document.getElementById('outputText');
+  const statsLabel = document.getElementById('statsLabel');
+  const copyBtn = document.getElementById('copyBtn');
+  const downloadTxtBtn = document.getElementById('downloadTxtBtn');
+  const downloadMdBtn = document.getElementById('downloadMdBtn');
+  const downloadPdfBtn = document.getElementById('downloadPdfBtn');
+  const clearBtn = document.getElementById('clearBtn');
+  const findInput = document.getElementById('findInput');
+  const replaceInput = document.getElementById('replaceInput');
+  const replaceBtn = document.getElementById('replaceBtn');
+
+  if (window.pdfjsLib) {
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+  } else {
+    console.warn('pdf.js failed to load — PDF upload will be unavailable.');
+  }
+
+  let images = []; // { file, url, img, name }
+  let activeIdx = -1;
+
+  function updateFrameCount(){
+    frameCount.textContent = images.length + ' page' + (images.length===1?'':'s') + ' loaded';
+    extractBtn.disabled = images.length < 1;
+  }
+
+  function setPreview(idx){
+    if (idx < 0 || idx >= images.length) return;
+    activeIdx = idx;
+    exitCropMode();
+    previewImg.src = images[idx].url;
+    previewImg.classList.remove('hidden');
+    previewPlaceholder.classList.add('hidden');
+    document.querySelectorAll('#thumbGrid .thumb').forEach((el,i) => {
+      el.classList.toggle('active', i === idx);
+    });
+    [rotateLeftBtn, rotateRightBtn, cropToggleBtn, resetPageBtn].forEach(b => b.disabled = false);
+  }
+
+  function disableEditTools(){
+    [rotateLeftBtn, rotateRightBtn, cropToggleBtn, resetPageBtn].forEach(b => b.disabled = true);
+    exitCropMode();
+  }
+
+  // ---------- image editing: rotate, crop, reset ----------
+  function loadImageFromUrl(url){
+    return new Promise(res => {
+      const img = new Image();
+      img.onload = () => res(img);
+      img.src = url;
+    });
+  }
+
+  async function rotateActive(deg){
+    if (activeIdx < 0) return;
+    const item = images[activeIdx];
+    const img = item.img;
+    const canvas = document.createElement('canvas');
+    const swap = Math.abs(deg) === 90;
+    canvas.width = swap ? img.naturalHeight : img.naturalWidth;
+    canvas.height = swap ? img.naturalWidth : img.naturalHeight;
+    const ctx = canvas.getContext('2d');
+    ctx.translate(canvas.width / 2, canvas.height / 2);
+    ctx.rotate(deg * Math.PI / 180);
+    ctx.drawImage(img, -img.naturalWidth / 2, -img.naturalHeight / 2);
+    const url = canvas.toDataURL('image/png');
+    item.url = url;
+    item.img = await loadImageFromUrl(url);
+    renderThumbs();
+    setPreview(activeIdx);
+  }
+  rotateLeftBtn.addEventListener('click', () => rotateActive(-90));
+  rotateRightBtn.addEventListener('click', () => rotateActive(90));
+
+  resetPageBtn.addEventListener('click', async () => {
+    if (activeIdx < 0) return;
+    const item = images[activeIdx];
+    item.url = item.originalUrl;
+    item.img = await loadImageFromUrl(item.originalUrl);
+    renderThumbs();
+    setPreview(activeIdx);
+  });
+
+  // crop
+  const cropHint = document.getElementById('cropHint');
+  let cropMode = false;
+  let cropRect = null; // {x,y,w,h} in image-display pixels
+  let dragMode = null; // 'move' | 'nw' | 'ne' | 'sw' | 'se'
+  let dragStartPointer = null;
+  let dragStartRect = null;
+  const MIN_CROP = 24;
+
+  function imgBox(){
+    return {
+      left: previewImg.offsetLeft,
+      top: previewImg.offsetTop,
+      width: previewImg.clientWidth,
+      height: previewImg.clientHeight
+    };
+  }
+
+  function renderCropBox(){
+    if (!cropRect) return;
+    const box = imgBox();
+    cropBox.style.left = (box.left + cropRect.x) + 'px';
+    cropBox.style.top = (box.top + cropRect.y) + 'px';
+    cropBox.style.width = cropRect.w + 'px';
+    cropBox.style.height = cropRect.h + 'px';
+  }
+
+  function exitCropMode(){
+    cropMode = false;
+    dragMode = null;
+    cropRect = null;
+    cropBox.style.display = 'none';
+    cropToggleBtn.classList.remove('active');
+    applyCropBtn.classList.add('hidden');
+    cropHint.classList.add('hidden');
+  }
+
+  cropToggleBtn.addEventListener('click', () => {
+    if (activeIdx < 0) return;
+    cropMode = !cropMode;
+    cropToggleBtn.classList.toggle('active', cropMode);
+    applyCropBtn.classList.toggle('hidden', !cropMode);
+    cropHint.classList.toggle('hidden', !cropMode);
+    if (cropMode) {
+      const box = imgBox();
+      const inset = 0.1;
+      cropRect = {
+        x: box.width * inset,
+        y: box.height * inset,
+        w: box.width * (1 - inset * 2),
+        h: box.height * (1 - inset * 2)
+      };
+      cropBox.style.display = 'block';
+      renderCropBox();
+    } else {
+      cropBox.style.display = 'none';
+      cropRect = null;
+    }
+  });
+
+  function pointerXY(e){
+    const point = e.touches ? (e.touches[0] || e.changedTouches[0]) : e;
+    return { x: point.clientX, y: point.clientY };
+  }
+
+  function onDragStart(e, mode){
+    if (!cropMode || !cropRect) return;
+    e.preventDefault();
+    e.stopPropagation();
+    dragMode = mode;
+    dragStartPointer = pointerXY(e);
+    dragStartRect = { x: cropRect.x, y: cropRect.y, w: cropRect.w, h: cropRect.h };
+  }
+
+  cropBox.addEventListener('mousedown', e => { if (e.target === cropBox) onDragStart(e, 'move'); });
+  cropBox.addEventListener('touchstart', e => { if (e.target === cropBox) onDragStart(e, 'move'); }, { passive:false });
+  document.querySelectorAll('.crop-handle').forEach(h => {
+    h.addEventListener('mousedown', e => onDragStart(e, h.dataset.handle));
+    h.addEventListener('touchstart', e => onDragStart(e, h.dataset.handle), { passive:false });
+  });
+
+  function onDragMove(e){
+    if (!dragMode || !cropRect) return;
+    e.preventDefault();
+    const box = imgBox();
+    const p = pointerXY(e);
+    const dx = p.x - dragStartPointer.x;
+    const dy = p.y - dragStartPointer.y;
+    let { x, y, w, h } = dragStartRect;
+
+    if (dragMode === 'move') {
+      x = dragStartRect.x + dx;
+      y = dragStartRect.y + dy;
+      x = Math.max(0, Math.min(x, box.width - w));
+      y = Math.max(0, Math.min(y, box.height - h));
+    } else {
+      if (dragMode.includes('w')) {
+        const right = dragStartRect.x + dragStartRect.w;
+        x = Math.max(0, Math.min(dragStartRect.x + dx, right - MIN_CROP));
+        w = right - x;
+      }
+      if (dragMode.includes('e')) {
+        w = Math.max(MIN_CROP, Math.min(dragStartRect.w + dx, box.width - dragStartRect.x));
+      }
+      if (dragMode.includes('n')) {
+        const bottom = dragStartRect.y + dragStartRect.h;
+        y = Math.max(0, Math.min(dragStartRect.y + dy, bottom - MIN_CROP));
+        h = bottom - y;
+      }
+      if (dragMode.includes('s')) {
+        h = Math.max(MIN_CROP, Math.min(dragStartRect.h + dy, box.height - dragStartRect.y));
+      }
+    }
+
+    cropRect = { x, y, w, h };
+    renderCropBox();
+  }
+
+  function onDragEnd(){
+    dragMode = null;
+  }
+
+  window.addEventListener('mousemove', onDragMove);
+  window.addEventListener('touchmove', onDragMove, { passive:false });
+  window.addEventListener('mouseup', onDragEnd);
+  window.addEventListener('touchend', onDragEnd);
+  window.addEventListener('resize', renderCropBox);
+
+  applyCropBtn.addEventListener('click', async () => {
+    if (activeIdx < 0 || !cropRect || cropRect.w < MIN_CROP || cropRect.h < MIN_CROP) return;
+    const item = images[activeIdx];
+    const img = item.img;
+    const box = imgBox();
+    const scaleX = img.naturalWidth / box.width;
+    const scaleY = img.naturalHeight / box.height;
+    const sx = cropRect.x * scaleX;
+    const sy = cropRect.y * scaleY;
+    const sw = cropRect.w * scaleX;
+    const sh = cropRect.h * scaleY;
+
+    const canvas = document.createElement('canvas');
+    canvas.width = sw;
+    canvas.height = sh;
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(img, sx, sy, sw, sh, 0, 0, sw, sh);
+    const url = canvas.toDataURL('image/png');
+    item.url = url;
+    item.img = await loadImageFromUrl(url);
+
+    exitCropMode();
+    renderThumbs();
+    setPreview(activeIdx);
+  });
+
+  function renderThumbs(){
+    thumbGrid.innerHTML = '';
+    images.forEach((item, idx) => {
+      const wrap = document.createElement('div');
+      wrap.className = 'thumb rounded-lg overflow-hidden border border-black/10 aspect-square';
+      wrap.title = item.name;
+      const img = document.createElement('img');
+      img.src = item.url;
+      img.className = 'w-full h-full object-cover';
+      const btn = document.createElement('button');
+      btn.textContent = '×';
+      btn.onclick = (e) => {
+        e.stopPropagation();
+        images.splice(idx,1);
+        renderThumbs();
+        updateFrameCount();
+      };
+      wrap.appendChild(img);
+      wrap.appendChild(btn);
+      wrap.addEventListener('click', () => setPreview(idx));
+      thumbGrid.appendChild(wrap);
+    });
+    updateFrameCount();
+    if (images.length && activeIdx === -1) setPreview(0);
+    if (!images.length) {
+      activeIdx = -1;
+      previewImg.classList.add('hidden');
+      previewPlaceholder.classList.remove('hidden');
+      disableEditTools();
+    }
+  }
+
+  async function addImageFile(file){
+    const url = URL.createObjectURL(file);
+    const img = new Image();
+    img.src = url;
+    await new Promise(res => { if (img.complete) res(); else img.onload = res; });
+    images.push({ file, url, originalUrl: url, img, name: file.name });
+  }
+
+  async function addPdfFile(file){
+    if (!window.pdfjsLib) {
+      alert('The PDF reader failed to load (probably a network/CDN issue). Try refreshing the page, or upload the PDF pages as images instead.');
+      return;
+    }
+    try {
+      const buf = await file.arrayBuffer();
+      const pdf = await pdfjsLib.getDocument({ data: buf }).promise;
+      for (let p = 1; p <= pdf.numPages; p++){
+        const page = await pdf.getPage(p);
+        const viewport = page.getViewport({ scale: 2 });
+        const canvas = document.createElement('canvas');
+        canvas.width = viewport.width;
+        canvas.height = viewport.height;
+        const ctx = canvas.getContext('2d');
+        await page.render({ canvasContext: ctx, viewport }).promise;
+        const url = canvas.toDataURL('image/png');
+        const img = new Image();
+        img.src = url;
+        await new Promise(res => { if (img.complete) res(); else img.onload = res; });
+        images.push({ file: null, url, originalUrl: url, img, name: file.name + ' — page ' + p });
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Could not read that PDF (' + err.message + '). It may be encrypted, corrupted, or image-only in a way this reader can\'t open.');
+    }
+  }
+
+  async function addFiles(fileList){
+    const files = Array.from(fileList);
+    for (const file of files){
+      if (file.type === 'application/pdf') {
+        await addPdfFile(file);
+      } else if (file.type.startsWith('image/')) {
+        await addImageFile(file);
+      }
+    }
+    renderThumbs();
+  }
+
+  dropZone.addEventListener('click', () => fileInput.click());
+  fileInput.addEventListener('change', e => addFiles(e.target.files));
+
+  ['dragenter','dragover'].forEach(evt => {
+    dropZone.addEventListener(evt, e => { e.preventDefault(); dropZone.classList.add('dragover'); });
+  });
+  ['dragleave','drop'].forEach(evt => {
+    dropZone.addEventListener(evt, e => { e.preventDefault(); dropZone.classList.remove('dragover'); });
+  });
+  dropZone.addEventListener('drop', e => {
+    if (e.dataTransfer.files) addFiles(e.dataTransfer.files);
+  });
+
+  function preprocess(img, enhance, upscale){
+    let targetW = img.naturalWidth;
+    if (upscale && targetW < 1000) targetW = Math.min(targetW * 2, 2000);
+    targetW = Math.min(targetW, 2500);
+    const targetH = Math.round(targetW * (img.naturalHeight / img.naturalWidth));
+
+    const canvas = document.createElement('canvas');
+    canvas.width = targetW;
+    canvas.height = targetH;
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(img, 0, 0, targetW, targetH);
+
+    if (enhance) {
+      const imageData = ctx.getImageData(0, 0, targetW, targetH);
+      const data = imageData.data;
+      const contrast = 55;
+      const factor = (259 * (contrast + 255)) / (255 * (259 - contrast));
+      for (let i = 0; i < data.length; i += 4) {
+        const gray = 0.299*data[i] + 0.587*data[i+1] + 0.114*data[i+2];
+        let val = factor * (gray - 128) + 128;
+        val = Math.max(0, Math.min(255, val));
+        data[i] = data[i+1] = data[i+2] = val;
+      }
+      ctx.putImageData(imageData, 0, 0);
+    }
+    return canvas;
+  }
+
+  function updateStats(){
+    const text = outputText.value;
+    const words = text.trim().length ? text.trim().split(/\s+/).length : 0;
+    statsLabel.textContent = words + ' word' + (words===1?'':'s') + ' · ' + text.length + ' character' + (text.length===1?'':'s');
+  }
+  outputText.addEventListener('input', updateStats);
+
+  function autoFormatHeadings(text){
+    return text.split('\n').map(line => {
+      const trimmed = line.trim();
+      if (!trimmed || trimmed.startsWith('#') || trimmed.startsWith('---')) return line;
+      const letters = trimmed.replace(/[^A-Za-zÀ-ÖØ-öø-ÿ]/g, '');
+      const isShortEnough = trimmed.length <= 60;
+      const isAllCaps = letters.length >= 3 && letters === letters.toUpperCase();
+      if (isAllCaps && isShortEnough) return '## ' + trimmed;
+      return line;
+    }).join('\n');
+  }
+
+  // Reconstruct line & column structure from Tesseract's word bounding boxes,
+  // so multi-column layouts (dates | job title, skill | rating, etc.) stay aligned
+  // instead of collapsing into one run-on line. Handles two things the naive
+  // left-to-right join gets wrong:
+  //  1. RTL scripts (Arabic) — words on a line must be ordered right-to-left,
+  //     not by ascending x, or the line reads back-to-front.
+  //  2. Tables — a big horizontal gap on ONE line is ambiguous, but the same
+  //     gap pattern repeating across several consecutive lines is a real
+  //     column grid, so those blocks are rendered as Markdown tables.
+  function reconstructLayout(data){
+    const words = (data.words || []).filter(w => w.text && w.text.trim());
+    if (!words.length) return (data.text || '').trim();
+
+    const avgHeight = words.reduce((s, w) => s + (w.bbox.y1 - w.bbox.y0), 0) / words.length;
+    const yThreshold = Math.max(6, avgHeight * 0.6);
+
+    // group words into lines by vertical center
+    const lines = [];
+    words.slice().sort((a, b) => a.bbox.y0 - b.bbox.y0).forEach(w => {
+      const cy = (w.bbox.y0 + w.bbox.y1) / 2;
+      let line = lines.find(l => Math.abs(l.cy - cy) < yThreshold);
+      if (!line) { line = { cy, words: [] }; lines.push(line); }
+      line.words.push(w);
+      line.cy = (line.cy * (line.words.length - 1) + cy) / line.words.length;
+    });
+    lines.sort((a, b) => a.cy - b.cy);
+
+    // per line: detect direction, order words correctly, split into cells on big gaps
+    const rows = lines.map(line => {
+      const arabicChars = line.words.reduce((s, w) => s + (w.text.match(/[\u0600-\u06FF]/g) || []).length, 0);
+      const totalChars = line.words.reduce((s, w) => s + w.text.length, 0) || 1;
+      const rtl = arabicChars / totalChars > 0.3;
+
+      line.words.sort((a, b) => rtl ? b.bbox.x0 - a.bbox.x0 : a.bbox.x0 - b.bbox.x0);
+
+      const charWidths = line.words.map(w => (w.bbox.x1 - w.bbox.x0) / Math.max(1, w.text.length));
+      const avgCharW = charWidths.reduce((s, c) => s + c, 0) / charWidths.length || 8;
+
+      const cells = [];
+      let cur = [];
+      let prevEdge = null;
+      line.words.forEach(w => {
+        const leadEdge = rtl ? w.bbox.x1 : w.bbox.x0;
+        const trailEdge = rtl ? w.bbox.x0 : w.bbox.x1;
+        if (prevEdge !== null) {
+          const gap = rtl ? (prevEdge - leadEdge) : (leadEdge - prevEdge);
+          if (gap > avgCharW * 4.5) {
+            cells.push(cur.join(' '));
+            cur = [];
+          }
+        }
+        cur.push(w.text);
+        prevEdge = trailEdge;
+      });
+      if (cur.length) cells.push(cur.join(' '));
+
+      return { cy: line.cy, cells };
+    });
+
+    // detect runs of consecutive rows that share the same column count (>=2) as tables
+    const out = [];
+    let i = 0;
+    while (i < rows.length) {
+      const cellCount = rows[i].cells.length;
+      if (cellCount >= 2) {
+        let j = i;
+        while (j < rows.length && rows[j].cells.length === cellCount) j++;
+        if (j - i >= 2) {
+          for (let r = i; r < j; r++) {
+            out.push('| ' + rows[r].cells.join(' | ') + ' |');
+            if (r === i) out.push('|' + Array(cellCount).fill(' --- ').join('|') + '|');
+          }
+          i = j;
+          continue;
+        }
+      }
+      out.push(rows[i].cells.join('   '));
+      i++;
+    }
+
+    return out.join('\n');
+  }
+
+  extractBtn.addEventListener('click', async () => {
+    if (images.length < 1 || !window.Tesseract) return;
+
+    extractBtn.disabled = true;
+    progressWrap.classList.remove('hidden');
+    progressBar.style.width = '0%';
+    progressLabel.textContent = 'Loading OCR engine…';
+
+    const lang = langSelect.value;
+    const enhance = enhanceCheckbox.checked;
+    const upscale = upscaleCheckbox.checked;
+    const withSeparators = separatorCheckbox.checked;
+    const psm = psmSelect.value;
+
+    try {
+      const worker = await Tesseract.createWorker(lang, 1, {
+        logger: m => {
+          if (m.status === 'recognizing text' && typeof m.progress === 'number') {
+            const overall = ((worker._pageIndex || 0) + m.progress) / images.length * 100;
+            progressBar.style.width = Math.round(overall) + '%';
+            progressLabel.textContent = 'Extracting page ' + ((worker._pageIndex || 0) + 1) + ' / ' + images.length + '…';
+          }
+        }
+      });
+      await worker.setParameters({ tessedit_pageseg_mode: psm });
+
+      const pageTexts = [];
+      for (let i = 0; i < images.length; i++) {
+        worker._pageIndex = i;
+        const canvas = preprocess(images[i].img, enhance, upscale);
+        const { data } = await worker.recognize(canvas);
+        const pageText = layoutCheckbox.checked ? reconstructLayout(data) : data.text.trim();
+        pageTexts.push(pageText);
+        progressBar.style.width = Math.round(((i + 1) / images.length) * 100) + '%';
+      }
+
+      await worker.terminate();
+
+      const finalText = withSeparators && images.length > 1
+        ? pageTexts.map((t, i) => '--- ' + images[i].name + ' ---\n\n' + t).join('\n\n')
+        : pageTexts.join('\n\n');
+
+      outputText.value = headingCheckbox.checked ? autoFormatHeadings(finalText) : finalText;
+      updateStats();
+      progressLabel.textContent = 'Done! Extracted text from ' + images.length + ' page' + (images.length===1?'':'s') + '.';
+      extractBtn.disabled = false;
+    } catch (err) {
+      console.error(err);
+      progressLabel.textContent = 'Error: ' + err.message;
+      extractBtn.disabled = false;
+    }
+  });
+
+  copyBtn.addEventListener('click', async () => {
+    try {
+      await navigator.clipboard.writeText(outputText.value);
+      copyBtn.textContent = 'Copied!';
+      setTimeout(() => copyBtn.textContent = 'Copy', 1200);
+    } catch (err) {
+      outputText.select();
+      document.execCommand('copy');
+    }
+  });
+
+  function downloadText(filename, mime){
+    const blob = new Blob([outputText.value], { type: mime });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+  downloadTxtBtn.addEventListener('click', () => downloadText('extracted-text.txt', 'text/plain'));
+  downloadMdBtn.addEventListener('click', () => downloadText('extracted-text.md', 'text/markdown'));
+
+  downloadPdfBtn.addEventListener('click', async () => {
+    if (!window.jspdf) {
+      alert('The PDF export library failed to load (probably a network/CDN issue). Try refreshing the page.');
+      return;
+    }
+    downloadPdfBtn.disabled = true;
+    downloadPdfBtn.textContent = 'Building PDF…';
+
+    try {
+      const ARABIC_FONT = '"Noto Naskh Arabic", Arial, sans-serif';
+      const hasArabic = s => /[\u0600-\u06FF]/.test(s);
+      try { await document.fonts.load('16px ' + ARABIC_FONT); } catch (e) {}
+      try { await document.fonts.ready; } catch (e) {}
+
+      function wrapByWidth(text, fontCss, maxWidthCss){
+        const probe = document.createElement('canvas').getContext('2d');
+        probe.font = fontCss;
+        const words = text.split(/\s+/).filter(Boolean);
+        const lines = [];
+        let cur = '';
+        words.forEach(w => {
+          const test = cur ? cur + ' ' + w : w;
+          if (cur && probe.measureText(test).width > maxWidthCss) {
+            lines.push(cur);
+            cur = w;
+          } else {
+            cur = test;
+          }
+        });
+        if (cur || !lines.length) lines.push(cur);
+        return lines;
+      }
+
+      // Renders one line of complex-script text (e.g. Arabic) via the browser's
+      // own text engine, so shaping/joining and right-to-left order come out
+      // correct — a plain embedded font in jsPDF can't do this on its own.
+      function rasterizeLine(text, fontSizeCssPx){
+        const fontCss = fontSizeCssPx + 'px ' + ARABIC_FONT;
+        const SCALE = 3;
+        const probe = document.createElement('canvas').getContext('2d');
+        probe.font = fontCss;
+        const wCss = Math.max(1, Math.ceil(probe.measureText(text).width) + 6);
+        const hCss = Math.ceil(fontSizeCssPx * 1.45);
+        const canvas = document.createElement('canvas');
+        canvas.width = wCss * SCALE;
+        canvas.height = hCss * SCALE;
+        const ctx = canvas.getContext('2d');
+        ctx.scale(SCALE, SCALE);
+        ctx.font = fontCss;
+        ctx.direction = 'rtl';
+        ctx.textAlign = 'right';
+        ctx.textBaseline = 'top';
+        ctx.fillStyle = '#000000';
+        ctx.fillText(text, wCss, 0);
+        return { dataUrl: canvas.toDataURL('image/png'), wCss, hCss };
+      }
+
+      const PX_TO_PT = 0.75; // CSS px -> pt at 96dpi/72pt
+
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF({ unit: 'pt', format: 'a4' });
+      const margin = 40;
+      const pageWidth = doc.internal.pageSize.getWidth();
+      const pageHeight = doc.internal.pageSize.getHeight();
+      const usableWidth = pageWidth - margin * 2;
+      const lineHeight = 16;
+      let y = margin;
+
+      const rawLines = (outputText.value || ' ').split('\n');
+      for (const raw of rawLines) {
+        const isHeading = raw.trim().startsWith('## ');
+        const content = isHeading ? raw.trim().slice(3) : raw;
+
+        if (hasArabic(content)) {
+          const fontSizeCssPx = isHeading ? 16 : 14;
+          const wrapped = wrapByWidth(content, fontSizeCssPx + 'px ' + ARABIC_FONT, usableWidth / PX_TO_PT - 4);
+          for (const sub of wrapped) {
+            const { dataUrl, wCss, hCss } = rasterizeLine(sub, fontSizeCssPx);
+            const wPt = wCss * PX_TO_PT;
+            const hPt = hCss * PX_TO_PT;
+            if (y + hPt > pageHeight - margin) { doc.addPage(); y = margin; }
+            const x = pageWidth - margin - wPt;
+            if (isHeading) {
+              doc.setFillColor(212, 212, 214);
+              doc.rect(margin - 6, y - 3, usableWidth + 12, hPt + 6, 'F');
+            }
+            doc.addImage(dataUrl, 'PNG', x, y, wPt, hPt);
+            y += hPt + 4;
+          }
+          if (isHeading) y += 6;
+          continue;
+        }
+
+        doc.setFont('helvetica', isHeading ? 'bold' : 'normal');
+        doc.setFontSize(isHeading ? 12 : 11);
+        const wrapped = doc.splitTextToSize(content || ' ', usableWidth - 12);
+
+        if (isHeading && y + (wrapped.length * lineHeight) > pageHeight - margin) {
+          doc.addPage();
+          y = margin;
+        }
+        if (isHeading) y += 6;
+
+        wrapped.forEach(line => {
+          if (y > pageHeight - margin) {
+            doc.addPage();
+            y = margin;
+          }
+          if (isHeading) {
+            doc.setFillColor(212, 212, 214);
+            doc.rect(margin - 6, y - 12, usableWidth + 12, lineHeight + 4, 'F');
+          }
+          doc.text(line, margin, y);
+          y += lineHeight;
+        });
+        if (isHeading) y += 6;
+      }
+
+      doc.save('extracted-text.pdf');
+    } catch (err) {
+      console.error(err);
+      alert('Could not build the PDF: ' + err.message);
+    } finally {
+      downloadPdfBtn.disabled = false;
+      downloadPdfBtn.textContent = 'Download .pdf';
+    }
+  });
+
+  clearBtn.addEventListener('click', () => {
+    outputText.value = '';
+    updateStats();
+  });
+
+  replaceBtn.addEventListener('click', () => {
+    const find = findInput.value;
+    if (!find) return;
+    outputText.value = outputText.value.split(find).join(replaceInput.value);
+    updateStats();
+  });
+
+  updateStats();
+  updateFrameCount();
+})();
+</script>
+
+</body>
+</html>
