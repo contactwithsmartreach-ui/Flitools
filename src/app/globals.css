@@ -30,6 +30,15 @@
 
   * {
     border-color: hsl(var(--border));
+    touch-action: pan-x pan-y;
+  }
+
+  html, body {
+    touch-action: manipulation;
+    -webkit-text-size-adjust: 100%;
+    -ms-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+    overscroll-behavior-y: none;
   }
 
   body {
