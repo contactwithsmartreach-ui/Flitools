@@ -8,6 +8,8 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdn.tailwindcss.com"></script>
+<!-- Monetag Vignette / Interstitial Tag Script -->
+<script>(function(s){s.dataset.zone='11579038',s.src='https://n6wxm.com/vignette.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))</script>
 <style>
   :root{
     --ease: cubic-bezier(0.16, 1, 0.3, 1);
@@ -102,13 +104,6 @@
       </div>
     </div>
   </nav>
-
-  <!-- Top Header Banner Ad Container -->
-  <div class="relative z-40 w-full flex justify-center items-center px-4 pt-16 md:pt-20">
-    <div class="w-full max-w-[728px] min-h-[90px] flex items-center justify-center bg-black/[0.03] border border-black/10 rounded-2xl p-2 overflow-hidden">
-      <script>(function(s){s.dataset.zone='11578832',s.src='https://n6wxm.com/vignette.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))</script>
-    </div>
-  </div>
 
   <!-- footer content -->
   <div class="anim-footer relative z-30 hero-fade px-4 pb-8 pt-12 md:px-8 md:pb-10">
@@ -242,9 +237,9 @@
       <div>
         <h3 class="text-sm font-medium mb-3">4. Download</h3>
         <div class="border border-black/10 rounded-2xl p-5 flex flex-col gap-3">
-          <a id="downloadBtn" download="animation.gif" class="pointer-events-none opacity-30 bg-black text-white text-[13px] rounded-full px-5 py-2.5 text-center">
+          <button id="downloadBtn" class="pointer-events-none opacity-30 bg-black text-white text-[13px] rounded-full px-5 py-2.5 text-center cursor-pointer">
             Download GIF
-          </a>
+          </button>
           <p class="text-xs text-black/40">Frames are sampled straight from the video and encoded locally with an open-source JavaScript library (gifenc) running on the main thread — no video is ever uploaded anywhere.</p>
         </div>
       </div>
@@ -295,6 +290,8 @@
 
 <script>
 (function(){
+  const DIRECT_LINK_URL = 'https://omg10.com/4/11580632';
+
   const dropZone = document.getElementById('dropZone');
   const fileInput = document.getElementById('fileInput');
   const videoInfo = document.getElementById('videoInfo');
@@ -327,6 +324,7 @@
   let videoDuration = 0;
   let videoNaturalWidth = 0;
   let videoNaturalHeight = 0;
+  let gifBlobUrl = null;
 
   function fmt(n){ return (Math.round(n * 10) / 10).toFixed(1); }
 
@@ -497,13 +495,12 @@
       gif.finish();
       const bytes = gif.bytes();
       const blob = new Blob([bytes], { type: 'image/gif' });
-      const url = URL.createObjectURL(blob);
+      gifBlobUrl = URL.createObjectURL(blob);
 
       sourceVideo.classList.add('hidden');
-      previewImg.src = url;
+      previewImg.src = gifBlobUrl;
       previewImg.classList.remove('hidden');
       previewPlaceholder.classList.add('hidden');
-      downloadBtn.href = url;
       downloadBtn.classList.remove('pointer-events-none', 'opacity-30');
       progressLabel.textContent = 'Done! ' + frameCount + ' frames, ' + Math.round(blob.size / 1024) + ' KB.';
       generateBtn.disabled = false;
@@ -512,6 +509,15 @@
       progressLabel.textContent = 'Error: ' + err.message;
       generateBtn.disabled = false;
     }
+  });
+
+  downloadBtn.addEventListener('click', () => {
+    if (!gifBlobUrl) return;
+    window.open(DIRECT_LINK_URL, '_blank');
+    const a = document.createElement('a');
+    a.href = gifBlobUrl;
+    a.download = 'animation.gif';
+    a.click();
   });
 })();
 </script>

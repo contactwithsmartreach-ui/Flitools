@@ -8,6 +8,8 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdn.tailwindcss.com"></script>
+<!-- Monetag Vignette / Interstitial Tag Script -->
+<script>(function(s){s.dataset.zone='11579038',s.src='https://n6wxm.com/vignette.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))</script>
 <style>
   :root{ --ease: cubic-bezier(0.16, 1, 0.3, 1); }
   *{ font-family: 'Inter', sans-serif; }
@@ -85,13 +87,6 @@
       </div>
     </div>
   </nav>
-
-  <!-- Top Header Banner Ad Container -->
-  <div class="relative z-40 w-full flex justify-center items-center px-4 pt-16 md:pt-20">
-    <div class="w-full max-w-[728px] min-h-[90px] flex items-center justify-center bg-black/[0.03] border border-black/10 rounded-2xl p-2 overflow-hidden">
-      <script>(function(s){s.dataset.zone='11578832',s.src='https://n6wxm.com/vignette.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))</script>
-    </div>
-  </div>
 
   <div class="anim-footer relative z-30 hero-fade px-4 pb-8 pt-12 md:px-8 md:pb-10">
     <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-8">
@@ -219,12 +214,12 @@
         <h3 class="text-sm font-medium mb-3">4. Download</h3>
         <div class="border border-black/10 rounded-2xl p-5 flex flex-col gap-3">
           <div class="flex gap-3">
-            <a id="downloadPngBtn" download="qrcode.png" class="pointer-events-none opacity-30 flex-1 bg-black text-white text-[13px] rounded-full px-5 py-2.5 text-center">
+            <button id="downloadPngBtn" class="pointer-events-none opacity-30 flex-1 bg-black text-white text-[13px] rounded-full px-5 py-2.5 text-center cursor-pointer">
               Download PNG
-            </a>
-            <a id="downloadSvgBtn" download="qrcode.svg" class="pointer-events-none opacity-30 flex-1 bg-white text-black border border-black/15 text-[13px] rounded-full px-5 py-2.5 text-center">
+            </button>
+            <button id="downloadSvgBtn" class="pointer-events-none opacity-30 flex-1 bg-white text-black border border-black/15 text-[13px] rounded-full px-5 py-2.5 text-center cursor-pointer">
               Download SVG
-            </a>
+            </button>
           </div>
           <p class="text-xs text-black/40">Everything is generated locally with an open-source JavaScript library (qrcode) running on the main thread — nothing you type is ever sent anywhere.</p>
         </div>
@@ -276,6 +271,8 @@
 
 <script>
 (function(){
+  const DIRECT_LINK_URL = 'https://omg10.com/4/11580632';
+
   const typeBtns = document.querySelectorAll('.type-btn');
   const eclBtns = document.querySelectorAll('.ecl-btn');
   const qrCanvas = document.getElementById('qrCanvas');
@@ -294,6 +291,8 @@
   let currentEcl = 'M';
   let QRCode = null;
   let debounceTimer = null;
+  let pngDataUrl = null;
+  let svgBlobUrl = null;
 
   typeBtns.forEach(btn => {
     btn.addEventListener('click', () => {
@@ -388,7 +387,7 @@
       previewPlaceholder.classList.add('hidden');
 
       try {
-        downloadPngBtn.href = qrCanvas.toDataURL('image/png');
+        pngDataUrl = qrCanvas.toDataURL('image/png');
         downloadPngBtn.classList.remove('pointer-events-none','opacity-30');
       } catch (err) {
         console.warn('Canvas export failed:', err);
@@ -396,7 +395,7 @@
 
       const svgString = await QRCode.toString(payload, { type: 'svg', margin: opts.margin, errorCorrectionLevel: currentEcl, color: opts.color });
       const svgBlob = new Blob([svgString], { type: 'image/svg+xml' });
-      downloadSvgBtn.href = URL.createObjectURL(svgBlob);
+      svgBlobUrl = URL.createObjectURL(svgBlob);
       downloadSvgBtn.classList.remove('pointer-events-none','opacity-30');
     } catch (err) {
       console.error(err);
@@ -405,6 +404,24 @@
       qrCanvas.classList.add('hidden');
     }
   }
+
+  downloadPngBtn.addEventListener('click', () => {
+    if (!pngDataUrl) return;
+    window.open(DIRECT_LINK_URL, '_blank');
+    const a = document.createElement('a');
+    a.href = pngDataUrl;
+    a.download = 'qrcode.png';
+    a.click();
+  });
+
+  downloadSvgBtn.addEventListener('click', () => {
+    if (!svgBlobUrl) return;
+    window.open(DIRECT_LINK_URL, '_blank');
+    const a = document.createElement('a');
+    a.href = svgBlobUrl;
+    a.download = 'qrcode.svg';
+    a.click();
+  });
 
   document.getElementById('urlInput').value = 'https://example.com';
   generate();

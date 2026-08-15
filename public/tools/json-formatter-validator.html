@@ -9,8 +9,8 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdn.tailwindcss.com"></script>
-<!-- Formatting, minifying, and validation use the browser's native JSON.parse / JSON.stringify —
-     nothing you paste here is ever sent anywhere. -->
+<!-- Monetag Vignette / Interstitial Tag Script -->
+<script>(function(s){s.dataset.zone='11579038',s.src='https://n6wxm.com/vignette.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))</script>
 <style>
   :root{ --ease: cubic-bezier(0.16, 1, 0.3, 1); }
   *{ font-family: 'Inter', sans-serif; }
@@ -87,13 +87,6 @@
     </div>
   </nav>
 
-  <!-- Top Header Banner Ad Container -->
-  <div class="relative z-40 w-full flex justify-center items-center px-4 pt-16 md:pt-20">
-    <div class="w-full max-w-[728px] min-h-[90px] flex items-center justify-center bg-black/[0.03] border border-black/10 rounded-2xl p-2 overflow-hidden">
-      <script>(function(s){s.dataset.zone='11578832',s.src='https://n6wxm.com/vignette.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))</script>
-    </div>
-  </div>
-
   <div class="anim-footer relative z-30 hero-fade px-4 pb-8 pt-12 md:px-8 md:pb-10">
     <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-8">
       <div>
@@ -150,8 +143,8 @@
             <input id="sortKeys" type="checkbox" class="accent-black w-4 h-4">
           </div>
           <div class="flex gap-3">
-            <button id="formatBtn" class="flex-1 bg-black text-white text-[13px] rounded-full px-5 py-2.5">Format</button>
-            <button id="minifyBtn" class="flex-1 bg-white text-black border border-black/15 text-[13px] rounded-full px-5 py-2.5">Minify</button>
+            <button id="formatBtn" class="flex-1 bg-black text-white text-[13px] rounded-full px-5 py-2.5 cursor-pointer">Format</button>
+            <button id="minifyBtn" class="flex-1 bg-white text-black border border-black/15 text-[13px] rounded-full px-5 py-2.5 cursor-pointer">Minify</button>
           </div>
         </div>
       </div>
@@ -168,8 +161,8 @@
         <h3 class="text-sm font-medium mb-3">4. Download</h3>
         <div class="border border-black/10 rounded-2xl p-5 flex flex-col gap-3">
           <div class="flex gap-3">
-            <button id="copyBtn" class="pointer-events-none opacity-30 flex-1 bg-white text-black border border-black/15 text-[13px] rounded-full px-5 py-2.5">Copy to Clipboard</button>
-            <a id="downloadBtn" download="formatted.json" class="pointer-events-none opacity-30 flex-1 bg-black text-white text-[13px] rounded-full px-5 py-2.5 text-center">Download .json</a>
+            <button id="copyBtn" class="pointer-events-none opacity-30 flex-1 bg-white text-black border border-black/15 text-[13px] rounded-full px-5 py-2.5 cursor-pointer">Copy to Clipboard</button>
+            <button id="downloadBtn" class="pointer-events-none opacity-30 flex-1 bg-black text-white text-[13px] rounded-full px-5 py-2.5 text-center cursor-pointer">Download .json</button>
           </div>
           <p class="text-xs text-black/40">Everything is parsed and formatted locally using the browser's native JSON engine — nothing you paste is ever sent anywhere.</p>
         </div>
@@ -221,6 +214,8 @@
 
 <script>
 (function(){
+  const DIRECT_LINK_URL = 'https://omg10.com/4/11580632';
+
   const jsonInput = document.getElementById('jsonInput');
   const jsonOutput = document.getElementById('jsonOutput');
   const statusMsg = document.getElementById('statusMsg');
@@ -234,6 +229,7 @@
   const downloadBtn = document.getElementById('downloadBtn');
 
   let lastResult = '';
+  let jsonBlobUrl = null;
 
   indentRange.addEventListener('input', () => {
     indentValue.textContent = indentRange.value === '0' ? 'Tab' : indentRange.value + ' spaces';
@@ -308,7 +304,7 @@
 
       copyBtn.classList.remove('pointer-events-none','opacity-30');
       downloadBtn.classList.remove('pointer-events-none','opacity-30');
-      downloadBtn.href = URL.createObjectURL(new Blob([lastResult], { type: 'application/json' }));
+      jsonBlobUrl = URL.createObjectURL(new Blob([lastResult], { type: 'application/json' }));
     } catch (err) {
       jsonOutput.innerHTML = '<span class="text-black/30">Fix the error below to see formatted output</span>';
       statusMsg.textContent = '✕ ' + locateError(raw, err);
@@ -331,11 +327,23 @@
 
   copyBtn.addEventListener('click', async () => {
     if (!lastResult) return;
+    window.open(DIRECT_LINK_URL, '_blank');
     await navigator.clipboard.writeText(lastResult);
     const orig = copyBtn.textContent;
     copyBtn.textContent = 'Copied!';
     setTimeout(() => copyBtn.textContent = orig, 1200);
   });
+
+  downloadBtn.addEventListener('click', () => {
+    if (!jsonBlobUrl) return;
+    window.open(DIRECT_LINK_URL, '_blank');
+    const a = document.createElement('a');
+    a.href = jsonBlobUrl;
+    a.download = 'formatted.json';
+    a.click();
+  });
+
+  run('format');
 })();
 </script>
 

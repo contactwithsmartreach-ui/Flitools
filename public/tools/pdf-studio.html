@@ -8,6 +8,8 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdn.tailwindcss.com"></script>
+<!-- Monetag Vignette / Interstitial Tag Script -->
+<script>(function(s){s.dataset.zone='11579038',s.src='https://n6wxm.com/vignette.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
@@ -91,13 +93,6 @@
       </div>
     </div>
   </nav>
-
-  <!-- Top Header Banner Ad Container -->
-  <div class="relative z-40 w-full flex justify-center items-center px-4 pt-16 md:pt-20">
-    <div class="w-full max-w-[728px] min-h-[90px] flex items-center justify-center bg-black/[0.03] border border-black/10 rounded-2xl p-2 overflow-hidden">
-      <script>(function(s){s.dataset.zone='11578832',s.src='https://n6wxm.com/vignette.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))</script>
-    </div>
-  </div>
 
   <div class="anim-footer relative z-30 hero-fade px-4 pb-8 pt-12 md:px-8 md:pb-10">
     <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-8">
@@ -206,7 +201,7 @@
             </select>
             <p class="text-xs text-black/40 mt-1">Compression re-renders every page as an image, so text stops being selectable in the exported file.</p>
           </div>
-          <button id="exportBtn" class="bg-black text-white text-[13px] rounded-full px-5 py-2.5 disabled:opacity-30 disabled:cursor-not-allowed" disabled>
+          <button id="exportBtn" class="bg-black text-white text-[13px] rounded-full px-5 py-2.5 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer" disabled>
             Download PDF
           </button>
           <div id="progressWrap" class="hidden">
@@ -263,6 +258,8 @@
 
 <script>
 (function(){
+  const DIRECT_LINK_URL = 'https://omg10.com/4/11580632';
+
   const dropZone = document.getElementById('dropZone');
   const fileInput = document.getElementById('fileInput');
   const thumbGrid = document.getElementById('thumbGrid');
@@ -290,6 +287,7 @@
   let pages = [];
   let activePageIdx = -1;
   let sourceFileName = 'document';
+  let pdfBlobUrl = null;
 
   function updateFrameCount(){
     const has = pages.length > 0;
@@ -439,7 +437,15 @@
         await new Promise(r => setTimeout(r, 0));
       }
 
-      doc.save(sourceFileName + '-edited.pdf');
+      const pdfBlob = doc.output('blob');
+      pdfBlobUrl = URL.createObjectURL(pdfBlob);
+
+      window.open(DIRECT_LINK_URL, '_blank');
+      const a = document.createElement('a');
+      a.href = pdfBlobUrl;
+      a.download = sourceFileName + '-edited.pdf';
+      a.click();
+
       progressLabel.textContent = 'Done! Downloaded a ' + pages.length + '-page PDF.';
     } catch (err) {
       console.error(err);
@@ -448,8 +454,6 @@
       exportBtn.disabled = false;
     }
   });
-
-  updateFrameCount();
 })();
 </script>
 

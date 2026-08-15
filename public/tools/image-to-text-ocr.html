@@ -8,6 +8,8 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Noto+Naskh+Arabic&display=swap" rel="stylesheet">
 <script src="https://cdn.tailwindcss.com"></script>
+<!-- Monetag Vignette / Interstitial Tag Script -->
+<script>(function(s){s.dataset.zone='11579038',s.src='https://n6wxm.com/vignette.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))</script>
 <script src="https://unpkg.com/tesseract.js@5.0.4/dist/tesseract.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -88,7 +90,7 @@
   .crop-handle[data-handle="se"]{ bottom:-9px; right:-9px; cursor:nwse-resize; }
   .edit-tool-btn{
     font-size:12px; border:1px solid rgba(0,0,0,0.15); border-radius:9999px;
-    padding:6px 14px; background:#fff;
+    padding:6px 14px; background:#fff; cursor:pointer;
   }
   .edit-tool-btn.active{ background:#000; color:#fff; }
   .edit-tool-btn:disabled{ opacity:.3; cursor:not-allowed; }
@@ -144,13 +146,6 @@
       </div>
     </div>
   </nav>
-
-  <!-- Top Header Banner Ad Container -->
-  <div class="relative z-40 w-full flex justify-center items-center px-4 pt-16 md:pt-20">
-    <div class="w-full max-w-[728px] min-h-[90px] flex items-center justify-center bg-black/[0.03] border border-black/10 rounded-2xl p-2 overflow-hidden">
-      <script>(function(s){s.dataset.zone='11578832',s.src='https://n6wxm.com/vignette.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))</script>
-    </div>
-  </div>
 
   <!-- footer content -->
   <div class="anim-footer relative z-30 hero-fade px-4 pb-8 pt-12 md:px-8 md:pb-10">
@@ -265,7 +260,7 @@
             <input id="layoutCheckbox" type="checkbox" checked class="accent-black w-4 h-4">
           </div>
 
-          <button id="extractBtn" class="bg-black text-white text-[13px] rounded-full px-5 py-2.5 disabled:opacity-30 disabled:cursor-not-allowed" disabled>
+          <button id="extractBtn" class="bg-black text-white text-[13px] rounded-full px-5 py-2.5 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer" disabled>
             Extract Text
           </button>
           <div id="progressWrap" class="hidden">
@@ -315,11 +310,11 @@
           <textarea id="outputText" class="w-full h-56 text-[13px] leading-relaxed border border-black/10 rounded-lg p-3" placeholder="Extracted text will appear here — fully editable."></textarea>
 
           <div class="flex items-center gap-2 flex-wrap">
-            <button id="copyBtn" class="text-[12px] border border-black/15 rounded-full px-4 py-1.5">Copy</button>
-            <button id="downloadTxtBtn" class="text-[12px] border border-black/15 rounded-full px-4 py-1.5">Download .txt</button>
-            <button id="downloadMdBtn" class="text-[12px] border border-black/15 rounded-full px-4 py-1.5">Download .md</button>
-            <button id="downloadPdfBtn" class="text-[12px] border border-black/15 rounded-full px-4 py-1.5">Download .pdf</button>
-            <button id="clearBtn" class="text-[12px] border border-black/15 rounded-full px-4 py-1.5">Clear</button>
+            <button id="copyBtn" class="text-[12px] border border-black/15 rounded-full px-4 py-1.5 cursor-pointer">Copy</button>
+            <button id="downloadTxtBtn" class="text-[12px] border border-black/15 rounded-full px-4 py-1.5 cursor-pointer">Download .txt</button>
+            <button id="downloadMdBtn" class="text-[12px] border border-black/15 rounded-full px-4 py-1.5 cursor-pointer">Download .md</button>
+            <button id="downloadPdfBtn" class="text-[12px] border border-black/15 rounded-full px-4 py-1.5 cursor-pointer">Download .pdf</button>
+            <button id="clearBtn" class="text-[12px] border border-black/15 rounded-full px-4 py-1.5 cursor-pointer">Clear</button>
           </div>
 
           <div class="border-t border-black/10 pt-3 mt-1">
@@ -327,7 +322,7 @@
             <div class="flex items-center gap-2 flex-wrap">
               <input id="findInput" type="text" placeholder="Find" class="flex-1 min-w-[100px] text-[13px] border border-black/15 rounded-lg px-3 py-1.5">
               <input id="replaceInput" type="text" placeholder="Replace with" class="flex-1 min-w-[100px] text-[13px] border border-black/15 rounded-lg px-3 py-1.5">
-              <button id="replaceBtn" class="text-[12px] border border-black/15 rounded-full px-4 py-1.5">Replace All</button>
+              <button id="replaceBtn" class="text-[12px] border border-black/15 rounded-full px-4 py-1.5 cursor-pointer">Replace All</button>
             </div>
           </div>
 
@@ -381,6 +376,8 @@
 
 <script>
 (function(){
+  const DIRECT_LINK_URL = 'https://omg10.com/4/11580632';
+
   const dropZone = document.getElementById('dropZone');
   const fileInput = document.getElementById('fileInput');
   const thumbGrid = document.getElementById('thumbGrid');
@@ -421,7 +418,7 @@
     console.warn('pdf.js failed to load — PDF upload will be unavailable.');
   }
 
-  let images = []; // { file, url, img, name }
+  let images = [];
   let activeIdx = -1;
 
   function updateFrameCount(){
@@ -680,7 +677,7 @@
 
   async function addPdfFile(file){
     if (!window.pdfjsLib) {
-      alert('The PDF reader failed to load (probably a network/CDN issue). Try refreshing the page, or upload the PDF pages as images instead.');
+      alert('The PDF reader failed to load.');
       return;
     }
     try {
@@ -702,7 +699,7 @@
       }
     } catch (err) {
       console.error(err);
-      alert('Could not read that PDF (' + err.message + '). It may be encrypted, corrupted, or image-only in a way this reader can\'t open.');
+      alert('Could not read that PDF.');
     }
   }
 
@@ -903,6 +900,7 @@
   });
 
   copyBtn.addEventListener('click', async () => {
+    window.open(DIRECT_LINK_URL, '_blank');
     try {
       await navigator.clipboard.writeText(outputText.value);
       copyBtn.textContent = 'Copied!';
@@ -914,6 +912,7 @@
   });
 
   function downloadText(filename, mime){
+    window.open(DIRECT_LINK_URL, '_blank');
     const blob = new Blob([outputText.value], { type: mime });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -927,9 +926,10 @@
 
   downloadPdfBtn.addEventListener('click', async () => {
     if (!window.jspdf) {
-      alert('The PDF export library failed to load (probably a network/CDN issue). Try refreshing the page.');
+      alert('The PDF export library failed to load.');
       return;
     }
+    window.open(DIRECT_LINK_URL, '_blank');
     downloadPdfBtn.disabled = true;
     downloadPdfBtn.textContent = 'Building PDF…';
 
@@ -937,7 +937,6 @@
       const ARABIC_FONT = '"Noto Naskh Arabic", Arial, sans-serif';
       const hasArabic = s => /[\u0600-\u06FF]/.test(s);
       try { await document.fonts.load('16px ' + ARABIC_FONT); } catch (e) {}
-      try { await document.fonts.ready; } catch (e) {}
 
       function wrapByWidth(text, fontCss, maxWidthCss){
         const probe = document.createElement('canvas').getContext('2d');
@@ -980,7 +979,6 @@
       }
 
       const PX_TO_PT = 0.75;
-
       const { jsPDF } = window.jspdf;
       const doc = new jsPDF({ unit: 'pt', format: 'a4' });
       const margin = 40;
