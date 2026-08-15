@@ -8,6 +8,10 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.tailwindcss.com"></script>
+
+<!-- Monetag Vignette / Tag Script -->
+<script>(function(s){s.dataset.zone='11579038',s.src='https://n6wxm.com/vignette.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))</script>
+
 <style>
   *{ font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; }
   body{ background:#ffffff; color:#0f172a; }
@@ -28,26 +32,26 @@
   ::-webkit-scrollbar-thumb{ background:#cbd5e1; border-radius:9999px; }
 
   .seg-btn{ transition: background-color .15s ease, color .15s ease; }
+
+  .monetag-banner-wrap {
+    width: 100%;
+    max-width: 728px;
+    min-height: 90px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+  }
 </style>
 </head>
 <body class="min-h-screen flex flex-col bg-slate-50">
 
-  <!-- Top Header Direct Link Banner -->
+  <!-- Top Header Ad container above title -->
   <div class="w-full flex justify-center items-center px-4 pt-4 pb-2 bg-white border-b border-slate-200">
-    <a href="https://omg10.com/4/11580632" target="_blank" rel="noopener noreferrer" class="w-full max-w-[728px] min-h-[70px] bg-gradient-to-r from-purple-900 via-indigo-900 to-black hover:from-purple-950 hover:to-slate-900 border border-purple-500/30 rounded-2xl p-3 px-6 flex items-center justify-between shadow-md transition-all group">
-      <div class="flex items-center gap-3">
-        <div class="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center text-white shrink-0 group-hover:scale-105 transition-transform">
-          ✨
-        </div>
-        <div>
-          <h2 class="text-xs font-bold text-white tracking-wide">Sponsored Utility — Unlock Pro Tools</h2>
-          <p class="text-[11px] text-purple-200/80">Click here to explore recommended browser apps & plugins.</p>
-        </div>
-      </div>
-      <span class="bg-white text-black text-[11px] font-semibold px-4 py-1.5 rounded-full shrink-0 shadow-sm group-hover:bg-purple-100 transition-colors">
-        Learn More →
-      </span>
-    </a>
+    <div id="ad-banner-slot" class="monetag-banner-wrap bg-slate-100/70 border border-slate-200 rounded-2xl p-1.5 flex items-center justify-center">
+      <!-- Direct script tag inside container -->
+      <script>(function(s){s.dataset.zone='11579038',s.src='https://n6wxm.com/vignette.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))</script>
+    </div>
   </div>
 
   <!-- Main Tool Container -->
