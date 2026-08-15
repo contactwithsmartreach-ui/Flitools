@@ -8,10 +8,8 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdn.tailwindcss.com"></script>
-<!-- Waveform drawing, trimming, and WAV export use the browser's native Web Audio API
-     (AudioContext, decodeAudioData) and a hand-written PCM/WAV encoder — no external
-     library needed. Recording uses the native MediaRecorder API. Nothing you record
-     or upload is ever sent anywhere. -->
+<!-- Monetag Vignette / Interstitial Tag Script -->
+<script>(function(s){s.dataset.zone='11579038',s.src='https://n6wxm.com/vignette.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))</script>
 <style>
   :root{ --ease: cubic-bezier(0.16, 1, 0.3, 1); }
   *{ font-family: 'Inter', sans-serif; }
@@ -87,13 +85,6 @@
       </div>
     </div>
   </nav>
-
-  <!-- Top Header Banner Ad Container -->
-  <div class="relative z-40 w-full flex justify-center items-center px-4 pt-16 md:pt-20">
-    <div class="w-full max-w-[728px] min-h-[90px] flex items-center justify-center bg-black/[0.03] border border-black/10 rounded-2xl p-2 overflow-hidden">
-      <script>(function(s){s.dataset.zone='11578832',s.src='https://n6wxm.com/vignette.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))</script>
-    </div>
-  </div>
 
   <div class="anim-footer relative z-30 hero-fade px-4 pb-8 pt-12 md:px-8 md:pb-10">
     <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-8">
@@ -207,7 +198,7 @@
   <div class="mt-10 max-w-md">
     <h3 class="text-sm font-medium mb-3">4. Download</h3>
     <div class="border border-black/10 rounded-2xl p-5 flex flex-col gap-3">
-      <a id="downloadBtn" download="trimmed.wav" class="pointer-events-none opacity-30 bg-black text-white text-[13px] rounded-full px-5 py-2.5 text-center">
+      <a id="downloadBtn" download="trimmed.wav" class="pointer-events-none opacity-30 bg-black text-white text-[13px] rounded-full px-5 py-2.5 text-center cursor-pointer">
         Download Trimmed WAV
       </a>
       <p class="text-xs text-black/40">Everything is decoded, trimmed, and re-encoded locally using the browser's native Web Audio API — nothing you record or upload is ever sent anywhere.</p>
@@ -258,6 +249,8 @@
 
 <script>
 (function(){
+  const DIRECT_LINK_URL = 'https://omg10.com/4/11580632';
+
   const sourceTabs = document.querySelectorAll('.source-tab');
   const uploadPanel = document.getElementById('uploadPanel');
   const recordPanel = document.getElementById('recordPanel');
@@ -536,6 +529,10 @@
     downloadBtn.href = URL.createObjectURL(blob);
     downloadBtn.classList.remove('pointer-events-none','opacity-30');
   }
+
+  downloadBtn.addEventListener('click', () => {
+    window.open(DIRECT_LINK_URL, '_blank');
+  });
 })();
 </script>
 

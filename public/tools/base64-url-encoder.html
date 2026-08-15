@@ -9,6 +9,8 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdn.tailwindcss.com"></script>
+<!-- Monetag Vignette / Interstitial Tag Script -->
+<script>(function(s){s.dataset.zone='11579038',s.src='https://n6wxm.com/vignette.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))</script>
 <style>
   :root{ --ease: cubic-bezier(0.16, 1, 0.3, 1); }
   *{ font-family: 'Inter', sans-serif; }
@@ -74,13 +76,6 @@
     </div>
   </nav>
 
-  <!-- Top Header Banner Ad Container -->
-  <div class="relative z-40 w-full flex justify-center items-center px-4 pt-16 md:pt-20">
-    <div class="w-full max-w-[728px] min-h-[90px] flex items-center justify-center bg-black/[0.03] border border-black/10 rounded-2xl p-2 overflow-hidden">
-      <script>(function(s){s.dataset.zone='11578832',s.src='https://n6wxm.com/vignette.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))</script>
-    </div>
-  </div>
-
   <div class="anim-footer relative z-30 hero-fade px-4 pb-8 pt-12 md:px-8 md:pb-10">
     <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-8">
       <div>
@@ -126,7 +121,7 @@
     <div class="flex flex-col gap-4">
       <div class="flex items-center justify-between">
         <h3 class="text-sm font-medium">2. Output result</h3>
-        <button id="copyBtn" class="text-[11px] rounded-full px-3 py-1.5 border border-black/15 hover:bg-black hover:text-white transition-colors pointer-events-none opacity-30">Copy Output</button>
+        <button id="copyBtn" class="text-[11px] rounded-full px-3 py-1.5 border border-black/15 hover:bg-black hover:text-white transition-colors pointer-events-none opacity-30 cursor-pointer">Copy Output</button>
       </div>
       <pre id="outputPre" class="mono w-full h-72 border border-black/10 rounded-2xl p-4 text-xs leading-relaxed overflow-auto bg-black/[0.02] text-black/80">SGVsbG8gV29ybGQh</pre>
     </div>
@@ -148,6 +143,8 @@
 
 <script>
 (function(){
+  const DIRECT_LINK_URL = 'https://omg10.com/4/11580632';
+
   const tabs = document.querySelectorAll('.mode-tab');
   const inputTxt = document.getElementById('inputTxt');
   const outputPre = document.getElementById('outputPre');
@@ -191,6 +188,7 @@
 
   inputTxt.addEventListener('input', process);
   copyBtn.addEventListener('click', async () => {
+    window.open(DIRECT_LINK_URL, '_blank');
     await navigator.clipboard.writeText(outputPre.textContent);
     const orig = copyBtn.textContent;
     copyBtn.textContent = 'Copied!';

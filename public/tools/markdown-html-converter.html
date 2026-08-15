@@ -9,10 +9,8 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdn.tailwindcss.com"></script>
-<!-- Markdown → HTML uses the open-source "marked" library (github.com/markedjs/marked).
-     HTML → Markdown uses the open-source "turndown" library (github.com/mixmark-io/turndown).
-     Both are loaded dynamically via ESM import at convert-time and run entirely on the main
-     thread — nothing you type is ever sent anywhere. -->
+<!-- Monetag Vignette / Interstitial Tag Script -->
+<script>(function(s){s.dataset.zone='11579038',s.src='https://n6wxm.com/vignette.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))</script>
 <style>
   :root{ --ease: cubic-bezier(0.16, 1, 0.3, 1); }
   *{ font-family: 'Inter', sans-serif; }
@@ -99,13 +97,6 @@
     </div>
   </nav>
 
-  <!-- Top Header Banner Ad Container -->
-  <div class="relative z-40 w-full flex justify-center items-center px-4 pt-16 md:pt-20">
-    <div class="w-full max-w-[728px] min-h-[90px] flex items-center justify-center bg-black/[0.03] border border-black/10 rounded-2xl p-2 overflow-hidden">
-      <script>(function(s){s.dataset.zone='11578832',s.src='https://n6wxm.com/vignette.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))</script>
-    </div>
-  </div>
-
   <div class="anim-footer relative z-30 hero-fade px-4 pb-8 pt-12 md:px-8 md:pb-10">
     <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-8">
       <div>
@@ -177,8 +168,8 @@ Type or paste **Markdown** here…"></textarea>
         <h3 class="text-sm font-medium mb-3">4. Download</h3>
         <div class="border border-black/10 rounded-2xl p-5 flex flex-col gap-3">
           <div class="flex gap-3">
-            <button id="copyBtn" class="pointer-events-none opacity-30 flex-1 bg-white text-black border border-black/15 text-[13px] rounded-full px-5 py-2.5">Copy to Clipboard</button>
-            <a id="downloadBtn" class="pointer-events-none opacity-30 flex-1 bg-black text-white text-[13px] rounded-full px-5 py-2.5 text-center">Download</a>
+            <button id="copyBtn" class="pointer-events-none opacity-30 flex-1 bg-white text-black border border-black/15 text-[13px] rounded-full px-5 py-2.5 cursor-pointer">Copy to Clipboard</button>
+            <a id="downloadBtn" class="pointer-events-none opacity-30 flex-1 bg-black text-white text-[13px] rounded-full px-5 py-2.5 text-center cursor-pointer">Download</a>
           </div>
           <p class="text-xs text-black/40">Conversion runs locally using the open-source libraries marked and turndown — nothing you type is ever sent anywhere.</p>
         </div>
@@ -230,6 +221,8 @@ Type or paste **Markdown** here…"></textarea>
 
 <script>
 (function(){
+  const DIRECT_LINK_URL = 'https://omg10.com/4/11580632';
+
   const dirTabs = document.querySelectorAll('.dir-tab');
   const sourceInput = document.getElementById('sourceInput');
   const inputLabel = document.getElementById('inputLabel');
@@ -363,10 +356,15 @@ Type or paste **Markdown** here…
 
   copyBtn.addEventListener('click', async () => {
     if (!lastResult) return;
+    window.open(DIRECT_LINK_URL, '_blank');
     await navigator.clipboard.writeText(lastResult);
     const orig = copyBtn.textContent;
     copyBtn.textContent = 'Copied!';
     setTimeout(() => copyBtn.textContent = orig, 1200);
+  });
+
+  downloadBtn.addEventListener('click', () => {
+    window.open(DIRECT_LINK_URL, '_blank');
   });
 
   convert();

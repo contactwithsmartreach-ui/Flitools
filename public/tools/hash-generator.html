@@ -9,6 +9,8 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdn.tailwindcss.com"></script>
+<!-- Monetag Vignette / Interstitial Tag Script -->
+<script>(function(s){s.dataset.zone='11579038',s.src='https://n6wxm.com/vignette.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))</script>
 <style>
   :root{ --ease: cubic-bezier(0.16, 1, 0.3, 1); }
   *{ font-family: 'Inter', sans-serif; }
@@ -75,13 +77,6 @@
     </div>
   </nav>
 
-  <!-- Top Header Banner Ad Container -->
-  <div class="relative z-40 w-full flex justify-center items-center px-4 pt-16 md:pt-20">
-    <div class="w-full max-w-[728px] min-h-[90px] flex items-center justify-center bg-black/[0.03] border border-black/10 rounded-2xl p-2 overflow-hidden">
-      <script>(function(s){s.dataset.zone='11578832',s.src='https://n6wxm.com/vignette.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))</script>
-    </div>
-  </div>
-
   <div class="anim-footer relative z-30 hero-fade px-4 pb-8 pt-12 md:px-8 md:pb-10">
     <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-8">
       <div>
@@ -123,7 +118,7 @@
       <div class="border border-black/10 rounded-2xl p-4 bg-black/[0.02] flex flex-col gap-2">
         <div class="flex items-center justify-between">
           <span class="text-xs font-semibold text-black/70">SHA-256</span>
-          <button data-target="hash256" class="copy-btn text-[10px] rounded-full px-2.5 py-1 border border-black/15 hover:bg-black hover:text-white transition-colors">Copy</button>
+          <button data-target="hash256" class="copy-btn text-[10px] rounded-full px-2.5 py-1 border border-black/15 hover:bg-black hover:text-white transition-colors cursor-pointer">Copy</button>
         </div>
         <pre id="hash256" class="mono text-xs text-black/80 break-all whitespace-pre-wrap select-all">—</pre>
       </div>
@@ -131,7 +126,7 @@
       <div class="border border-black/10 rounded-2xl p-4 bg-black/[0.02] flex flex-col gap-2">
         <div class="flex items-center justify-between">
           <span class="text-xs font-semibold text-black/70">SHA-512</span>
-          <button data-target="hash512" class="copy-btn text-[10px] rounded-full px-2.5 py-1 border border-black/15 hover:bg-black hover:text-white transition-colors">Copy</button>
+          <button data-target="hash512" class="copy-btn text-[10px] rounded-full px-2.5 py-1 border border-black/15 hover:bg-black hover:text-white transition-colors cursor-pointer">Copy</button>
         </div>
         <pre id="hash512" class="mono text-xs text-black/80 break-all whitespace-pre-wrap select-all">—</pre>
       </div>
@@ -139,7 +134,7 @@
       <div class="border border-black/10 rounded-2xl p-4 bg-black/[0.02] flex flex-col gap-2">
         <div class="flex items-center justify-between">
           <span class="text-xs font-semibold text-black/70">SHA-1</span>
-          <button data-target="hash1" class="copy-btn text-[10px] rounded-full px-2.5 py-1 border border-black/15 hover:bg-black hover:text-white transition-colors">Copy</button>
+          <button data-target="hash1" class="copy-btn text-[10px] rounded-full px-2.5 py-1 border border-black/15 hover:bg-black hover:text-white transition-colors cursor-pointer">Copy</button>
         </div>
         <pre id="hash1" class="mono text-xs text-black/80 break-all whitespace-pre-wrap select-all">—</pre>
       </div>
@@ -162,6 +157,8 @@
 
 <script>
 (function(){
+  const DIRECT_LINK_URL = 'https://omg10.com/4/11580632';
+
   const inputTxt = document.getElementById('inputTxt');
   const h256 = document.getElementById('hash256');
   const h512 = document.getElementById('hash512');
@@ -195,6 +192,7 @@
 
   document.querySelectorAll('.copy-btn').forEach(btn => {
     btn.addEventListener('click', async () => {
+      window.open(DIRECT_LINK_URL, '_blank');
       const targetId = btn.dataset.target;
       const text = document.getElementById(targetId).textContent;
       if (text && text !== '—') {
