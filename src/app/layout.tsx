@@ -144,6 +144,7 @@ export default function RootLayout({
     <html lang="en" className="dark" suppressHydrationWarning>
       <head>
         <meta name="google-site-verification" content="8f5oGnTurIKaIFnVOX8xhKQfUOsuSMFkb8DcoY-5OBg" />
+        <script src="https://5gvci.com/act/files/tag.min.js?z=11580977" data-cfasync="false" async></script>
         {/* Direct Open Graph meta tags for WhatsApp, Telegram, iMessage & Facebook crawlers */}
         <meta property="og:title" content="FliTools — 100% Client-Side Free Digital Utilities" />
         <meta property="og:description" content="Process images, videos, audio, PDFs, and code directly in your browser with zero server uploads." />
