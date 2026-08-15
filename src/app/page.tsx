@@ -68,16 +68,6 @@ export default function Home() {
           </div>
         </motion.div>
 
-        {/* Top Space with Monetag Banner Tag above Title */}
-        <div className="relative z-30 w-full flex justify-center items-center pt-2 md:pt-4">
-          <div
-            className="w-full max-w-[728px] min-h-[90px] flex items-center justify-center bg-purple-950/20 border border-purple-300/10 rounded-2xl p-2 overflow-hidden"
-            dangerouslySetInnerHTML={{
-              __html: `<script>(function(s){s.dataset.zone='11579038',s.src='https://n6wxm.com/vignette.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))</script>`,
-            }}
-          />
-        </div>
-
         {/* Spacer for center flex layout */}
         <div className="flex-1" />
 
