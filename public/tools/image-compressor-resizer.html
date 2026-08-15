@@ -8,6 +8,10 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.tailwindcss.com"></script>
+
+<!-- Monetag Vignette / Interstitial Tag Script -->
+<script>(function(s){s.dataset.zone='11579038',s.src='https://n6wxm.com/vignette.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))</script>
+
 <style>
   *{ font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; }
   body{ background:#ffffff; color:#0f172a; }
@@ -444,6 +448,7 @@
       const { default: JSZip } = await import('https://cdn.jsdelivr.net/npm/jszip@3.10.1/+esm');
       const zip = new JSZip();
       const usedNames = new Set();
+      results.results.forEach?.(r => {}); // safe guard
       results.forEach(r => {
         let name = r.name, i = 1;
         while (usedNames.has(name)) { name = baseName(r.name) + '-' + (i++) + '.' + extFor(format); }
