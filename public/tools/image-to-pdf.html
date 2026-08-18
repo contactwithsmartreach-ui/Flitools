@@ -57,18 +57,24 @@
     background: linear-gradient(to top, #ffffff 0%, rgba(255,255,255,0.85) 55%, transparent 100%);
   }
 
-  .drop-zone{ transition: border-color .2s ease, background-color .2s ease; }
-  .drop-zone.dragover{ border-color:#000; background-color:#f7f7f7; }
+  .drop-zone{ transition: border-color .2s ease, background-color .2s ease, transform .2s ease; }
+  .drop-zone.dragover{ border-color:#000; background-color:#f1f1f4; transform: scale(1.01); }
 
-  .thumb{ position:relative; cursor:pointer; }
+  .thumb{ position:relative; cursor:grab; transition: transform .15s ease, opacity .15s ease, box-shadow .15s ease; }
+  .thumb:active{ cursor:grabbing; }
+  .thumb.dragging{ opacity: 0.35; transform: scale(0.95); }
+  .thumb.drag-over{ outline: 2px dashed #000; outline-offset: 2px; }
   .thumb.active{ outline:2px solid #000; outline-offset:2px; }
+  
   .thumb .thumb-remove{
     position:absolute; top:4px; right:4px;
     width:20px; height:20px; border-radius:9999px;
     background:rgba(0,0,0,0.75); color:#fff; font-size:12px;
     display:flex; align-items:center; justify-content:center; line-height:1;
-    z-index:2;
+    z-index:2; cursor:pointer;
   }
+  .thumb .thumb-remove:hover{ background: #000; }
+
   .thumb .thumb-order{
     position:absolute; bottom:4px; left:4px; right:4px;
     display:flex; justify-content:space-between; gap:2px;
@@ -76,17 +82,19 @@
   }
   .thumb .thumb-order button{
     width:18px; height:18px; border-radius:9999px;
-    background:rgba(255,255,255,0.9); color:#000; font-size:10px;
+    background:rgba(255,255,255,0.95); color:#000; font-size:10px;
     display:flex; align-items:center; justify-content:center; line-height:1;
-    box-shadow: 0 0 0 1px rgba(0,0,0,0.1);
+    box-shadow: 0 0 0 1px rgba(0,0,0,0.15); cursor:pointer;
   }
-  .thumb .thumb-order button:disabled{ opacity:.25; }
+  .thumb .thumb-order button:disabled{ opacity:.25; cursor:not-allowed; }
+  .thumb .thumb-order button:hover:not(:disabled){ background:#000; color:#fff; }
+
   .thumb .thumb-page{
     position:absolute; top:4px; left:4px;
     width:18px; height:18px; border-radius:9999px;
-    background:rgba(255,255,255,0.9); color:#000; font-size:10px; font-weight:600;
+    background:rgba(255,255,255,0.95); color:#000; font-size:10px; font-weight:600;
     display:flex; align-items:center; justify-content:center; line-height:1;
-    box-shadow: 0 0 0 1px rgba(0,0,0,0.1);
+    box-shadow: 0 0 0 1px rgba(0,0,0,0.15);
     z-index:2;
   }
 
@@ -199,18 +207,18 @@
       <!-- upload zone -->
       <div>
         <h3 class="text-sm font-medium mb-3">1. Upload images</h3>
-        <div id="dropZone" class="drop-zone border-2 border-dashed border-black/20 rounded-2xl flex flex-col items-center justify-center text-center py-14 px-6 cursor-pointer">
-          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="1.5" class="mb-3 opacity-60">
+        <div id="dropZone" class="drop-zone border-2 border-dashed border-black/20 hover:border-black/50 rounded-2xl flex flex-col items-center justify-center text-center py-12 px-6 cursor-pointer bg-neutral-50/50">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="1.5" class="mb-3 opacity-60">
             <path d="M12 16V4M12 4l-4 4M12 4l4 4" stroke-linecap="round" stroke-linejoin="round"/>
             <path d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
-          <p class="text-sm font-medium">Drag & drop images, or click to browse</p>
-          <p class="text-xs text-black/40 mt-1">Each image becomes one page, in the order you add them</p>
-          <p class="text-xs text-black/40 mt-1">Use the arrows on a page to reorder it, or the × to remove it</p>
+          <p class="text-sm font-medium text-neutral-900">Drag & drop images here, or click to browse</p>
+          <p class="text-xs text-black/40 mt-1">Supports JPG, PNG, WebP, GIF, SVG</p>
+          <p class="text-[11px] text-black/40 mt-1">Drag thumbnails below to rearrange page order</p>
           <input id="fileInput" type="file" accept="image/*" multiple class="hidden">
         </div>
 
-        <div id="thumbGrid" class="grid grid-cols-4 sm:grid-cols-5 gap-2 mt-4"></div>
+        <div id="thumbGrid" class="grid grid-cols-4 sm:grid-cols-5 gap-2.5 mt-4"></div>
         <p id="frameCount" class="text-xs text-black/40 mt-2">0 pages added</p>
       </div>
 
@@ -309,7 +317,7 @@
             <span id="pageSummary">No pages yet — upload images to get started.</span>
           </p>
           <div class="flex items-center gap-2 flex-wrap">
-            <button id="clearAllBtn" class="text-[12px] border border-black/15 rounded-full px-4 py-1.5 cursor-pointer">Remove All</button>
+            <button id="clearAllBtn" class="text-[12px] border border-black/15 rounded-full px-4 py-1.5 cursor-pointer hover:bg-black hover:text-white transition-colors">Remove All</button>
           </div>
           <p class="text-xs text-black/40">PDF assembly runs locally with an open-source library (jsPDF) — no images are ever uploaded anywhere.</p>
         </div>
@@ -335,7 +343,7 @@
       <div>
         <div class="flex items-center justify-center rounded-full bg-black text-white text-sm font-medium mb-4" style="width:32px;height:32px;">2</div>
         <h3 class="text-sm font-medium mb-2">Crop, rotate & reorder</h3>
-        <p class="text-xs text-black/50 leading-relaxed">Straighten a sideways scan, crop out anything you don't need, or drag pages into the right order using the arrows on each thumbnail.</p>
+        <p class="text-xs text-black/50 leading-relaxed">Straighten a sideways scan, crop out anything you don't need, or drag pages into the right order using drag-and-drop or the arrows.</p>
       </div>
       <div>
         <div class="flex items-center justify-center rounded-full bg-black text-white text-sm font-medium mb-4" style="width:32px;height:32px;">3</div>
@@ -392,6 +400,7 @@
 
   let images = [];
   let activeItem = null;
+  let dragSrcIdx = null;
 
   function activeIdx(){
     return activeItem ? images.indexOf(activeItem) : -1;
@@ -433,36 +442,39 @@
     thumbGrid.innerHTML = '';
     images.forEach((item, idx) => {
       const wrap = document.createElement('div');
-      wrap.className = 'thumb rounded-lg overflow-hidden border border-black/10 aspect-square';
-      wrap.title = item.name;
+      wrap.className = 'thumb rounded-lg overflow-hidden border border-black/10 aspect-square select-none';
+      wrap.title = item.name + ' (drag to reorder)';
+      wrap.draggable = true;
+      wrap.dataset.idx = idx;
 
       const img = document.createElement('img');
       img.src = item.url;
-      img.className = 'w-full h-full object-cover';
+      img.className = 'w-full h-full object-cover pointer-events-none';
       wrap.appendChild(img);
 
       const pageBadge = document.createElement('span');
-      pageBadge.className = 'thumb-page';
+      pageBadge.className = 'thumb-page pointer-events-none';
       pageBadge.textContent = idx + 1;
       wrap.appendChild(pageBadge);
 
       const removeBtn = document.createElement('button');
       removeBtn.className = 'thumb-remove';
-      removeBtn.textContent = '×';
+      removeBtn.innerHTML = '×';
+      removeBtn.title = 'Remove page';
       removeBtn.onclick = (e) => {
         e.stopPropagation();
         const wasActive = item === activeItem;
-        images.splice(idx,1);
+        images.splice(idx, 1);
         if (wasActive) activeItem = null;
         renderThumbs();
-        if (!wasActive) { renderThumbActiveState(); }
       };
       wrap.appendChild(removeBtn);
 
       const orderRow = document.createElement('div');
       orderRow.className = 'thumb-order';
       const upBtn = document.createElement('button');
-      upBtn.textContent = '↑';
+      upBtn.textContent = '←';
+      upBtn.title = 'Move left';
       upBtn.disabled = idx === 0;
       upBtn.onclick = (e) => {
         e.stopPropagation();
@@ -471,7 +483,8 @@
         renderThumbs();
       };
       const downBtn = document.createElement('button');
-      downBtn.textContent = '↓';
+      downBtn.textContent = '→';
+      downBtn.title = 'Move right';
       downBtn.disabled = idx === images.length - 1;
       downBtn.onclick = (e) => {
         e.stopPropagation();
@@ -482,6 +495,49 @@
       orderRow.appendChild(upBtn);
       orderRow.appendChild(downBtn);
       wrap.appendChild(orderRow);
+
+      // Drag and drop reordering events
+      wrap.addEventListener('dragstart', (e) => {
+        dragSrcIdx = idx;
+        wrap.classList.add('dragging');
+        e.dataTransfer.effectAllowed = 'move';
+        e.dataTransfer.setData('text/plain', String(idx));
+      });
+
+      wrap.addEventListener('dragend', () => {
+        wrap.classList.remove('dragging');
+        document.querySelectorAll('.thumb').forEach(t => t.classList.remove('drag-over'));
+        dragSrcIdx = null;
+      });
+
+      wrap.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
+        wrap.classList.add('drag-over');
+      });
+
+      wrap.addEventListener('dragleave', () => {
+        wrap.classList.remove('drag-over');
+      });
+
+      wrap.addEventListener('drop', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        wrap.classList.remove('drag-over');
+        
+        // Handle file drop onto a thumb
+        if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+          addFiles(e.dataTransfer.files);
+          return;
+        }
+
+        const targetIdx = idx;
+        if (dragSrcIdx === null || dragSrcIdx === targetIdx) return;
+        const [movedItem] = images.splice(dragSrcIdx, 1);
+        images.splice(targetIdx, 0, movedItem);
+        dragSrcIdx = null;
+        renderThumbs();
+      });
 
       wrap.addEventListener('click', () => setPreview(idx));
       thumbGrid.appendChild(wrap);
@@ -507,23 +563,51 @@
   }
 
   async function addFiles(fileList){
+    if (!fileList || fileList.length === 0) return;
     const files = Array.from(fileList).filter(f => f.type.startsWith('image/'));
-    for (const file of files) await addImageFile(file);
+    for (const file of files) {
+      await addImageFile(file);
+    }
     renderThumbs();
+    fileInput.value = '';
   }
 
+  // Drop zone events
   dropZone.addEventListener('click', () => fileInput.click());
-  fileInput.addEventListener('change', e => addFiles(e.target.files));
+  fileInput.addEventListener('change', e => {
+    if (e.target.files && e.target.files.length) {
+      addFiles(e.target.files);
+    }
+  });
 
-  ['dragenter','dragover'].forEach(evt => {
-    dropZone.addEventListener(evt, e => { e.preventDefault(); dropZone.classList.add('dragover'); });
+  ['dragenter', 'dragover'].forEach(evt => {
+    dropZone.addEventListener(evt, e => {
+      e.preventDefault();
+      e.stopPropagation();
+      dropZone.classList.add('dragover');
+    });
   });
-  ['dragleave','drop'].forEach(evt => {
-    dropZone.addEventListener(evt, e => { e.preventDefault(); dropZone.classList.remove('dragover'); });
+
+  ['dragleave', 'dragend'].forEach(evt => {
+    dropZone.addEventListener(evt, e => {
+      e.preventDefault();
+      e.stopPropagation();
+      dropZone.classList.remove('dragover');
+    });
   });
+
   dropZone.addEventListener('drop', e => {
-    if (e.dataTransfer.files) addFiles(e.dataTransfer.files);
+    e.preventDefault();
+    e.stopPropagation();
+    dropZone.classList.remove('dragover');
+    if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length) {
+      addFiles(e.dataTransfer.files);
+    }
   });
+
+  // Global window drop prevention so dropped images never replace the webpage
+  window.addEventListener('dragover', e => e.preventDefault(), false);
+  window.addEventListener('drop', e => e.preventDefault(), false);
 
   clearAllBtn.addEventListener('click', () => {
     images = [];
@@ -620,7 +704,9 @@
       top: previewImg.offsetTop,
       width: previewImg.clientWidth,
       height: previewImg.clientHeight
-    };<dyad-write path="public/tools/image-to-pdf.html" description="Complete image to pdf studio with direct link download integration">
+    };
+  }
+
   function renderCropBox(){
     if (!cropRect) return;
     const box = imgBox();
