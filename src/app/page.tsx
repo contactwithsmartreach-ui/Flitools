@@ -8,7 +8,7 @@ import ToolsGrid from "@/components/ToolsGrid";
 import FAQSection from "@/components/FAQSection";
 import Footer from "@/components/Footer";
 import { ToolItem } from "@/data/tools";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, ShieldCheck, Cpu } from "lucide-react";
 
 // Code-split heavy interactive modals so they load dynamically on demand
 const ToolModal = dynamic(() => import("@/components/ToolModal"), {
@@ -88,45 +88,69 @@ export default function Home() {
               transition={{ delay: 0.5, duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
               className="font-light text-[clamp(2rem,8vw,4.5rem)] md:text-[clamp(2.5rem,5.5vw,4.5rem)] tracking-[-0.03em] leading-none text-white"
             >
-              One Hub, Zero <br />
-              Limits. Worldwide.
+              Free Digital Tools. <br />
+              Private & In-Browser.
             </motion.h1>
 
-            {/* Buttons styled like purple glass cards */}
+            {/* Supporting Copy (18px desktop / 16px mobile, 560px max desktop / 300px mobile, 16px below H1) */}
+            <motion.p
+              initial={{ y: 14, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 0.55, duration: 0.65, ease: [0.16, 1, 0.3, 1] }}
+              className="mt-4 text-[16px] md:text-[18px] text-purple-100/90 leading-relaxed font-light max-w-[300px] md:max-w-[560px]"
+            >
+              Process PDFs, media, and code with 100% client-side privacy. All conversions run locally inside your browser with zero server uploads.
+            </motion.p>
+
+            {/* CTA Buttons Block */}
             <motion.div
               initial={{ y: 12, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: 0.6, duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-              className="flex items-center gap-3 pt-2"
+              className="flex flex-col gap-3.5 pt-2"
             >
-              {/* Primary Purple Button */}
-              <button
-                onClick={scrollToTools}
-                className="relative h-fit w-fit px-6 py-3 border-2 border-[rgba(75,30,133,0.6)] rounded-full flex justify-center items-center gap-2.5 overflow-hidden group/btn hover:border-purple-300/80 hover:shadow-xl hover:shadow-purple-500/30 active:scale-95 transition-all duration-300 backdrop-blur-[12px] bg-gradient-to-r from-[rgba(75,30,133,1)] via-purple-700 to-[rgba(75,30,133,0.8)] text-white shadow-md cursor-pointer transform-gpu"
-              >
-                <div className="absolute inset-0 bg-gradient-to-r from-purple-600/40 via-fuchsia-500/40 to-purple-600/40 translate-x-[-100%] group-hover/btn:translate-x-[100%] transition-transform duration-700"></div>
-                <p className="relative z-10 font-medium tracking-wide text-xs">Explore Directory</p>
-                <ArrowRight className="relative z-10 w-4 h-4 group-hover/btn:translate-x-[10%] transition-transform duration-300 text-purple-200" />
-              </button>
+              <div className="flex items-center gap-3 flex-wrap sm:flex-nowrap">
+                {/* Primary CTA (2-4 words, action specific) */}
+                <button
+                  onClick={scrollToTools}
+                  className="relative h-fit w-fit px-6 py-3 border-2 border-[rgba(75,30,133,0.7)] rounded-full flex justify-center items-center gap-2.5 overflow-hidden group/btn hover:border-purple-300/80 hover:shadow-xl hover:shadow-purple-500/30 active:scale-95 transition-all duration-300 backdrop-blur-[12px] bg-gradient-to-r from-[rgba(75,30,133,1)] via-purple-700 to-[rgba(75,30,133,0.9)] text-white shadow-md cursor-pointer transform-gpu"
+                >
+                  <div className="absolute inset-0 bg-gradient-to-r from-purple-600/40 via-fuchsia-500/40 to-purple-600/40 translate-x-[-100%] group-hover/btn:translate-x-[100%] transition-transform duration-700"></div>
+                  <p className="relative z-10 font-semibold tracking-wide text-xs">Browse Free Tools</p>
+                  <ArrowRight className="relative z-10 w-4 h-4 group-hover/btn:translate-x-[10%] transition-transform duration-300 text-purple-200" />
+                </button>
 
-              {/* Secondary Purple Border Glass Button */}
-              <button
-                onClick={() => setIsHowItWorksOpen(true)}
-                className="relative h-fit w-fit px-6 py-3 border-2 border-purple-300/30 rounded-full flex justify-center items-center gap-2 overflow-hidden group/btn hover:border-purple-300/60 hover:bg-purple-900/30 active:scale-95 transition-all duration-300 backdrop-blur-[12px] text-purple-200 font-medium cursor-pointer text-xs transform-gpu"
-              >
-                <span>How It Works</span>
-              </button>
+                {/* Secondary CTA (70% visual weight) */}
+                <button
+                  onClick={() => setIsHowItWorksOpen(true)}
+                  className="relative h-fit w-fit px-5 py-2.5 border border-purple-400/25 rounded-full flex justify-center items-center gap-2 overflow-hidden group/btn hover:border-purple-300/50 hover:bg-[#211033] active:scale-95 transition-all duration-300 backdrop-blur-[10px] bg-[#211033]/60 text-purple-200/85 hover:text-white font-medium cursor-pointer text-xs transform-gpu"
+                >
+                  <span>How It Works</span>
+                </button>
+              </div>
+
+              {/* Trust Chips (Background: #211033, Text: #E6DAFF, 12px Icon + 14px Text) */}
+              <div className="flex items-center gap-2.5 flex-wrap pt-1">
+                <div className="inline-flex items-center gap-1.5 bg-[#211033] text-[#E6DAFF] border border-purple-500/20 px-3 py-1.5 rounded-full text-[14px] font-medium shadow-sm">
+                  <ShieldCheck className="w-3 h-3 text-purple-300 shrink-0" />
+                  <span>100% Private (Zero Uploads)</span>
+                </div>
+                <div className="inline-flex items-center gap-1.5 bg-[#211033] text-[#E6DAFF] border border-purple-500/20 px-3 py-1.5 rounded-full text-[14px] font-medium shadow-sm">
+                  <Cpu className="w-3 h-3 text-purple-300 shrink-0" />
+                  <span>Local Browser Processing</span>
+                </div>
+              </div>
             </motion.div>
           </div>
 
-          {/* Right block: Tag pills with purple glass theme */}
+          {/* Right block: Category tag pills */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.7, duration: 0.6 }}
             className="flex items-center gap-2 flex-wrap md:flex-nowrap"
           >
-            {["Neuromorphic", "AGI", "Cybernetics"].map((tag) => (
+            {["PDF Studio", "Media Converters", "Developer Tools"].map((tag) => (
               <span
                 key={tag}
                 className="border border-[rgba(168,85,247,0.3)] bg-purple-950/40 backdrop-blur-md px-3.5 py-1.5 rounded-full text-[11px] font-medium text-purple-200 shadow-sm"
