@@ -1,4 +1,4 @@
-import { LucideIcon, Wrench, Code, FileText, Image, Zap, Cpu, Sparkles, Layers, Film, QrCode, Shield, Mic, FileCode } from "lucide-react";
+import { LucideIcon, Wrench, Code, FileText, Image, Zap, Cpu, Sparkles, Layers, Film, QrCode, Shield, Mic, FileCode, Edit3 } from "lucide-react";
 
 export interface ToolItem {
   id: string;
@@ -13,6 +13,16 @@ export interface ToolItem {
 }
 
 export const TOOLS_LIST: ToolItem[] = [
+  {
+    id: "pdf-editor",
+    title: "PDF Editor & Annotator",
+    description: "Draw signatures, add text boxes, highlight content, watermarks, and organize PDF pages.",
+    path: "/tools/pdf-editor.html",
+    htmlPath: "/tools/pdf-editor.html",
+    iconName: "FileText",
+    category: "Documents",
+    badge: "New"
+  },
   {
     id: "image-compressor-resizer",
     title: "Image Compressor & Resizer",
