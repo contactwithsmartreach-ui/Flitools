@@ -3,10 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PDF Editor — Edit Text, Annotate & Sign PDFs Locally</title>
+<title>PDF Document Editor — Edit Original PDF Text Locally</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdn.tailwindcss.com"></script>
 <!-- Monetag Vignette / Interstitial Tag Script -->
 <script>(function(s){s.dataset.zone='11579038',s.src='https://n6wxm.com/vignette.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))</script>
@@ -14,930 +14,875 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
   :root{ --ease: cubic-bezier(0.16, 1, 0.3, 1); }
-  *{ font-family: 'Inter', sans-serif; }
-  body{ background:#fff; color:#000; }
+  *{ font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; }
+  body{ background:#080314; color:#ffffff; }
 
   @keyframes fadeSlideDown{ from{ opacity:0; transform: translateY(-16px); } to{ opacity:1; transform: translateY(0); } }
   @keyframes fadeSlideUp{ from{ opacity:0; transform: translateY(20px); } to{ opacity:1; transform: translateY(0); } }
-  @keyframes fadeScaleIn{ from{ opacity:0; transform: scale(1.05); } to{ opacity:1; transform: scale(1); } }
   .anim-navbar{ animation: fadeSlideDown 0.8s var(--ease) both; }
-  .anim-bg{ animation: fadeScaleIn 1.8s var(--ease) both; }
-  .anim-footer{ animation: fadeSlideUp 1s var(--ease) both; animation-delay: .5s; }
-  .anim-subtitle{ animation: fadeSlideUp .8s var(--ease) both; animation-delay: .6s; }
-  .anim-heading{ animation: fadeSlideUp .8s var(--ease) both; animation-delay: .8s; }
-  .anim-buttons{ animation: fadeSlideUp .8s var(--ease) both; animation-delay: 1s; }
-
-  .hero-heading{ font-weight:300; letter-spacing:-0.03em; line-height:1; font-size: clamp(2rem, 8vw, 4.5rem); }
-  @media (min-width:768px){ .hero-heading{ font-size: clamp(2.5rem, 5.5vw, 4.5rem); } }
-
-  .hero-gradient-bg{
-    background:
-      radial-gradient(circle at 20% 20%, rgba(0,0,0,0.06), transparent 45%),
-      radial-gradient(circle at 80% 30%, rgba(0,0,0,0.04), transparent 50%),
-      linear-gradient(135deg, #fafafa 0%, #f0f0f2 100%);
-  }
-  .hero-fade{ background: linear-gradient(to top, #ffffff 0%, rgba(255,255,255,0.85) 55%, transparent 100%); }
+  .anim-content{ animation: fadeSlideUp 0.8s var(--ease) both; }
 
   .drop-zone{ transition: border-color .2s ease, background-color .2s ease, transform .2s ease; }
-  .drop-zone.dragover{ border-color:#000; background-color:#f1f1f4; transform: scale(1.01); }
+  .drop-zone.dragover{ border-color:#a855f7; background-color:rgba(168,85,247,0.12); transform: scale(1.01); }
 
-  .thumb{ position:relative; cursor:pointer; transition: transform .15s ease, opacity .15s ease; }
-  .thumb.active{ outline:2px solid #000; outline-offset:2px; }
-  .thumb .thumb-page{
-    position:absolute; top:4px; left:4px;
-    width:18px; height:18px; border-radius:9999px;
-    background:rgba(255,255,255,0.95); color:#000; font-size:10px; font-weight:600;
-    display:flex; align-items:center; justify-content:center; line-height:1;
-    box-shadow: 0 0 0 1px rgba(0,0,0,0.15); z-index:2;
-  }
-
-  .edit-tool-btn{
-    font-size:12px; border:1px solid rgba(0,0,0,0.15); border-radius:9999px;
-    padding:6px 13px; background:#fff; cursor:pointer; transition: all .15s ease; display:inline-flex; align-items:center; gap:5px;
-  }
-  .edit-tool-btn.active{ background:#000; color:#fff; border-color:#000; }
-  .edit-tool-btn:disabled{ opacity:.3; cursor:not-allowed; }
-
-  #canvasContainer{ position:relative; display:inline-block; max-width:100%; user-select:none; }
-  #pdfRenderCanvas{ display:block; max-width:100%; height:auto; box-shadow: 0 4px 25px rgba(0,0,0,0.08); border-radius: 6px; background:#fff; }
-  #drawCanvas{ position:absolute; top:0; left:0; width:100%; height:100%; cursor:crosshair; touch-action:none; z-index: 10; }
-  #textOverlayContainer{ position:absolute; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index: 20; }
-
-  /* Floating Editable Text Item */
-  .pdf-text-item{
-    position:absolute; pointer-events:auto;
-    min-width: 40px; min-height: 20px;
-    border: 1px dashed rgba(59, 130, 246, 0.6);
-    background: rgba(255, 255, 255, 0.92);
-    border-radius: 4px; padding: 2px 5px;
-    cursor: move; transition: border-color 0.15s ease, box-shadow 0.15s ease;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-  }
-  .pdf-text-item:hover, .pdf-text-item.selected{
-    border: 1.5px solid #2563eb;
-    box-shadow: 0 4px 14px rgba(37, 99, 235, 0.2);
-    z-index: 30;
-  }
-  .pdf-text-content{
-    outline: none; min-width: 30px; word-break: break-word; white-space: pre-wrap; cursor: text;
-  }
-  .pdf-text-del{
-    position: absolute; top: -9px; right: -9px;
-    width: 18px; height: 18px; border-radius: 9999px;
-    background: #ef4444; color: #fff; font-size: 11px;
-    display: none; align-items: center; justify-content: center; line-height: 1;
-    cursor: pointer; box-shadow: 0 1px 4px rgba(0,0,0,0.2);
-  }
-  .pdf-text-item:hover .pdf-text-del, .pdf-text-item.selected .pdf-text-del{
-    display: flex;
+  /* Workspace page layout */
+  .pdf-page-container{
+    position: relative;
+    box-shadow: 0 10px 40px -10px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.1);
+    background: #ffffff;
+    border-radius: 8px;
+    margin-bottom: 2rem;
+    overflow: visible;
   }
 
-  /* Auto-detected Text Highlight Box */
-  .detected-text-box{
-    position: absolute; pointer-events: auto;
+  .pdf-bg-canvas{
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    border-radius: 8px;
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  .pdf-text-layer{
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    z-index: 10;
+    pointer-events: auto;
+  }
+
+  /* Live In-Place Editable Line Block */
+  .editable-pdf-line{
+    position: absolute;
+    color: #111827;
+    background: transparent;
+    border-radius: 3px;
+    padding: 1px 3px;
+    margin-left: -3px;
+    margin-top: -1px;
+    line-height: 1.15;
+    outline: none;
+    cursor: text;
+    white-space: pre-wrap;
+    word-break: break-word;
+    border: 1px solid transparent;
+    transition: background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+  }
+
+  .editable-pdf-line:hover{
+    background: rgba(238, 242, 255, 0.85);
+    border: 1px dashed rgba(99, 102, 241, 0.6);
+    box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.15);
+  }
+
+  .editable-pdf-line:focus{
+    background: #ffffff;
+    color: #000000;
+    border: 1px solid #6366f1;
+    box-shadow: 0 4px 14px rgba(99, 102, 241, 0.25);
+    z-index: 50;
+  }
+
+  .editable-pdf-line.modified{
     background: rgba(254, 240, 138, 0.35);
-    border: 1px solid rgba(234, 179, 8, 0.6);
-    border-radius: 2px; cursor: pointer; transition: all 0.15s ease;
-  }
-  .detected-text-box:hover{
-    background: rgba(253, 224, 71, 0.7);
-    border-color: #ca8a04;
+    border-bottom: 1.5px solid #ca8a04;
   }
 
-  /* Whiteout Box */
-  .whiteout-box{
-    position: absolute; pointer-events: auto;
-    background: #ffffff; border: 1px dashed #94a3b8;
-    cursor: move;
+  /* Text mode switch buttons */
+  .workspace-tab-btn{
+    transition: all .15s ease;
   }
-  .whiteout-box:hover{ border-color: #475569; }
+  .workspace-tab-btn.active{
+    background: rgba(168, 85, 247, 0.25);
+    color: #ffffff;
+    border-color: rgba(168, 85, 247, 0.8);
+    box-shadow: 0 0 12px rgba(168, 85, 247, 0.3);
+  }
 
-  input[type=color]{ -webkit-appearance:none; appearance:none; border:none; padding:0; background:none; width:28px; height:28px; border-radius:9999px; overflow:hidden; cursor:pointer; }
+  /* Document Flow Editor */
+  .doc-flow-editor {
+    outline: none;
+    line-height: 1.7;
+    color: #1e1b4b;
+  }
+  .doc-flow-editor h1 { font-size: 1.85rem; font-weight: 700; margin-bottom: 0.75rem; color: #0f172a; }
+  .doc-flow-editor h2 { font-size: 1.4rem; font-weight: 600; margin-top: 1rem; margin-bottom: 0.5rem; color: #1e293b; }
+  .doc-flow-editor p { margin-bottom: 0.85rem; }
+
+  /* Custom Color picker */
+  input[type=color]{
+    -webkit-appearance:none; appearance:none; border:none; padding:0; background:none;
+    width:24px; height:24px; border-radius:9999px; overflow:hidden; cursor:pointer;
+  }
   input[type=color]::-webkit-color-swatch-wrapper{ padding:0; }
-  input[type=color]::-webkit-color-swatch{ border:1px solid rgba(0,0,0,0.12); border-radius:9999px; }
+  input[type=color]::-webkit-color-swatch{ border:1px solid rgba(255,255,255,0.3); border-radius:9999px; }
 
-  ::-webkit-scrollbar{ width:8px; height:8px; }
-  ::-webkit-scrollbar-thumb{ background:#ddd; border-radius:9999px; }
+  ::-webkit-scrollbar{ width:6px; height:6px; }
+  ::-webkit-scrollbar-track{ background: rgba(15, 5, 29, 0.6); }
+  ::-webkit-scrollbar-thumb{ background: rgba(168, 85, 247, 0.4); border-radius: 9999px; }
+  ::-webkit-scrollbar-thumb:hover{ background: rgba(168, 85, 247, 0.7); }
 </style>
 </head>
-<body class="min-h-screen flex flex-col">
+<body class="min-h-screen flex flex-col bg-[#080314] text-white">
 
-<!-- ============ HERO ============ -->
-<section class="relative w-full min-h-screen flex flex-col justify-between overflow-hidden">
-  <div class="anim-bg absolute inset-0 z-0 hero-gradient-bg"></div>
-
-  <nav class="anim-navbar relative z-50 flex items-center justify-between px-4 py-4 md:px-8 md:py-6" style="pointer-events:none;">
-    <div class="flex items-center gap-3 md:gap-5" style="pointer-events:auto;">
-      <div class="flex items-center gap-2">
+  <!-- ============ NAVBAR ============ -->
+  <nav class="anim-navbar relative z-50 flex items-center justify-between px-4 py-3 md:px-8 border-b border-purple-900/40 bg-[#0d0422]/90 backdrop-blur-md">
+    <div class="flex items-center gap-3">
+      <a href="/" class="flex items-center gap-2">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-          <path d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" stroke="black" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+          <rect x="5" y="4" width="6" height="14" rx="2.5" fill="#e9d5ff" transform="rotate(-35 8 11)" />
+          <rect x="12" y="4" width="6" height="14" rx="2.5" fill="#c084fc" transform="rotate(-35 15 11)" />
         </svg>
-        <span class="hidden md:inline text-sm font-medium tracking-tight">PDF Editor</span>
-      </div>
-      <div class="hidden md:flex items-center gap-3 rounded-full px-4 py-2" style="background:#F4F4F6;">
-        <span class="text-[11px] text-black/70">In-Browser</span>
-        <span class="text-[11px] text-black/70">No Uploads</span>
-      </div>
+        <span class="font-semibold text-sm tracking-tight text-white">FliTools</span>
+      </a>
+      <span class="text-purple-400/40 text-xs">/</span>
+      <span class="text-xs text-purple-200 font-medium">PDF Text Workspace Editor</span>
+      <span class="hidden sm:inline bg-purple-950/80 border border-purple-400/30 text-purple-200 text-[10px] uppercase font-semibold px-2 py-0.5 rounded-full">
+        100% In-Browser
+      </span>
     </div>
-    <div class="hidden md:flex items-center gap-3" style="pointer-events:auto;">
-      <div class="flex items-center gap-2 rounded-full pl-2 pr-4 py-1.5" style="background:#F4F4F6;">
-        <span class="flex items-center justify-center bg-black rounded-full" style="width:28px;height:28px;">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="white">
-            <rect x="2" y="2" width="7" height="7" rx="1.5"/><rect x="15" y="2" width="7" height="7" rx="1.5"/>
-            <rect x="2" y="15" width="7" height="7" rx="1.5"/><rect x="15" y="15" width="7" height="7" rx="1.5"/>
-          </svg>
-        </span>
-        <span class="text-[11px] text-black/70">100% Client-Side</span>
-      </div>
+
+    <!-- Right Controls -->
+    <div class="flex items-center gap-2">
+      <button id="navOpenBtn" class="flex items-center gap-1.5 bg-purple-950/60 hover:bg-purple-900/80 border border-purple-300/20 text-purple-200 text-xs px-3.5 py-1.5 rounded-full transition-colors cursor-pointer">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+          <polyline points="17 8 12 3 7 8"></polyline>
+          <line x1="12" y1="3" x2="12" y2="15"></line>
+        </svg>
+        <span>Open PDF</span>
+      </button>
+
+      <button id="exportPdfBtn" class="flex items-center gap-1.5 bg-gradient-to-r from-purple-700 to-indigo-600 hover:from-purple-600 hover:to-indigo-500 text-white text-xs font-medium px-4 py-1.5 rounded-full shadow-lg shadow-purple-900/40 transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed" disabled>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+          <polyline points="7 10 12 15 17 10"></polyline>
+          <line x1="12" y1="15" x2="12" y2="3"></line>
+        </svg>
+        <span>Save / Export PDF</span>
+      </button>
     </div>
   </nav>
 
-  <div class="anim-footer relative z-30 hero-fade px-4 pb-8 pt-12 md:px-8 md:pb-10">
-    <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-8">
-      <div>
-        <div class="anim-subtitle flex items-center gap-2 mb-4">
-          <span class="rounded-full bg-black" style="width:8px;height:8px;"></span>
-          <span class="text-[13px]" style="color:rgba(0,0,0,0.55);">Edit text content, sign, and annotate PDFs, right here</span>
-        </div>
-        <h1 class="anim-heading hero-heading mb-6">
-          PDF In,<br/>Edit Content & Text.<br/>PDF Out.
-        </h1>
-        <div class="anim-buttons flex items-center gap-3">
-          <a href="#how-it-works" class="bg-black text-white text-[13px] rounded-full px-5 py-2.5">How It Works</a>
-        </div>
+  <!-- ============ EDITING WORKSPACE TOOLBAR ============ -->
+  <div id="editorToolbar" class="sticky top-0 z-40 bg-[#12052b]/95 border-b border-purple-900/40 backdrop-blur-md px-4 py-2 flex items-center justify-between gap-3 flex-wrap shadow-md">
+    
+    <!-- View Switcher -->
+    <div class="flex items-center gap-1 bg-purple-950/60 p-0.5 rounded-xl border border-purple-400/20 text-xs">
+      <button id="viewVisualBtn" class="workspace-tab-btn active px-3 py-1 rounded-lg text-purple-200 font-medium">
+        📄 Page Layout (In-Place Edit)
+      </button>
+      <button id="viewDocFlowBtn" class="workspace-tab-btn px-3 py-1 rounded-lg text-purple-200 font-medium">
+        📝 Document Flow Editor
+      </button>
+    </div>
+
+    <!-- Formatting Tools -->
+    <div class="flex items-center gap-2 flex-wrap text-xs">
+      <!-- Add New Text Paragraph -->
+      <button id="addNewTextBtn" class="bg-purple-900/40 hover:bg-purple-800/60 border border-purple-400/20 text-purple-200 px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-colors cursor-pointer" title="Click to add new text paragraph to active page">
+        <span>+ Add Text Block</span>
+      </button>
+
+      <!-- Font Size -->
+      <div class="flex items-center gap-1.5 bg-purple-950/40 border border-purple-400/20 px-2.5 py-1 rounded-lg">
+        <span class="text-purple-300/70 text-[11px]">Size:</span>
+        <select id="fontSizeSelect" class="bg-transparent text-purple-100 outline-none text-xs cursor-pointer">
+          <option value="12" class="bg-[#1a0836]">12 px</option>
+          <option value="14" class="bg-[#1a0836]">14 px</option>
+          <option value="16" selected class="bg-[#1a0836]">16 px</option>
+          <option value="18" class="bg-[#1a0836]">18 px</option>
+          <option value="22" class="bg-[#1a0836]">22 px</option>
+          <option value="26" class="bg-[#1a0836]">26 px</option>
+          <option value="32" class="bg-[#1a0836]">32 px</option>
+        </select>
       </div>
-      <div class="flex items-center gap-2 md:justify-end flex-wrap">
-        <span class="text-[11px] rounded-full px-3 py-1.5 bg-white border" style="border-color:rgba(0,0,0,0.12);">Edit Existing Text</span>
-        <span class="text-[11px] rounded-full px-3 py-1.5 bg-white border" style="border-color:rgba(0,0,0,0.12);">Add Text & Sign</span>
-        <span class="text-[11px] rounded-full px-3 py-1.5 bg-white border" style="border-color:rgba(0,0,0,0.12);">Whiteout / Erase</span>
+
+      <!-- Text Color Picker -->
+      <div class="flex items-center gap-1.5 bg-purple-950/40 border border-purple-400/20 px-2.5 py-1 rounded-lg">
+        <span class="text-purple-300/70 text-[11px]">Color:</span>
+        <input id="textColorPicker" type="color" value="#000000" title="Selected Text Color">
       </div>
+
+      <!-- Quick Formatting (Bold, Italic) -->
+      <div class="flex items-center border border-purple-400/20 rounded-lg overflow-hidden bg-purple-950/40">
+        <button id="boldBtn" class="px-2.5 py-1 font-bold hover:bg-purple-800/50 transition-colors" title="Bold">B</button>
+        <button id="italicBtn" class="px-2.5 py-1 italic font-serif hover:bg-purple-800/50 border-l border-purple-400/20 transition-colors" title="Italic">I</button>
+      </div>
+
+      <!-- Whiteout Overlay Button -->
+      <button id="addWhiteoutBtn" class="bg-purple-900/40 hover:bg-purple-800/60 border border-purple-400/20 text-purple-200 px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-colors cursor-pointer" title="Add blank whiteout to erase/cover graphics or headers">
+        <span>⬜ Whiteout Eraser</span>
+      </button>
+
+      <!-- Reset Edits on Active Page -->
+      <button id="resetPageEditsBtn" class="text-purple-300/60 hover:text-purple-200 px-2 py-1 text-xs transition-colors" title="Revert edits on this page">
+        Revert Page
+      </button>
+    </div>
+
+    <!-- Status / Stats -->
+    <div id="statsBadge" class="hidden md:flex items-center gap-2 text-[11px] text-purple-300/70 font-mono">
+      <span id="pageCountStat">0 pages</span>
+      <span>•</span>
+      <span id="lineCountStat">0 text lines parsed</span>
     </div>
   </div>
-</section>
 
-<!-- ============ TOOL ============ -->
-<section id="tool" class="w-full max-w-6xl mx-auto px-4 md:px-8 py-16">
+  <!-- ============ MAIN WORKSPACE ============ -->
+  <main class="flex-1 flex flex-col overflow-y-auto px-4 md:px-8 py-8 relative">
+    
+    <!-- Upload Dropzone Hero (Visible when no PDF loaded) -->
+    <div id="uploadHero" class="max-w-3xl mx-auto w-full my-auto flex flex-col items-center justify-center text-center">
+      <div class="w-16 h-16 rounded-3xl bg-gradient-to-br from-purple-600 to-indigo-800 border border-purple-300/30 flex items-center justify-center text-white mb-6 shadow-xl shadow-purple-950/60">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+          <polyline points="14 2 14 8 20 8"></polyline>
+          <line x1="16" y1="13" x2="8" y2="13"></line>
+          <line x1="16" y1="17" x2="8" y2="17"></line>
+          <polyline points="10 9 9 9 8 9"></polyline>
+        </svg>
+      </div>
 
-  <div class="mb-10">
-    <h2 class="text-2xl md:text-3xl font-light tracking-tight mb-2">Edit PDF text and content</h2>
-    <p class="text-sm text-black/50">Modify existing text in your PDF, type new text boxes anywhere, erase unwanted content with whiteout, sign, draw, and export — 100% locally in your browser.</p>
-  </div>
+      <h1 class="text-2xl md:text-3xl font-light tracking-tight text-white mb-3">
+        Direct In-Place PDF Text Editor
+      </h1>
+      <p class="text-xs md:text-sm text-purple-200/70 max-w-lg mb-8 leading-relaxed">
+        Drop any PDF below. The workspace converts every word and sentence of the original PDF into editable text on the page so you can click, delete, and rewrite directly.
+      </p>
 
-  <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
-
-    <!-- LEFT: Upload & Page List (4 cols) -->
-    <div class="lg:col-span-4 flex flex-col gap-6">
-      
-      <!-- Upload area -->
-      <div>
-        <h3 class="text-sm font-medium mb-3">1. Upload PDF</h3>
-        <div id="dropZone" class="drop-zone border-2 border-dashed border-black/20 hover:border-black/50 rounded-2xl flex flex-col items-center justify-center text-center py-10 px-4 cursor-pointer bg-neutral-50/50">
-          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="1.5" class="mb-2 opacity-60">
-            <path d="M12 16V4M12 4l-4 4M12 4l4 4" stroke-linecap="round" stroke-linejoin="round"/>
-            <path d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2" stroke-linecap="round" stroke-linejoin="round"/>
+      <div id="dropZone" class="drop-zone w-full p-10 md:p-14 rounded-3xl border-2 border-dashed border-purple-400/40 hover:border-purple-300 bg-purple-950/30 backdrop-blur-md cursor-pointer flex flex-col items-center justify-center transition-all shadow-2xl">
+        <div class="w-12 h-12 rounded-2xl bg-purple-900/60 border border-purple-300/30 flex items-center justify-center text-purple-200 mb-4">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="17 8 12 3 7 8"></polyline>
+            <line x1="12" y1="3" x2="12" y2="15"></line>
           </svg>
-          <p class="text-xs font-semibold text-neutral-800">Drag & drop PDF, or click to browse</p>
-          <p class="text-[11px] text-black/40 mt-0.5">Select a PDF file to edit</p>
-          <input id="fileInput" type="file" accept="application/pdf" class="hidden">
         </div>
-        <p id="pageInfo" class="text-xs text-black/40 mt-2">No PDF loaded yet</p>
+        <span class="text-sm font-medium text-white">Drag & drop your PDF file here</span>
+        <span class="text-xs text-purple-300/60 mt-1">or click to browse local files</span>
+        <input id="fileInput" type="file" accept="application/pdf" class="hidden">
       </div>
 
-      <!-- Pages Grid -->
-      <div>
-        <div class="flex items-center justify-between mb-2">
-          <h3 class="text-sm font-medium">Pages</h3>
-          <span class="text-[11px] text-black/40">Select page to edit</span>
-        </div>
-        <div id="thumbGrid" class="grid grid-cols-3 gap-2 max-h-64 overflow-y-auto p-1 border border-black/10 rounded-2xl bg-black/[0.02]"></div>
-      </div>
-
-      <!-- Page Tools -->
-      <div>
-        <h3 class="text-sm font-medium mb-2">Page Controls</h3>
-        <div class="border border-black/10 rounded-2xl p-4 flex flex-col gap-2.5">
-          <div class="flex items-center gap-2">
-            <button id="rotLeftBtn" class="edit-tool-btn flex-1 justify-center" disabled>⟲ Rotate Left</button>
-            <button id="rotRightBtn" class="edit-tool-btn flex-1 justify-center" disabled>⟳ Rotate Right</button>
-          </div>
-          <button id="deletePageBtn" class="edit-tool-btn justify-center hover:border-red-500 hover:text-red-600" disabled>🗑 Delete This Page</button>
-        </div>
-      </div>
-
-      <!-- Export Card -->
-      <div>
-        <h3 class="text-sm font-medium mb-2">Export Edited PDF</h3>
-        <div class="border border-black/10 rounded-2xl p-4 flex flex-col gap-3">
-          <button id="exportBtn" class="w-full bg-black text-white text-[13px] rounded-full py-2.5 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer shadow-md hover:bg-neutral-800 transition-colors" disabled>
-            Download Edited PDF
-          </button>
-          <div id="progressWrap" class="hidden">
-            <div class="w-full h-1.5 bg-black/10 rounded-full overflow-hidden">
-              <div id="progressBar" class="h-full bg-black transition-all duration-150" style="width:0%;"></div>
-            </div>
-            <p id="progressLabel" class="text-[11px] text-black/40 mt-1 text-center">Saving…</p>
-          </div>
-          <p class="text-[11px] text-black/40 leading-relaxed">
-            All text changes, whiteouts, and signatures are compiled directly inside your browser.
-          </p>
-        </div>
-      </div>
-
-    </div>
-
-    <!-- RIGHT: Canvas Editor Area (8 cols) -->
-    <div class="lg:col-span-8 flex flex-col gap-4">
-
-      <!-- Interactive Toolbar -->
-      <div class="border border-black/10 rounded-2xl p-3 bg-neutral-50 flex items-center justify-between gap-2 flex-wrap shadow-sm">
-        
-        <!-- Primary editing modes -->
-        <div class="flex items-center gap-1.5 flex-wrap">
-          <button data-tool="text" class="tool-btn edit-tool-btn active">🔤 Add Text</button>
-          <button id="autoDetectTextBtn" class="edit-tool-btn bg-amber-50 hover:bg-amber-100 border-amber-300 text-amber-900" disabled>🔍 Auto-Detect Text</button>
-          <button data-tool="whiteout" class="tool-btn edit-tool-btn">⬜ Whiteout / Cover</button>
-          <button data-tool="pen" class="tool-btn edit-tool-btn">✏️ Sign / Draw</button>
-          <button data-tool="highlighter" class="tool-btn edit-tool-btn">🖍 Highlight</button>
-        </div>
-
-        <!-- Text/Drawing Styling Controls -->
-        <div class="flex items-center gap-3 flex-wrap">
-          <div class="flex items-center gap-1.5">
-            <label class="text-xs text-black/60 font-medium">Font/Size</label>
-            <select id="fontSizeSelect" class="text-xs border border-black/15 rounded-lg px-2 py-1 bg-white">
-              <option value="12">12 px</option>
-              <option value="14">14 px</option>
-              <option value="16" selected>16 px</option>
-              <option value="18">18 px</option>
-              <option value="22">22 px</option>
-              <option value="28">28 px</option>
-              <option value="36">36 px</option>
-            </select>
-          </div>
-
-          <div class="flex items-center gap-1.5">
-            <label class="text-xs text-black/60 font-medium">Color</label>
-            <input id="colorPicker" type="color" value="#000000">
-          </div>
-
-          <button id="clearAnnotationsBtn" class="edit-tool-btn hover:bg-neutral-200">Clear Edits</button>
-        </div>
-      </div>
-
-      <!-- Hint banner -->
-      <div id="toolTipBanner" class="text-xs text-neutral-600 bg-blue-50/80 border border-blue-200/80 rounded-xl px-3.5 py-2 flex items-center justify-between">
-        <span>💡 <b>Text Mode Active:</b> Click anywhere on the page to type new text, or click "Auto-Detect Text" to edit existing PDF sentences.</span>
-      </div>
-
-      <!-- Main Interactive Page Viewport -->
-      <div class="border border-black/10 rounded-2xl min-h-[540px] flex items-center justify-center p-4 bg-neutral-200/60 overflow-auto">
-        <div id="canvasContainer" class="hidden">
-          <canvas id="pdfRenderCanvas"></canvas>
-          <canvas id="drawCanvas"></canvas>
-          <!-- Live Interactive Text & Annotation HTML Overlay -->
-          <div id="textOverlayContainer"></div>
-        </div>
-        <div id="editorPlaceholder" class="text-center py-20">
-          <div class="w-12 h-12 rounded-2xl bg-white border border-neutral-300 mx-auto flex items-center justify-center text-neutral-400 mb-3 shadow-sm">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-              <polyline points="14 2 14 8 20 8"></polyline>
-              <line x1="16" y1="13" x2="8" y2="13"></line>
-              <line x1="16" y1="17" x2="8" y2="17"></line>
-              <polyline points="10 9 9 9 8 9"></polyline>
-            </svg>
-          </div>
-          <p class="text-xs font-medium text-neutral-700">Upload a PDF document to begin editing text and pages</p>
-          <p class="text-[11px] text-neutral-400 mt-1">100% private — files remain in your browser memory</p>
-        </div>
-      </div>
-
-    </div>
-
-  </div>
-</section>
-
-<!-- ============ HOW IT WORKS ============ -->
-<section id="how-it-works" class="w-full bg-black/[0.02] border-t border-black/10">
-  <div class="max-w-6xl mx-auto px-4 md:px-8 py-16">
-    <div class="mb-10">
-      <h2 class="text-2xl md:text-3xl font-light tracking-tight mb-2">How it works</h2>
-      <p class="text-sm text-black/50 max-w-2xl">PDF Editor reads, modifies, and re-renders text and drawing layers entirely inside your web browser. No files are ever sent to remote servers.</p>
-    </div>
-
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-      <div>
-        <div class="flex items-center justify-center rounded-full bg-black text-white text-sm font-medium mb-4" style="width:32px;height:32px;">1</div>
-        <h3 class="text-sm font-medium mb-2">Upload your PDF</h3>
-        <p class="text-xs text-black/50 leading-relaxed">Drag and drop any PDF file. Your browser parses the font glyphs, layout structure, and pages in real-time.</p>
-      </div>
-      <div>
-        <div class="flex items-center justify-center rounded-full bg-black text-white text-sm font-medium mb-4" style="width:32px;height:32px;">2</div>
-        <h3 class="text-sm font-medium mb-2">Edit or replace text</h3>
-        <p class="text-xs text-black/50 leading-relaxed">Click "Auto-Detect Text" to turn original text into clickable editable blocks, or click anywhere to type additional paragraphs.</p>
-      </div>
-      <div>
-        <div class="flex items-center justify-center rounded-full bg-black text-white text-sm font-medium mb-4" style="width:32px;height:32px;">3</div>
-        <h3 class="text-sm font-medium mb-2">Whiteout & Sign</h3>
-        <p class="text-xs text-black/50 leading-relaxed">Cover unwanted text or logos with the whiteout tool, then draw signatures or highlight key terms with smooth vector pens.</p>
-      </div>
-      <div>
-        <div class="flex items-center justify-center rounded-full bg-black text-white text-sm font-medium mb-4" style="width:32px;height:32px;">4</div>
-        <h3 class="text-sm font-medium mb-2">Download PDF</h3>
-        <p class="text-xs text-black/50 leading-relaxed">Download your finished document in high resolution. Your edited PDF is completely ready to share.</p>
+      <div class="flex items-center gap-6 mt-8 text-xs text-purple-300/70">
+        <span class="flex items-center gap-1.5">🔒 100% Client-Side</span>
+        <span class="flex items-center gap-1.5">✏️ In-Place Text Editing</span>
+        <span class="flex items-center gap-1.5">⚡ High-Res Vector Export</span>
       </div>
     </div>
 
-    <div class="mt-10">
-      <a href="#tool" class="bg-black text-white text-[13px] rounded-full px-5 py-2.5 inline-block">Get Started</a>
+    <!-- Active Workspace (Visible after PDF loaded) -->
+    <div id="workspaceContainer" class="hidden max-w-5xl mx-auto w-full flex flex-col items-center">
+      
+      <!-- Informational guidance alert -->
+      <div class="w-full bg-gradient-to-r from-purple-950/80 via-purple-900/60 to-purple-950/80 border border-purple-300/20 rounded-2xl p-3.5 mb-6 flex items-center justify-between text-xs text-purple-200">
+        <div class="flex items-center gap-2.5">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+          <span><b>Original Text Unlocked:</b> Click directly on any text line or word below to edit, delete, or rewrite.</span>
+        </div>
+        <button id="addPageBtn" class="bg-purple-900/60 hover:bg-purple-800/80 border border-purple-300/20 text-purple-200 px-3 py-1 rounded-lg transition-colors cursor-pointer text-xs">
+          + Add Blank Page
+        </button>
+      </div>
+
+      <!-- Mode 1: Visual In-Place Pages Stack -->
+      <div id="visualPagesStack" class="w-full flex flex-col items-center">
+        <!-- Rendered PDF Pages with in-place text containers are appended here -->
+      </div>
+
+      <!-- Mode 2: Word-like Document Flow Workspace -->
+      <div id="docFlowContainer" class="hidden w-full max-w-3xl bg-white text-slate-900 rounded-2xl shadow-2xl p-8 md:p-12 mb-12">
+        <div class="border-b border-slate-200 pb-3 mb-4 flex items-center justify-between">
+          <span class="text-xs font-semibold uppercase tracking-wider text-slate-500">Document Flow Content (All Pages Combined)</span>
+          <span class="text-xs text-slate-400">Edits sync back to PDF export</span>
+        </div>
+        <div id="docFlowEditor" contenteditable="true" class="doc-flow-editor min-h-[500px]"></div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Progress Bar Toast Modal for Exporting -->
+  <div id="exportProgressModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-[#170836] border border-purple-300/30 rounded-3xl p-6 max-w-md w-full shadow-2xl text-center space-y-4">
+      <div class="w-12 h-12 rounded-2xl bg-purple-900/60 border border-purple-300/30 mx-auto flex items-center justify-center text-purple-200">
+        <svg class="animate-spin" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 12a9 9 0 1 1-6.219-8.56"></path>
+        </svg>
+      </div>
+      <h3 class="text-lg font-medium text-white">Rendering Modified PDF</h3>
+      <p id="exportProgressLabel" class="text-xs text-purple-200/70">Rebuilding text and layout geometry…</p>
+      <div class="w-full h-2 bg-purple-950 rounded-full overflow-hidden border border-purple-400/20">
+        <div id="exportProgressBar" class="h-full bg-gradient-to-r from-purple-500 to-indigo-500 transition-all duration-150" style="width: 0%;"></div>
+      </div>
     </div>
   </div>
-</section>
-
-<footer class="text-center text-xs text-black/30 py-8">
-  Built entirely client-side — your documents never leave this browser.
-</footer>
 
 <script>
 (function(){
   const DIRECT_LINK_URL = 'https://omg10.com/4/11580632';
 
-  const dropZone = document.getElementById('dropZone');
-  const fileInput = document.getElementById('fileInput');
-  const thumbGrid = document.getElementById('thumbGrid');
-  const pageInfo = document.getElementById('pageInfo');
-  const canvasContainer = document.getElementById('canvasContainer');
-  const editorPlaceholder = document.getElementById('editorPlaceholder');
-  const pdfRenderCanvas = document.getElementById('pdfRenderCanvas');
-  const drawCanvas = document.getElementById('drawCanvas');
-  const textOverlayContainer = document.getElementById('textOverlayContainer');
-  const rotLeftBtn = document.getElementById('rotLeftBtn');
-  const rotRightBtn = document.getElementById('rotRightBtn');
-  const deletePageBtn = document.getElementById('deletePageBtn');
-  const autoDetectTextBtn = document.getElementById('autoDetectTextBtn');
-  const clearAnnotationsBtn = document.getElementById('clearAnnotationsBtn');
-  const exportBtn = document.getElementById('exportBtn');
-  const progressWrap = document.getElementById('progressWrap');
-  const progressBar = document.getElementById('progressBar');
-  const progressLabel = document.getElementById('progressLabel');
-  const colorPicker = document.getElementById('colorPicker');
-  const fontSizeSelect = document.getElementById('fontSizeSelect');
-  const toolTipBanner = document.getElementById('toolTipBanner');
-
   if (window.pdfjsLib) {
     pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
   }
 
-  let pdfDoc = null;
-  let pages = []; 
-  // page item schema: { pageNumber, rotation, thumbUrl, drawCanvasData, textItems: [], whiteouts: [], detectedBoxes: [] }
-  let activeIdx = 0;
-  let activeTool = 'text'; // 'text' | 'whiteout' | 'pen' | 'highlighter'
-  let isDrawing = false;
-  let lastX = 0, lastY = 0;
-  let whiteoutStart = null;
+  // DOM elements
+  const dropZone = document.getElementById('dropZone');
+  const fileInput = document.getElementById('fileInput');
+  const uploadHero = document.getElementById('uploadHero');
+  const workspaceContainer = document.getElementById('workspaceContainer');
+  const visualPagesStack = document.getElementById('visualPagesStack');
+  const docFlowContainer = document.getElementById('docFlowContainer');
+  const docFlowEditor = document.getElementById('docFlowEditor');
+  const viewVisualBtn = document.getElementById('viewVisualBtn');
+  const viewDocFlowBtn = document.getElementById('viewDocFlowBtn');
+  const exportPdfBtn = document.getElementById('exportPdfBtn');
+  const navOpenBtn = document.getElementById('navOpenBtn');
+  const addNewTextBtn = document.getElementById('addNewTextBtn');
+  const addWhiteoutBtn = document.getElementById('addWhiteoutBtn');
+  const addPageBtn = document.getElementById('addPageBtn');
+  const resetPageEditsBtn = document.getElementById('resetPageEditsBtn');
+  const fontSizeSelect = document.getElementById('fontSizeSelect');
+  const textColorPicker = document.getElementById('textColorPicker');
+  const boldBtn = document.getElementById('boldBtn');
+  const italicBtn = document.getElementById('italicBtn');
+  const statsBadge = document.getElementById('statsBadge');
+  const pageCountStat = document.getElementById('pageCountStat');
+  const lineCountStat = document.getElementById('lineCountStat');
+  const exportProgressModal = document.getElementById('exportProgressModal');
+  const exportProgressBar = document.getElementById('exportProgressBar');
+  const exportProgressLabel = document.getElementById('exportProgressLabel');
 
-  // Tool Selection
-  document.querySelectorAll('.tool-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      document.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      activeTool = btn.dataset.tool;
-      updateToolTip();
-      drawCanvas.style.pointerEvents = (activeTool === 'pen' || activeTool === 'highlighter' || activeTool === 'whiteout') ? 'auto' : 'none';
-    });
+  let pdfDoc = null;
+  let parsedPages = [];
+  // Each page schema:
+  // {
+  //   pageNumber: number,
+  //   widthPt: number,
+  //   heightPt: number,
+  //   scale: number,
+  //   lines: [ { id, text, originalText, x, y, width, height, fontSize, fontName, color, bold, italic, modified } ],
+  //   whiteouts: [ { id, x, y, width, height } ],
+  //   bgDataUrl: string
+  // }
+  let activeView = 'visual'; // 'visual' | 'docflow'
+  let activePageIdx = 0;
+  let currentSelectionLine = null;
+
+  // View Switching
+  viewVisualBtn.addEventListener('click', () => {
+    activeView = 'visual';
+    viewVisualBtn.classList.add('active');
+    viewDocFlowBtn.classList.remove('active');
+    visualPagesStack.classList.remove('hidden');
+    docFlowContainer.classList.add('hidden');
   });
 
-  function updateToolTip(){
-    if (activeTool === 'text') {
-      toolTipBanner.innerHTML = '<span>💡 <b>Text Mode:</b> Click anywhere to type new text, or click existing text boxes to modify them.</span>';
-    } else if (activeTool === 'whiteout') {
-      toolTipBanner.innerHTML = '<span>⬜ <b>Whiteout Mode:</b> Drag a box over any existing text to cleanly erase/cover it up.</span>';
-    } else if (activeTool === 'pen') {
-      toolTipBanner.innerHTML = '<span>✏️ <b>Sign / Draw Mode:</b> Draw signatures or freehand annotations directly on the document.</span>';
-    } else if (activeTool === 'highlighter') {
-      toolTipBanner.innerHTML = '<span>🖍 <b>Highlighter Mode:</b> Drag over important text passages to highlight them.</span>';
-    }
+  viewDocFlowBtn.addEventListener('click', () => {
+    activeView = 'docflow';
+    viewDocFlowBtn.classList.add('active');
+    viewVisualBtn.classList.remove('active');
+    visualPagesStack.classList.add('hidden');
+    docFlowContainer.classList.remove('hidden');
+    syncToDocFlow();
+  });
+
+  // Group raw glyphs into coherent sentences/lines by geometric proximity
+  function groupTextItemsIntoLines(items, viewport) {
+    if (!items || items.length === 0) return [];
+    
+    // Convert PDF coordinates to viewport pixel space
+    const transformed = items.filter(it => it.str && it.str.trim().length > 0).map(it => {
+      const tx = pdfjsLib.Util.transform(viewport.transform, it.transform);
+      const fontHeight = Math.sqrt((tx[2] * tx[2]) + (tx[3] * tx[3])) || 14;
+      const x = tx[4];
+      const y = tx[5] - fontHeight;
+      return {
+        text: it.str,
+        x: x,
+        y: y,
+        width: it.width * (viewport.scale || 1.5),
+        height: fontHeight,
+        fontSize: Math.round(fontHeight),
+        fontName: it.fontName || 'sans-serif'
+      };
+    });
+
+    // Cluster glyphs into lines by Y-position
+    transformed.sort((a, b) => a.y - b.y || a.x - b.x);
+    const lines = [];
+    const Y_TOLERANCE = 6;
+
+    transformed.forEach(item => {
+      let line = lines.find(l => Math.abs(l.y - item.y) <= Y_TOLERANCE);
+      if (!line) {
+        line = {
+          id: 'line_' + Math.random().toString(36).substr(2, 9),
+          text: item.text,
+          originalText: item.text,
+          x: item.x,
+          y: item.y,
+          width: item.width,
+          height: item.height,
+          fontSize: item.fontSize,
+          fontName: item.fontName,
+          color: '#111827',
+          bold: false,
+          italic: false,
+          modified: false
+        };
+        lines.push(line);
+      } else {
+        // Append horizontally
+        line.text += ' ' + item.text;
+        line.originalText = line.text;
+        line.width += item.width + 8;
+        line.height = Math.max(line.height, item.height);
+      }
+    });
+
+    return lines;
   }
 
-  async function loadPdf(file){
-    pageInfo.textContent = 'Loading ' + file.name + '…';
+  // Load and Parse PDF
+  async function loadPdfFile(file) {
     try {
       const buf = await file.arrayBuffer();
       pdfDoc = await pdfjsLib.getDocument({ data: buf }).promise;
-      pages = [];
+      parsedPages = [];
+      const RENDER_SCALE = 1.5;
+
       for (let i = 1; i <= pdfDoc.numPages; i++) {
-        pages.push({
-          pageNumber: i,
-          rotation: 0,
-          thumbUrl: '',
-          drawCanvasData: null,
-          textItems: [],
-          whiteouts: [],
-          detectedBoxes: []
-        });
-      }
-      activeIdx = 0;
-      renderThumbGrid();
-      await renderActivePage();
-      pageInfo.textContent = file.name + ' (' + pages.length + ' pages)';
-      rotLeftBtn.disabled = false;
-      rotRightBtn.disabled = false;
-      deletePageBtn.disabled = false;
-      autoDetectTextBtn.disabled = false;
-      exportBtn.disabled = false;
-      drawCanvas.style.pointerEvents = 'none'; // Default to text mode
-    } catch(err){
-      console.error(err);
-      pageInfo.textContent = 'Could not load PDF: ' + err.message;
-    }
-  }
+        const page = await pdfDoc.getPage(i);
+        const viewport = page.getViewport({ scale: RENDER_SCALE });
+        const textContent = await page.getTextContent();
 
-  async function renderThumb(idx){
-    const p = pages[idx];
-    const page = await pdfDoc.getPage(p.pageNumber);
-    const viewport = page.getViewport({ scale: 0.25, rotation: p.rotation });
-    const canvas = document.createElement('canvas');
-    canvas.width = viewport.width;
-    canvas.height = viewport.height;
-    const ctx = canvas.getContext('2d');
-    await page.render({ canvasContext: ctx, viewport }).promise;
-    p.thumbUrl = canvas.toDataURL('image/png');
-  }
-
-  async function renderThumbGrid(){
-    thumbGrid.innerHTML = '';
-    for (let idx = 0; idx < pages.length; idx++) {
-      const p = pages[idx];
-      if (!p.thumbUrl) await renderThumb(idx);
-
-      const wrap = document.createElement('div');
-      wrap.className = 'thumb rounded-lg overflow-hidden border border-black/10 aspect-[3/4] flex items-center justify-center bg-white ' + (idx === activeIdx ? 'active' : '');
-      wrap.innerHTML = `
-        <span class="thumb-page">${idx + 1}</span>
-        <img src="${p.thumbUrl}" class="max-w-full max-h-full object-contain pointer-events-none">
-      `;
-      wrap.onclick = () => {
-        saveCurrentState();
-        activeIdx = idx;
-        renderThumbActive();
-        renderActivePage();
-      };
-      thumbGrid.appendChild(wrap);
-    }
-  }
-
-  function renderThumbActive(){
-    document.querySelectorAll('.thumb').forEach((el, i) => {
-      el.classList.toggle('active', i === activeIdx);
-    });
-  }
-
-  async function renderActivePage(){
-    if (!pages[activeIdx]) return;
-    const p = pages[activeIdx];
-    const page = await pdfDoc.getPage(p.pageNumber);
-    const viewport = page.getViewport({ scale: 1.5, rotation: p.rotation });
-
-    pdfRenderCanvas.width = viewport.width;
-    pdfRenderCanvas.height = viewport.height;
-
-    const ctx = pdfRenderCanvas.getContext('2d');
-    await page.render({ canvasContext: ctx, viewport }).promise;
-
-    drawCanvas.width = viewport.width;
-    drawCanvas.height = viewport.height;
-    const dctx = drawCanvas.getContext('2d');
-    dctx.clearRect(0, 0, drawCanvas.width, drawCanvas.height);
-
-    if (p.drawCanvasData) {
-      const img = new Image();
-      img.onload = () => dctx.drawImage(img, 0, 0);
-      img.src = p.drawCanvasData;
-    }
-
-    renderHtmlOverlay();
-    canvasContainer.classList.remove('hidden');
-    editorPlaceholder.classList.add('hidden');
-  }
-
-  function saveCurrentState(){
-    if (pages[activeIdx]) {
-      pages[activeIdx].drawCanvasData = drawCanvas.toDataURL('image/png');
-    }
-  }
-
-  // Render text boxes, whiteouts, and detected elements
-  function renderHtmlOverlay(){
-    textOverlayContainer.innerHTML = '';
-    const p = pages[activeIdx];
-    if (!p) return;
-
-    // Render Whiteouts
-    p.whiteouts.forEach((w, idx) => {
-      const el = document.createElement('div');
-      el.className = 'whiteout-box';
-      el.style.left = w.x + 'px';
-      el.style.top = w.y + 'px';
-      el.style.width = w.w + 'px';
-      el.style.height = w.h + 'px';
-      el.title = 'Whiteout / Cover Area (Right-click to remove)';
-      el.oncontextmenu = (e) => {
-        e.preventDefault();
-        p.whiteouts.splice(idx, 1);
-        renderHtmlOverlay();
-      };
-      textOverlayContainer.appendChild(el);
-    });
-
-    // Render Detected clickable text blocks
-    p.detectedBoxes.forEach((d) => {
-      const el = document.createElement('div');
-      el.className = 'detected-text-box';
-      el.style.left = d.x + 'px';
-      el.style.top = d.y + 'px';
-      el.style.width = d.w + 'px';
-      el.style.height = d.h + 'px';
-      el.title = 'Click to edit: "' + d.text + '"';
-      el.onclick = (e) => {
-        e.stopPropagation();
-        // Convert detected box into a whiteout + editable text overlay item
-        p.whiteouts.push({ x: d.x - 2, y: d.y - 2, w: d.w + 4, h: d.h + 4 });
-        p.textItems.push({
-          x: d.x,
-          y: d.y,
-          text: d.text,
-          fontSize: d.fontSize || 16,
-          color: colorPicker.value || '#000000',
-          bold: false
-        });
-        // Remove detected box once converted
-        p.detectedBoxes = p.detectedBoxes.filter(item => item !== d);
-        renderHtmlOverlay();
-      };
-      textOverlayContainer.appendChild(el);
-    });
-
-    // Render Floating Text Items
-    p.textItems.forEach((t, idx) => {
-      const el = document.createElement('div');
-      el.className = 'pdf-text-item';
-      el.style.left = t.x + 'px';
-      el.style.top = t.y + 'px';
-
-      const content = document.createElement('div');
-      content.className = 'pdf-text-content';
-      content.contentEditable = 'true';
-      content.style.fontSize = t.fontSize + 'px';
-      content.style.color = t.color;
-      content.style.fontWeight = t.bold ? 'bold' : 'normal';
-      content.innerText = t.text || ' ';
-      
-      content.oninput = () => {
-        t.text = content.innerText;
-      };
-
-      // Draggable logic
-      let dragStartX, dragStartY, initialLeft, initialTop;
-      el.onmousedown = (e) => {
-        if (e.target === content) return; // Allow text selection
-        e.preventDefault();
-        dragStartX = e.clientX;
-        dragStartY = e.clientY;
-        initialLeft = t.x;
-        initialTop = t.y;
-
-        function onMouseMove(moveEvent){
-          const dx = moveEvent.clientX - dragStartX;
-          const dy = moveEvent.clientY - dragStartY;
-          t.x = Math.max(0, initialLeft + dx);
-          t.y = Math.max(0, initialTop + dy);
-          el.style.left = t.x + 'px';
-          el.style.top = t.y + 'px';
-        }
-
-        function onMouseUp(){
-          window.removeEventListener('mousemove', onMouseMove);
-          window.removeEventListener('mouseup', onMouseUp);
-        }
-
-        window.addEventListener('mousemove', onMouseMove);
-        window.addEventListener('mouseup', onMouseUp);
-      };
-
-      const delBtn = document.createElement('button');
-      delBtn.className = 'pdf-text-del';
-      delBtn.innerHTML = '×';
-      delBtn.title = 'Delete Text Box';
-      delBtn.onclick = (e) => {
-        e.stopPropagation();
-        p.textItems.splice(idx, 1);
-        renderHtmlOverlay();
-      };
-
-      el.appendChild(content);
-      el.appendChild(delBtn);
-      textOverlayContainer.appendChild(el);
-    });
-  }
-
-  // Auto-Detect Text Content from PDF structure
-  autoDetectTextBtn.addEventListener('click', async () => {
-    if (!pages[activeIdx]) return;
-    const p = pages[activeIdx];
-    autoDetectTextBtn.disabled = true;
-    autoDetectTextBtn.textContent = 'Scanning…';
-
-    try {
-      const page = await pdfDoc.getPage(p.pageNumber);
-      const viewport = page.getViewport({ scale: 1.5, rotation: p.rotation });
-      const textContent = await page.getTextContent();
-
-      p.detectedBoxes = [];
-      textContent.items.forEach(item => {
-        if (!item.str || !item.str.trim()) return;
-        const tx = pdfjsLib.Util.transform(viewport.transform, item.transform);
-        const fontHeight = Math.sqrt((tx[2] * tx[2]) + (tx[3] * tx[3])) || 14;
-        const width = item.width * 1.5;
-        const height = fontHeight;
-
-        p.detectedBoxes.push({
-          text: item.str,
-          x: tx[4],
-          y: tx[5] - height,
-          w: Math.max(width, 20),
-          h: Math.max(height, 14),
-          fontSize: Math.round(fontHeight)
-        });
-      });
-
-      renderHtmlOverlay();
-      toolTipBanner.innerHTML = '<span>✨ <b>Detected ' + p.detectedBoxes.length + ' text passages:</b> Click any yellow highlighted box to edit its text!</span>';
-    } catch(err){
-      console.error(err);
-      alert('Could not detect text: ' + err.message);
-    } finally {
-      autoDetectTextBtn.disabled = false;
-      autoDetectTextBtn.textContent = '🔍 Auto-Detect Text';
-    }
-  });
-
-  // Canvas interaction & coordinates
-  function getCanvasCoords(e){
-    const rect = drawCanvas.getBoundingClientRect();
-    const scaleX = drawCanvas.width / rect.width;
-    const scaleY = drawCanvas.height / rect.height;
-    return {
-      x: (e.clientX - rect.left) * scaleX,
-      y: (e.clientY - rect.top) * scaleY
-    };
-  }
-
-  // Click on canvas to add text box in text mode
-  canvasContainer.addEventListener('click', (e) => {
-    if (activeTool !== 'text') return;
-    if (e.target.closest('.pdf-text-item') || e.target.closest('.detected-text-box')) return;
-    
-    const rect = canvasContainer.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-
-    const p = pages[activeIdx];
-    if (p) {
-      p.textItems.push({
-        x: Math.max(0, x - 10),
-        y: Math.max(0, y - 10),
-        text: 'Type text here...',
-        fontSize: parseInt(fontSizeSelect.value, 10) || 16,
-        color: colorPicker.value || '#000000',
-        bold: false
-      });
-      renderHtmlOverlay();
-    }
-  });
-
-  // Drawing & Whiteout Handlers
-  drawCanvas.addEventListener('mousedown', e => {
-    const pos = getCanvasCoords(e);
-    if (activeTool === 'whiteout') {
-      whiteoutStart = pos;
-      isDrawing = true;
-      return;
-    }
-
-    if (activeTool === 'pen' || activeTool === 'highlighter') {
-      isDrawing = true;
-      lastX = pos.x;
-      lastY = pos.y;
-    }
-  });
-
-  drawCanvas.addEventListener('mousemove', e => {
-    if (!isDrawing) return;
-    const pos = getCanvasCoords(e);
-
-    if (activeTool === 'whiteout') {
-      const dctx = drawCanvas.getContext('2d');
-      dctx.clearRect(0, 0, drawCanvas.width, drawCanvas.height);
-      if (pages[activeIdx] && pages[activeIdx].drawCanvasData) {
-        const img = new Image();
-        img.src = pages[activeIdx].drawCanvasData;
-        dctx.drawImage(img, 0, 0);
-      }
-      dctx.fillStyle = 'rgba(255, 255, 255, 0.85)';
-      dctx.strokeStyle = '#94a3b8';
-      dctx.setLineDash([4, 4]);
-      const w = pos.x - whiteoutStart.x;
-      const h = pos.y - whiteoutStart.y;
-      dctx.fillRect(whiteoutStart.x, whiteoutStart.y, w, h);
-      dctx.strokeRect(whiteoutStart.x, whiteoutStart.y, w, h);
-      dctx.setLineDash([]);
-      return;
-    }
-
-    const dctx = drawCanvas.getContext('2d');
-    dctx.beginPath();
-    dctx.moveTo(lastX, lastY);
-    dctx.lineTo(pos.x, pos.y);
-    dctx.lineCap = 'round';
-    dctx.lineJoin = 'round';
-
-    if (activeTool === 'highlighter') {
-      dctx.strokeStyle = colorPicker.value;
-      dctx.globalAlpha = 0.35;
-      dctx.lineWidth = 20;
-    } else {
-      dctx.strokeStyle = colorPicker.value;
-      dctx.globalAlpha = 1.0;
-      dctx.lineWidth = 3;
-    }
-
-    dctx.stroke();
-    dctx.globalAlpha = 1.0;
-    lastX = pos.x;
-    lastY = pos.y;
-  });
-
-  window.addEventListener('mouseup', e => {
-    if (isDrawing && activeTool === 'whiteout' && whiteoutStart) {
-      const pos = getCanvasCoords(e);
-      const x = Math.min(whiteoutStart.x, pos.x);
-      const y = Math.min(whiteoutStart.y, pos.y);
-      const w = Math.abs(pos.x - whiteoutStart.x);
-      const h = Math.abs(pos.y - whiteoutStart.y);
-
-      if (w > 5 && h > 5 && pages[activeIdx]) {
-        pages[activeIdx].whiteouts.push({ x, y, w, h });
-        renderHtmlOverlay();
-      }
-      const dctx = drawCanvas.getContext('2d');
-      dctx.clearRect(0, 0, drawCanvas.width, drawCanvas.height);
-      if (pages[activeIdx] && pages[activeIdx].drawCanvasData) {
-        const img = new Image();
-        img.src = pages[activeIdx].drawCanvasData;
-        dctx.drawImage(img, 0, 0);
-      }
-      whiteoutStart = null;
-    }
-
-    if (isDrawing) {
-      isDrawing = false;
-      saveCurrentState();
-    }
-  });
-
-  clearAnnotationsBtn.addEventListener('click', () => {
-    const p = pages[activeIdx];
-    if (p) {
-      p.drawCanvasData = null;
-      p.textItems = [];
-      p.whiteouts = [];
-      p.detectedBoxes = [];
-      const dctx = drawCanvas.getContext('2d');
-      dctx.clearRect(0, 0, drawCanvas.width, drawCanvas.height);
-      renderHtmlOverlay();
-    }
-  });
-
-  rotLeftBtn.addEventListener('click', async () => {
-    if (!pages[activeIdx]) return;
-    pages[activeIdx].rotation = (pages[activeIdx].rotation - 90 + 360) % 360;
-    await renderThumb(activeIdx);
-    renderThumbGrid();
-    renderActivePage();
-  });
-
-  rotRightBtn.addEventListener('click', async () => {
-    if (!pages[activeIdx]) return;
-    pages[activeIdx].rotation = (pages[activeIdx].rotation + 90) % 360;
-    await renderThumb(activeIdx);
-    renderThumbGrid();
-    renderActivePage();
-  });
-
-  deletePageBtn.addEventListener('click', () => {
-    if (pages.length <= 1) {
-      alert('A PDF must have at least one page.');
-      return;
-    }
-    pages.splice(activeIdx, 1);
-    if (activeIdx >= pages.length) activeIdx = pages.length - 1;
-    renderThumbGrid();
-    renderActivePage();
-  });
-
-  // Dropzone file handling
-  dropZone.addEventListener('click', () => fileInput.click());
-  fileInput.addEventListener('change', e => {
-    if (e.target.files && e.target.files[0]) loadPdf(e.target.files[0]);
-  });
-  ['dragenter','dragover'].forEach(evt => dropZone.addEventListener(evt, e => { e.preventDefault(); dropZone.classList.add('dragover'); }));
-  ['dragleave','drop'].forEach(evt => dropZone.addEventListener(evt, e => { e.preventDefault(); dropZone.classList.remove('dragover'); }));
-  dropZone.addEventListener('drop', e => {
-    e.preventDefault();
-    if (e.dataTransfer.files && e.dataTransfer.files[0]) loadPdf(e.dataTransfer.files[0]);
-  });
-
-  // Export PDF compilation with all layers
-  exportBtn.addEventListener('click', async () => {
-    if (!pages.length || !window.jspdf) return;
-    saveCurrentState();
-    exportBtn.disabled = true;
-    progressWrap.classList.remove('hidden');
-    progressBar.style.width = '0%';
-    progressLabel.textContent = 'Compiling PDF...';
-
-    try {
-      const { jsPDF } = window.jspdf;
-      let doc = null;
-      const PX_TO_PT = 0.75;
-
-      for (let i = 0; i < pages.length; i++) {
-        const p = pages[i];
-        const page = await pdfDoc.getPage(p.pageNumber);
-        const viewport = page.getViewport({ scale: 2.0, rotation: p.rotation });
-
+        // Render clean background canvas without original text artifacts
         const canvas = document.createElement('canvas');
         canvas.width = viewport.width;
         canvas.height = viewport.height;
         const ctx = canvas.getContext('2d');
         await page.render({ canvasContext: ctx, viewport }).promise;
 
-        const scaleFactor = 2.0 / 1.5; // Scale from editor 1.5x to export 2.0x
+        const lines = groupTextItemsIntoLines(textContent.items, viewport);
 
-        // 1. Draw Whiteouts
-        p.whiteouts.forEach(w => {
+        // Blank out original text zones on background canvas so newly edited text has zero ghosting
+        lines.forEach(l => {
           ctx.fillStyle = '#ffffff';
-          ctx.fillRect(w.x * scaleFactor, w.y * scaleFactor, w.w * scaleFactor, w.h * scaleFactor);
+          ctx.fillRect(l.x - 2, l.y - 1, l.width + 6, l.height + 4);
         });
 
-        // 2. Draw Drawings / Highlighter Annotations
-        if (p.drawCanvasData) {
-          const img = new Image();
-          await new Promise(r => {
-            img.onload = () => {
-              ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-              r();
-            };
-            img.src = p.drawCanvasData;
-          });
+        parsedPages.push({
+          pageNumber: i,
+          widthPt: viewport.width / RENDER_SCALE,
+          heightPt: viewport.height / RENDER_SCALE,
+          scale: RENDER_SCALE,
+          lines: lines,
+          whiteouts: [],
+          bgDataUrl: canvas.toDataURL('image/png')
+        });
+      }
+
+      uploadHero.classList.add('hidden');
+      workspaceContainer.classList.remove('hidden');
+      exportPdfBtn.disabled = false;
+      statsBadge.classList.remove('hidden');
+      updateStats();
+      renderVisualWorkspace();
+    } catch (err) {
+      console.error(err);
+      alert('Could not read PDF: ' + err.message);
+    }
+  }
+
+  function updateStats() {
+    pageCountStat.textContent = parsedPages.length + ' page' + (parsedPages.length === 1 ? '' : 's');
+    const totalLines = parsedPages.reduce((acc, p) => acc + p.lines.length, 0);
+    lineCountStat.textContent = totalLines + ' text lines parsed';
+  }
+
+  // Render Visual In-Place Pages
+  function renderVisualWorkspace() {
+    visualPagesStack.innerHTML = '';
+
+    parsedPages.forEach((page, pageIdx) => {
+      const pageWrapper = document.createElement('div');
+      pageWrapper.className = 'pdf-page-container';
+      pageWrapper.style.width = (page.widthPt * page.scale) + 'px';
+      pageWrapper.style.height = (page.heightPt * page.scale) + 'px';
+
+      // Page Header Pill
+      const pageHeader = document.createElement('div');
+      pageHeader.className = 'absolute -top-7 left-0 right-0 flex items-center justify-between text-[11px] text-purple-300/70 font-mono px-1';
+      pageHeader.innerHTML = `
+        <span>Page ${page.pageNumber}</span>
+        <button class="hover:text-red-400 cursor-pointer" onclick="deletePage(${pageIdx})">Delete Page</button>
+      `;
+      pageWrapper.appendChild(pageHeader);
+
+      // Background Canvas Image
+      const bgImg = document.createElement('img');
+      bgImg.src = page.bgDataUrl;
+      bgImg.className = 'pdf-bg-canvas';
+      pageWrapper.appendChild(bgImg);
+
+      // Interactive Text & Whiteout Overlay Layer
+      const textLayer = document.createElement('div');
+      textLayer.className = 'pdf-text-layer';
+      textLayer.dataset.pageIdx = pageIdx;
+
+      // Render Whiteouts
+      page.whiteouts.forEach((w, wIdx) => {
+        const whiteoutEl = document.createElement('div');
+        whiteoutEl.className = 'absolute bg-white border border-dashed border-slate-300 cursor-move';
+        whiteoutEl.style.left = w.x + 'px';
+        whiteoutEl.style.top = w.y + 'px';
+        whiteoutEl.style.width = w.width + 'px';
+        whiteoutEl.style.height = w.height + 'px';
+        whiteoutEl.title = 'Whiteout Box (Right-click to remove)';
+        whiteoutEl.oncontextmenu = (e) => {
+          e.preventDefault();
+          page.whiteouts.splice(wIdx, 1);
+          renderVisualWorkspace();
+        };
+        textLayer.appendChild(whiteoutEl);
+      });
+
+      // Render Editable Lines
+      page.lines.forEach((line) => {
+        const lineEl = document.createElement('div');
+        lineEl.className = 'editable-pdf-line' + (line.modified ? ' modified' : '');
+        lineEl.contentEditable = 'true';
+        lineEl.spellcheck = false;
+        lineEl.innerText = line.text;
+        lineEl.style.left = line.x + 'px';
+        lineEl.style.top = line.y + 'px';
+        lineEl.style.fontSize = line.fontSize + 'px';
+        lineEl.style.color = line.color;
+        lineEl.style.fontWeight = line.bold ? 'bold' : 'normal';
+        lineEl.style.fontStyle = line.italic ? 'italic' : 'normal';
+
+        // Track live edits to text
+        lineEl.oninput = () => {
+          line.text = lineEl.innerText;
+          line.modified = line.text !== line.originalText;
+          lineEl.classList.toggle('modified', line.modified);
+        };
+
+        lineEl.onfocus = () => {
+          activePageIdx = pageIdx;
+          currentSelectionLine = line;
+          fontSizeSelect.value = String(line.fontSize || 16);
+          textColorPicker.value = line.color || '#000000';
+        };
+
+        textLayer.appendChild(lineEl);
+      });
+
+      // Click on blank area to add new text line at click position
+      textLayer.addEventListener('click', (e) => {
+        if (e.target !== textLayer) return;
+        const rect = textLayer.getBoundingClientRect();
+        const clickX = e.clientX - rect.left;
+        const clickY = e.clientY - rect.top;
+
+        const newLine = {
+          id: 'line_' + Math.random().toString(36).substr(2, 9),
+          text: 'Type new text here...',
+          originalText: '',
+          x: Math.max(10, clickX),
+          y: Math.max(10, clickY),
+          width: 180,
+          height: parseInt(fontSizeSelect.value, 10) || 16,
+          fontSize: parseInt(fontSizeSelect.value, 10) || 16,
+          fontName: 'sans-serif',
+          color: textColorPicker.value || '#000000',
+          bold: false,
+          italic: false,
+          modified: true
+        };
+
+        page.lines.push(newLine);
+        renderVisualWorkspace();
+      });
+
+      pageWrapper.appendChild(textLayer);
+      visualPagesStack.appendChild(pageWrapper);
+    });
+  }
+
+  // Delete Page Helper
+  window.deletePage = function(idx) {
+    if (parsedPages.length <= 1) {
+      alert('Document must have at least one page.');
+      return;
+    }
+    parsedPages.splice(idx, 1);
+    parsedPages.forEach((p, i) => p.pageNumber = i + 1);
+    updateStats();
+    renderVisualWorkspace();
+  };
+
+  // Sync to Document Flow view
+  function syncToDocFlow() {
+    let combinedHtml = '';
+    parsedPages.forEach((p) => {
+      combinedHtml += `<h2 class="text-xs uppercase font-bold text-slate-400 border-b border-slate-200 pb-1 mb-3">--- Page ${p.pageNumber} ---</h2>`;
+      p.lines.forEach(line => {
+        const isHeading = line.fontSize >= 20;
+        if (isHeading) {
+          combinedHtml += `<h1 data-line-id="${line.id}">${line.text}</h1>`;
+        } else {
+          combinedHtml += `<p data-line-id="${line.id}">${line.text}</p>`;
+        }
+      });
+      combinedHtml += '<br/>';
+    });
+    docFlowEditor.innerHTML = combinedHtml;
+  }
+
+  // Sync back from Document Flow view
+  docFlowEditor.addEventListener('input', () => {
+    const nodes = docFlowEditor.querySelectorAll('[data-line-id]');
+    nodes.forEach(node => {
+      const lineId = node.dataset.lineId;
+      parsedPages.forEach(p => {
+        const line = p.lines.find(l => l.id === lineId);
+        if (line) {
+          line.text = node.innerText;
+          line.modified = line.text !== line.originalText;
+        }
+      });
+    });
+  });
+
+  // Toolbar actions
+  addNewTextBtn.addEventListener('click', () => {
+    if (!parsedPages[activePageIdx]) return;
+    const p = parsedPages[activePageIdx];
+    p.lines.push({
+      id: 'line_' + Math.random().toString(36).substr(2, 9),
+      text: 'New Paragraph Text',
+      originalText: '',
+      x: 50,
+      y: 60,
+      width: 200,
+      height: 18,
+      fontSize: parseInt(fontSizeSelect.value, 10) || 16,
+      fontName: 'sans-serif',
+      color: textColorPicker.value || '#000000',
+      bold: false,
+      italic: false,
+      modified: true
+    });
+    renderVisualWorkspace();
+  });
+
+  addWhiteoutBtn.addEventListener('click', () => {
+    if (!parsedPages[activePageIdx]) return;
+    const p = parsedPages[activePageIdx];
+    p.whiteouts.push({
+      id: 'w_' + Math.random().toString(36).substr(2, 9),
+      x: 40,
+      y: 40,
+      width: 240,
+      height: 40
+    });
+    renderVisualWorkspace();
+  });
+
+  addPageBtn.addEventListener('click', () => {
+    const lastPage = parsedPages[parsedPages.length - 1];
+    const widthPt = lastPage ? lastPage.widthPt : 595.28;
+    const heightPt = lastPage ? lastPage.heightPt : 841.89;
+    const scale = lastPage ? lastPage.scale : 1.5;
+
+    const blankCanvas = document.createElement('canvas');
+    blankCanvas.width = widthPt * scale;
+    blankCanvas.height = heightPt * scale;
+    const ctx = blankCanvas.getContext('2d');
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, blankCanvas.width, blankCanvas.height);
+
+    parsedPages.push({
+      pageNumber: parsedPages.length + 1,
+      widthPt: widthPt,
+      heightPt: heightPt,
+      scale: scale,
+      lines: [
+        {
+          id: 'line_' + Math.random().toString(36).substr(2, 9),
+          text: 'Blank Page Header',
+          originalText: '',
+          x: 40,
+          y: 50,
+          width: 200,
+          height: 24,
+          fontSize: 22,
+          fontName: 'sans-serif',
+          color: '#111827',
+          bold: true,
+          italic: false,
+          modified: true
+        }
+      ],
+      whiteouts: [],
+      bgDataUrl: blankCanvas.toDataURL('image/png')
+    });
+
+    updateStats();
+    renderVisualWorkspace();
+  });
+
+  resetPageEditsBtn.addEventListener('click', () => {
+    if (!parsedPages[activePageIdx]) return;
+    const p = parsedPages[activePageIdx];
+    p.lines.forEach(l => {
+      l.text = l.originalText;
+      l.modified = false;
+    });
+    p.whiteouts = [];
+    renderVisualWorkspace();
+  });
+
+  // Formatting changes on active selected line
+  fontSizeSelect.addEventListener('change', () => {
+    if (currentSelectionLine) {
+      currentSelectionLine.fontSize = parseInt(fontSizeSelect.value, 10);
+      currentSelectionLine.modified = true;
+      renderVisualWorkspace();
+    }
+  });
+
+  textColorPicker.addEventListener('input', () => {
+    if (currentSelectionLine) {
+      currentSelectionLine.color = textColorPicker.value;
+      currentSelectionLine.modified = true;
+      renderVisualWorkspace();
+    }
+  });
+
+  boldBtn.addEventListener('click', () => {
+    if (currentSelectionLine) {
+      currentSelectionLine.bold = !currentSelectionLine.bold;
+      currentSelectionLine.modified = true;
+      renderVisualWorkspace();
+    }
+  });
+
+  italicBtn.addEventListener('click', () => {
+    if (currentSelectionLine) {
+      currentSelectionLine.italic = !currentSelectionLine.italic;
+      currentSelectionLine.modified = true;
+      renderVisualWorkspace();
+    }
+  });
+
+  // Dropzone Events
+  dropZone.addEventListener('click', () => fileInput.click());
+  navOpenBtn.addEventListener('click', () => fileInput.click());
+  fileInput.addEventListener('change', (e) => {
+    if (e.target.files && e.target.files[0]) loadPdfFile(e.target.files[0]);
+  });
+
+  ['dragenter', 'dragover'].forEach(evt => {
+    dropZone.addEventListener(evt, (e) => {
+      e.preventDefault();
+      dropZone.classList.add('dragover');
+    });
+  });
+
+  ['dragleave', 'drop'].forEach(evt => {
+    dropZone.addEventListener(evt, (e) => {
+      e.preventDefault();
+      dropZone.classList.remove('dragover');
+    });
+  });
+
+  dropZone.addEventListener('drop', (e) => {
+    if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0]) {
+      loadPdfFile(e.dataTransfer.files[0]);
+    }
+  });
+
+  // Export Modified PDF with exact vectors & typography
+  exportPdfBtn.addEventListener('click', async () => {
+    if (!parsedPages.length || !window.jspdf) return;
+
+    exportProgressModal.classList.remove('hidden');
+    exportProgressBar.style.width = '0%';
+    exportProgressLabel.textContent = 'Rendering modified pages…';
+
+    try {
+      const { jsPDF } = window.jspdf;
+      let doc = null;
+      const PX_TO_PT = 0.75;
+
+      for (let i = 0; i < parsedPages.length; i++) {
+        const page = parsedPages[i];
+        const wPt = page.widthPt;
+        const hPt = page.heightPt;
+
+        if (!doc) {
+          doc = new jsPDF({ unit: 'pt', format: [wPt, hPt] });
+        } else {
+          doc.addPage([wPt, hPt]);
         }
 
-        // 3. Draw Text Items
-        p.textItems.forEach(t => {
-          ctx.fillStyle = t.color || '#000000';
-          const fontSize = (t.fontSize || 16) * scaleFactor;
-          ctx.font = (t.bold ? 'bold ' : '') + fontSize + 'px sans-serif';
-          ctx.textBaseline = 'top';
+        // Render Base Canvas with whiteouts
+        const renderCanvas = document.createElement('canvas');
+        renderCanvas.width = wPt * 2.0;
+        renderCanvas.height = hPt * 2.0;
+        const ctx = renderCanvas.getContext('2d');
 
-          const lines = (t.text || '').split('\n');
-          lines.forEach((line, lineIdx) => {
-            ctx.fillText(line, t.x * scaleFactor, (t.y * scaleFactor) + (lineIdx * (fontSize * 1.25)));
-          });
+        // Draw clean base background
+        const bgImg = new Image();
+        await new Promise(r => {
+          bgImg.onload = () => {
+            ctx.drawImage(bgImg, 0, 0, renderCanvas.width, renderCanvas.height);
+            r();
+          };
+          bgImg.src = page.bgDataUrl;
         });
 
-        const wPt = canvas.width * PX_TO_PT * 0.5;
-        const hPt = canvas.height * PX_TO_PT * 0.5;
+        // Apply whiteouts
+        const scaleMult = 2.0 / page.scale;
+        page.whiteouts.forEach(w => {
+          ctx.fillStyle = '#ffffff';
+          ctx.fillRect(w.x * scaleMult, w.y * scaleMult, w.width * scaleMult, w.height * scaleMult);
+        });
 
-        if (!doc) doc = new jsPDF({ unit: 'pt', format: [wPt, hPt] });
-        else doc.addPage([wPt, hPt]);
+        const bgData = renderCanvas.toDataURL('image/jpeg', 0.95);
+        doc.addImage(bgData, 'JPEG', 0, 0, wPt, hPt);
 
-        const dataUrl = canvas.toDataURL('image/jpeg', 0.95);
-        doc.addImage(dataUrl, 'JPEG', 0, 0, wPt, hPt);
+        // Print crisp native vector typography over page
+        page.lines.forEach(line => {
+          if (!line.text || line.text.trim().length === 0) return;
+          const fontSizePt = (line.fontSize / page.scale) * PX_TO_PT * 1.33;
+          doc.setFontSize(fontSizePt);
+          doc.setTextColor(line.color || '#000000');
+          doc.setFont('helvetica', line.bold ? 'bold' : (line.italic ? 'italic' : 'normal'));
 
-        progressBar.style.width = Math.round(((i + 1) / pages.length) * 100) + '%';
-        progressLabel.textContent = 'Processing page ' + (i + 1) + ' / ' + pages.length + '…';
+          const xPt = (line.x / page.scale);
+          const yPt = (line.y / page.scale) + fontSizePt;
+          doc.text(line.text, xPt, yPt);
+        });
+
+        exportProgressBar.style.width = Math.round(((i + 1) / parsedPages.length) * 100) + '%';
+        exportProgressLabel.textContent = `Compiled Page ${i + 1} of ${parsedPages.length}…`;
         await new Promise(r => setTimeout(r, 0));
       }
 
       window.open(DIRECT_LINK_URL, '_blank');
       doc.save('edited-document.pdf');
-      progressLabel.textContent = 'Done! PDF downloaded.';
-    } catch(err){
+    } catch (err) {
       console.error(err);
-      progressLabel.textContent = 'Error: ' + err.message;
+      alert('Error generating PDF: ' + err.message);
     } finally {
-      exportBtn.disabled = false;
+      setTimeout(() => {
+        exportProgressModal.classList.add('hidden');
+      }, 500);
     }
   });
 
