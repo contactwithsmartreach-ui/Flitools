@@ -92,7 +92,7 @@ export default function Home() {
               Private & In-Browser.
             </motion.h1>
 
-            {/* Supporting Copy */}
+            {/* Supporting Copy (18px desktop / 16px mobile, 560px max desktop / 300px mobile, 16px below H1) */}
             <motion.p
               initial={{ y: 14, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
@@ -102,26 +102,27 @@ export default function Home() {
               Process PDFs, media, and code with 100% client-side privacy. All conversions run locally inside your browser with zero server uploads.
             </motion.p>
 
-            {/* CTA Buttons Block - Clean & High Contrast */}
+            {/* CTA Buttons Block */}
             <motion.div
               initial={{ y: 12, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: 0.6, duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
               className="flex items-center gap-3 flex-wrap sm:flex-nowrap pt-2"
             >
-              {/* Primary Action Button */}
+              {/* Primary CTA (2-4 words, action specific) */}
               <button
                 onClick={scrollToTools}
-                className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full bg-purple-600 hover:bg-purple-500 text-white text-xs font-semibold shadow-lg shadow-purple-900/40 active:scale-95 transition-all duration-200 cursor-pointer"
+                className="relative h-fit w-fit px-6 py-3 border-2 border-[rgba(75,30,133,0.7)] rounded-full flex justify-center items-center gap-2.5 overflow-hidden group/btn hover:border-purple-300/80 hover:shadow-xl hover:shadow-purple-500/30 active:scale-95 transition-all duration-300 backdrop-blur-[12px] bg-gradient-to-r from-[rgba(75,30,133,1)] via-purple-700 to-[rgba(75,30,133,0.9)] text-white shadow-md cursor-pointer transform-gpu"
               >
-                <span>Browse Free Tools</span>
-                <ArrowRight className="w-3.5 h-3.5 text-white" />
+                <div className="absolute inset-0 bg-gradient-to-r from-purple-600/40 via-fuchsia-500/40 to-purple-600/40 translate-x-[-100%] group-hover/btn:translate-x-[100%] transition-transform duration-700"></div>
+                <p className="relative z-10 font-semibold tracking-wide text-xs">Browse Free Tools</p>
+                <ArrowRight className="relative z-10 w-4 h-4 group-hover/btn:translate-x-[10%] transition-transform duration-300 text-purple-200" />
               </button>
 
-              {/* Secondary Action Button */}
+              {/* Secondary CTA (70% visual weight) */}
               <button
                 onClick={() => setIsHowItWorksOpen(true)}
-                className="inline-flex items-center justify-center px-5 py-3 rounded-full bg-purple-950/60 hover:bg-purple-900/60 text-purple-100 hover:text-white text-xs font-medium active:scale-95 transition-all duration-200 cursor-pointer"
+                className="relative h-fit w-fit px-5 py-2.5 border border-purple-400/25 rounded-full flex justify-center items-center gap-2 overflow-hidden group/btn hover:border-purple-300/50 hover:bg-[#211033] active:scale-95 transition-all duration-300 backdrop-blur-[10px] bg-[#211033]/60 text-purple-200/85 hover:text-white font-medium cursor-pointer text-xs transform-gpu"
               >
                 <span>How It Works</span>
               </button>
@@ -138,7 +139,7 @@ export default function Home() {
             {["PDF Studio", "Media Converters", "Developer Tools"].map((tag) => (
               <span
                 key={tag}
-                className="bg-purple-950/70 px-3.5 py-1.5 rounded-full text-[11px] font-medium text-purple-200 shadow-sm"
+                className="border border-[rgba(168,85,247,0.3)] bg-purple-950/40 backdrop-blur-md px-3.5 py-1.5 rounded-full text-[11px] font-medium text-purple-200 shadow-sm"
               >
                 {tag}
               </span>

@@ -14,8 +14,7 @@ import {
   QrCode,
   Shield,
   Mic,
-  FileCode,
-  ArrowRight
+  FileCode
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -66,7 +65,7 @@ export default function ToolsGrid({ onSelectTool }: ToolsGridProps) {
             </h2>
           </div>
 
-          {/* Search input */}
+          {/* Search input with purple glass glow */}
           <div className="relative w-full md:w-80">
             <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-purple-300/60 pointer-events-none" />
             <input
@@ -74,7 +73,7 @@ export default function ToolsGrid({ onSelectTool }: ToolsGridProps) {
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search tools..."
-              className="w-full bg-[#170830] rounded-full pl-10 pr-4 py-2.5 text-xs text-white placeholder-purple-300/50 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all"
+              className="w-full bg-purple-950/40 border border-purple-300/20 rounded-full pl-10 pr-4 py-2.5 text-xs text-purple-100 placeholder-purple-300/40 focus:outline-none focus:ring-2 focus:ring-purple-500/40 focus:border-purple-400 transition-all"
             />
           </div>
         </div>
@@ -85,10 +84,10 @@ export default function ToolsGrid({ onSelectTool }: ToolsGridProps) {
             <button
               key={cat}
               onClick={() => setSelectedCategory(cat)}
-              className={`px-4 py-2 rounded-full text-xs font-semibold transition-all whitespace-nowrap cursor-pointer ${
+              className={`px-4 py-2 rounded-full text-xs font-medium transition-all whitespace-nowrap cursor-pointer border ${
                 selectedCategory === cat
-                  ? "bg-purple-600 text-white shadow-md shadow-purple-900/50"
-                  : "bg-purple-950/60 text-purple-200 hover:bg-purple-900/50 hover:text-white"
+                  ? "border-[rgba(75,30,133,0.8)] bg-gradient-to-r from-[rgba(75,30,133,1)] via-purple-700 to-[rgba(75,30,133,0.9)] text-white shadow-md shadow-purple-950/50"
+                  : "border-purple-300/20 bg-purple-950/30 text-purple-200 hover:bg-purple-900/30"
               }`}
             >
               {cat}
@@ -96,9 +95,9 @@ export default function ToolsGrid({ onSelectTool }: ToolsGridProps) {
           ))}
         </div>
 
-        {/* Grid display */}
+        {/* Grid display using Uiverse card structure */}
         {filteredTools.length === 0 ? (
-          <div className="py-20 text-center rounded-3xl bg-purple-950/20">
+          <div className="py-20 text-center rounded-3xl border-2 border-dashed border-purple-900/30 bg-purple-950/20">
             <Layers className="w-10 h-10 text-purple-400/60 mx-auto mb-3" />
             <h3 className="text-base font-medium text-purple-100">No tools found</h3>
             <p className="text-xs text-purple-300/60 mt-1 max-w-sm mx-auto">
@@ -117,42 +116,68 @@ export default function ToolsGrid({ onSelectTool }: ToolsGridProps) {
                   exit={{ opacity: 0, scale: 0.97 }}
                   transition={{ duration: 0.2, ease: "easeOut" }}
                   onClick={() => onSelectTool?.(tool)}
-                  className="relative min-h-[19em] w-full rounded-3xl bg-gradient-to-br from-[#240c42] via-[#1a0733] to-[#120424] text-white p-6 flex justify-between flex-col gap-4 hover:shadow-2xl hover:shadow-purple-600/20 transition-all duration-300 group/card hover:-translate-y-1 cursor-pointer overflow-hidden transform-gpu"
+                  className="relative min-h-[19em] w-full border-2 border-[rgba(75,30,133,0.5)] rounded-[1.5em] bg-gradient-to-br from-[rgba(75,30,133,1)] via-purple-700/80 to-[rgba(75,30,133,0.2)] text-white p-[1.5em] flex justify-between flex-col gap-[1em] backdrop-blur-[12px] hover:shadow-2xl hover:shadow-purple-500/30 transition-all duration-300 group/card hover:-translate-y-1 cursor-pointer overflow-hidden transform-gpu"
                 >
-                  <div className="absolute top-5 right-5 flex items-center gap-2 z-20">
+                  <div className="absolute inset-0 bg-gradient-to-br from-purple-600/30 via-fuchsia-500/20 to-transparent opacity-0 group-hover/card:opacity-100 transition-opacity duration-300 rounded-[1.5em] pointer-events-none"></div>
+                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(120,50,190,0.1),transparent_60%)] pointer-events-none"></div>
+
+                  <div className="absolute top-4 right-4 flex items-center gap-2 z-20">
                     {tool.badge && (
-                      <span className="bg-purple-950/90 text-purple-200 text-[10px] uppercase font-bold tracking-wider px-2.5 py-1 rounded-full">
+                      <span className="bg-purple-950/80 border border-purple-300/30 text-purple-100 text-[10px] uppercase font-semibold tracking-wider px-2.5 py-0.5 rounded-full">
                         {tool.badge}
                       </span>
                     )}
+                    <div className="flex gap-1.5 ml-1">
+                      <div className="w-2 h-2 rounded-full bg-purple-300/50"></div>
+                      <div className="w-2 h-2 rounded-full bg-purple-300/30"></div>
+                      <div className="w-2 h-2 rounded-full bg-purple-300/10"></div>
+                    </div>
                   </div>
 
-                  <div className="relative z-10 space-y-3 pt-1">
+                  <div className="relative z-10 space-y-3 pt-2">
                     <div className="flex items-center gap-2.5">
-                      <div className="p-2.5 rounded-2xl bg-purple-900/50 flex items-center justify-center">
+                      <div className="p-2 rounded-xl bg-purple-950/60 border border-purple-300/20 shadow-inner">
                         {iconMap[tool.iconName] || <Wrench className="w-5 h-5 text-purple-200" />}
                       </div>
-                      <span className="text-[11px] font-semibold uppercase tracking-wider text-purple-200/90 bg-purple-950/80 px-2.5 py-1 rounded-full">
+                      <span className="text-[11px] font-medium tracking-wide uppercase text-purple-200/80 bg-purple-950/40 px-2.5 py-0.5 rounded-full border border-purple-300/10">
                         {tool.category}
                       </span>
                     </div>
 
-                    <h3 className="text-xl font-bold leading-snug text-white group-hover/card:text-purple-200 transition-colors">
+                    <h1 className="text-[1.5em] font-bold leading-tight bg-gradient-to-r from-white via-purple-100 to-purple-200 bg-clip-text text-transparent">
                       {tool.title}
-                    </h3>
+                    </h1>
 
-                    <p className="text-xs text-purple-100/80 leading-relaxed font-light line-clamp-3">
+                    <p className="text-[0.88em] text-purple-100/90 leading-relaxed font-light line-clamp-3">
                       {tool.description}
                     </p>
                   </div>
 
-                  {/* Clean, High-Contrast Action Button */}
                   <div className="relative z-10 pt-2">
-                    <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-purple-600 group-hover/card:bg-purple-500 text-white text-xs font-semibold transition-all duration-200 shadow-md shadow-purple-950/40">
-                      <span>Explore Tool</span>
-                      <ArrowRight className="w-3.5 h-3.5 text-white group-hover/card:translate-x-0.5 transition-transform" />
-                    </div>
+                    <button
+                      className="relative h-fit w-fit px-[1.4em] py-[0.7em] border-[1px] border-purple-300/30 rounded-full flex justify-center items-center gap-[0.7em] overflow-hidden group/btn hover:border-purple-300/50 hover:shadow-lg hover:shadow-purple-500/20 active:scale-95 transition-all duration-300 backdrop-blur-[12px] bg-purple-500/10 text-white cursor-pointer"
+                    >
+                      <div className="absolute inset-0 bg-gradient-to-r from-purple-600/40 via-fuchsia-500/40 to-purple-600/40 translate-x-[-100%] group-hover/btn:translate-x-[100%] transition-transform duration-700"></div>
+
+                      <p className="relative z-10 font-medium tracking-wide text-xs">Explore Now</p>
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        strokeWidth="2"
+                        stroke="currentColor"
+                        className="relative z-10 w-4 h-4 group-hover/btn:translate-x-[10%] transition-transform duration-300"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"
+                        ></path>
+                      </svg>
+                    </button>
                   </div>
+
+                  <div className="absolute bottom-4 left-4 w-8 h-8 rounded-full bg-gradient-to-br from-purple-400/20 to-transparent blur-sm pointer-events-none"></div>
                 </motion.div>
               ))}
             </AnimatePresence>
