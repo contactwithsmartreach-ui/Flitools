@@ -1,3 +1,64 @@
+<problem file="src/app/page.tsx" line="34" column="6" code="17008">JSX element 'div' has no corresponding closing tag.</problem>
+<problem file="src/app/page.tsx" line="40" column="8" code="17008">JSX element 'section' has no corresponding closing tag.</problem>
+<problem file="src/app/page.tsx" line="79" column="55" code="1005">'>' expected.</problem>
+<problem file="src/app/page.tsx" line="79" column="157" code="1382">Unexpected token. Did you mean `{'>'}` or `&gt;`?</problem>
+<problem file="src/app/page.tsx" line="93" column="31" code="1382">Unexpected token. Did you mean `{'>'}` or `&gt;`?</problem>
+<problem file="src/app/page.tsx" line="94" column="6" code="1005">'}' expected.</problem>
+<problem file="src/app/page.tsx" line="95" column="1" code="1381">Unexpected token. Did you mean `{'}'}` or `&rbrace;`?</problem>
+<problem file="src/app/page.tsx" line="97" column="37" code="1382">Unexpected token. Did you mean `{'>'}` or `&gt;`?</problem>
+<problem file="src/app/page.tsx" line="98" column="6" code="1005">'}' expected.</problem>
+<problem file="src/app/page.tsx" line="99" column="1" code="1381">Unexpected token. Did you mean `{'}'}` or `&rbrace;`?</problem>
+<problem file="src/app/page.tsx" line="102" column="3" code="1109">Expression expected.</problem>
+<problem file="src/app/page.tsx" line="102" column="61" code="1003">Identifier expected.</problem>
+<problem file="src/app/page.tsx" line="102" column="67" code="1382">Unexpected token. Did you mean `{'>'}` or `&gt;`?</problem>
+<problem file="src/app/page.tsx" line="105" column="29" code="1382">Unexpected token. Did you mean `{'>'}` or `&gt;`?</problem>
+<problem file="src/app/page.tsx" line="106" column="5" code="1109">Expression expected.</problem>
+<problem file="src/app/page.tsx" line="108" column="48" code="1005">'}' expected.</problem>
+<problem file="src/app/page.tsx" line="109" column="5" code="1381">Unexpected token. Did you mean `{'}'}` or `&rbrace;`?</problem>
+<problem file="src/app/page.tsx" line="110" column="3" code="1381">Unexpected token. Did you mean `{'}'}` or `&rbrace;`?</problem>
+<problem file="src/app/page.tsx" line="113" column="6" code="17008">JSX element 'div' has no corresponding closing tag.</problem>
+<problem file="src/app/page.tsx" line="119" column="8" code="17008">JSX element 'section' has no corresponding closing tag.</problem>
+<problem file="src/app/page.tsx" line="123" column="56" code="1005">',' expected.</problem>
+<problem file="src/app/page.tsx" line="123" column="80" code="1005">',' expected.</problem>
+<problem file="src/app/page.tsx" line="124" column="13" code="1005">',' expected.</problem>
+<problem file="src/app/page.tsx" line="126" column="8" code="1005">':' expected.</problem>
+<problem file="src/app/page.tsx" line="126" column="15" code="1136">Property assignment expected.</problem>
+<problem file="src/app/page.tsx" line="126" column="17" code="1005">'...' expected.</problem>
+<problem file="src/app/page.tsx" line="126" column="33" code="1003">Identifier expected.</problem>
+<problem file="src/app/page.tsx" line="137" column="31" code="1382">Unexpected token. Did you mean `{'>'}` or `&gt;`?</problem>
+<problem file="src/app/page.tsx" line="138" column="6" code="1005">'}' expected.</problem>
+<problem file="src/app/page.tsx" line="139" column="1" code="1381">Unexpected token. Did you mean `{'}'}` or `&rbrace;`?</problem>
+<problem file="src/app/page.tsx" line="141" column="37" code="1382">Unexpected token. Did you mean `{'>'}` or `&gt;`?</problem>
+<problem file="src/app/page.tsx" line="142" column="6" code="1005">'}' expected.</problem>
+<problem file="src/app/page.tsx" line="143" column="1" code="1381">Unexpected token. Did you mean `{'}'}` or `&rbrace;`?</problem>
+<problem file="src/app/page.tsx" line="146" column="3" code="1109">Expression expected.</problem>
+<problem file="src/app/page.tsx" line="146" column="61" code="1003">Identifier expected.</problem>
+<problem file="src/app/page.tsx" line="146" column="67" code="1382">Unexpected token. Did you mean `{'>'}` or `&gt;`?</problem>
+<problem file="src/app/page.tsx" line="149" column="29" code="1382">Unexpected token. Did you mean `{'>'}` or `&gt;`?</problem>
+<problem file="src/app/page.tsx" line="150" column="5" code="1109">Expression expected.</problem>
+<problem file="src/app/page.tsx" line="152" column="48" code="1005">'}' expected.</problem>
+<problem file="src/app/page.tsx" line="153" column="5" code="1381">Unexpected token. Did you mean `{'}'}` or `&rbrace;`?</problem>
+<problem file="src/app/page.tsx" line="154" column="3" code="1381">Unexpected token. Did you mean `{'}'}` or `&rbrace;`?</problem>
+<problem file="src/app/page.tsx" line="301" column="1" code="1381">Unexpected token. Did you mean `{'}'}` or `&rbrace;`?</problem>
+<problem file="src/app/page.tsx" line="301" column="2" code="1005">'</' expected.</problem>
+<problem file="src/app/page.tsx" line="79" column="51" code="2322">Type '{ initial: { y: number; opacity: number; }; animate: { y: number; opacity: number; }; transition: { delay: number; duration: number; ease: [number, number, number, number]; }; className: string; src: true; }' is not assignable to type 'IntrinsicAttributes & Omit<HTMLMotionProps<"div">, "ref"> & RefAttributes<HTMLDivElement>'.
+  Property 'src' does not exist on type 'IntrinsicAttributes & Omit<HTMLMotionProps<"div">, "ref"> & RefAttributes<HTMLDivElement>'.</problem>
+<problem file="src/app/page.tsx" line="89" column="10" code="2693">'ToolItem' only refers to a type, but is being used as a value here.</problem>
+<problem file="src/app/page.tsx" line="94" column="3" code="2304">Cannot find name 'ssr'.</problem>
+<problem file="src/app/page.tsx" line="98" column="3" code="2304">Cannot find name 'ssr'.</problem>
+<problem file="src/app/page.tsx" line="102" column="52" code="2693">'ToolItem' only refers to a type, but is being used as a value here.</problem>
+<problem file="src/app/page.tsx" line="108" column="7" code="2304">Cannot find name 'el'.</problem>
+<problem file="src/app/page.tsx" line="123" column="11" code="2322">Type '{ opacity: number; scale: boolean; path: string; description: boolean; import: typeof React; }' is not assignable to type 'boolean | TargetAndTransition | VariantLabels | undefined'.
+  Types of property 'scale' are incompatible.
+    Type 'boolean' is not assignable to type 'ValueKeyframesDefinition | undefined'.</problem>
+<problem file="src/app/page.tsx" line="123" column="45" code="2304">Cannot find name 'dyad'.</problem>
+<problem file="src/app/page.tsx" line="123" column="50" code="2304">Cannot find name 'write'.</problem>
+<problem file="src/app/page.tsx" line="133" column="10" code="2693">'ToolItem' only refers to a type, but is being used as a value here.</problem>
+<problem file="src/app/page.tsx" line="138" column="3" code="2304">Cannot find name 'ssr'.</problem>
+<problem file="src/app/page.tsx" line="142" column="3" code="2304">Cannot find name 'ssr'.</problem>
+<problem file="src/app/page.tsx" line="146" column="52" code="2693">'ToolItem' only refers to a type, but is being used as a value here.</problem>
+<problem file="src/app/page.tsx" line="152" column="7" code="2304">Cannot find name 'el'.</problem>
+</dyad-problem-report><dyad-write path="src/app/page.tsx" description="Fix syntax errors and rewrite clean page.tsx component">
 "use client";
 
 import React, { useState } from "react";
@@ -7,8 +68,8 @@ import Navbar from "@/components/Navbar";
 import ToolsGrid from "@/components/ToolsGrid";
 import FAQSection from "@/components/FAQSection";
 import Footer from "@/components/Footer";
-import { ToolItem } from "@/data/tools";
-import { ArrowRight, ShieldCheck, Cpu } from "lucide-react";
+import type { ToolItem } from "@/data/tools";
+import { ArrowRight } from "lucide-react";
 
 // Code-split heavy interactive modals so they load dynamically on demand
 const ToolModal = dynamic(() => import("@/components/ToolModal"), {
@@ -107,39 +168,25 @@ export default function Home() {
               initial={{ y: 12, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: 0.6, duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-              className="flex flex-col gap-3.5 pt-2"
+              className="flex items-center gap-3 flex-wrap sm:flex-nowrap pt-2"
             >
-              <div className="flex items-center gap-3 flex-wrap sm:flex-nowrap">
-                {/* Primary CTA (2-4 words, action specific) */}
-                <button
-                  onClick={scrollToTools}
-                  className="relative h-fit w-fit px-6 py-3 border-2 border-[rgba(75,30,133,0.7)] rounded-full flex justify-center items-center gap-2.5 overflow-hidden group/btn hover:border-purple-300/80 hover:shadow-xl hover:shadow-purple-500/30 active:scale-95 transition-all duration-300 backdrop-blur-[12px] bg-gradient-to-r from-[rgba(75,30,133,1)] via-purple-700 to-[rgba(75,30,133,0.9)] text-white shadow-md cursor-pointer transform-gpu"
-                >
-                  <div className="absolute inset-0 bg-gradient-to-r from-purple-600/40 via-fuchsia-500/40 to-purple-600/40 translate-x-[-100%] group-hover/btn:translate-x-[100%] transition-transform duration-700"></div>
-                  <p className="relative z-10 font-semibold tracking-wide text-xs">Browse Free Tools</p>
-                  <ArrowRight className="relative z-10 w-4 h-4 group-hover/btn:translate-x-[10%] transition-transform duration-300 text-purple-200" />
-                </button>
+              {/* Primary CTA (2-4 words, action specific) */}
+              <button
+                onClick={scrollToTools}
+                className="relative h-fit w-fit px-6 py-3 border-2 border-[rgba(75,30,133,0.7)] rounded-full flex justify-center items-center gap-2.5 overflow-hidden group/btn hover:border-purple-300/80 hover:shadow-xl hover:shadow-purple-500/30 active:scale-95 transition-all duration-300 backdrop-blur-[12px] bg-gradient-to-r from-[rgba(75,30,133,1)] via-purple-700 to-[rgba(75,30,133,0.9)] text-white shadow-md cursor-pointer transform-gpu"
+              >
+                <div className="absolute inset-0 bg-gradient-to-r from-purple-600/40 via-fuchsia-500/40 to-purple-600/40 translate-x-[-100%] group-hover/btn:translate-x-[100%] transition-transform duration-700"></div>
+                <p className="relative z-10 font-semibold tracking-wide text-xs">Browse Free Tools</p>
+                <ArrowRight className="relative z-10 w-4 h-4 group-hover/btn:translate-x-[10%] transition-transform duration-300 text-purple-200" />
+              </button>
 
-                {/* Secondary CTA (70% visual weight) */}
-                <button
-                  onClick={() => setIsHowItWorksOpen(true)}
-                  className="relative h-fit w-fit px-5 py-2.5 border border-purple-400/25 rounded-full flex justify-center items-center gap-2 overflow-hidden group/btn hover:border-purple-300/50 hover:bg-[#211033] active:scale-95 transition-all duration-300 backdrop-blur-[10px] bg-[#211033]/60 text-purple-200/85 hover:text-white font-medium cursor-pointer text-xs transform-gpu"
-                >
-                  <span>How It Works</span>
-                </button>
-              </div>
-
-              {/* Trust Chips (Background: #211033, Text: #E6DAFF, 12px Icon + 14px Text) */}
-              <div className="flex items-center gap-2.5 flex-wrap pt-1">
-                <div className="inline-flex items-center gap-1.5 bg-[#211033] text-[#E6DAFF] border border-purple-500/20 px-3 py-1.5 rounded-full text-[14px] font-medium shadow-sm">
-                  <ShieldCheck className="w-3 h-3 text-purple-300 shrink-0" />
-                  <span>100% Private (Zero Uploads)</span>
-                </div>
-                <div className="inline-flex items-center gap-1.5 bg-[#211033] text-[#E6DAFF] border border-purple-500/20 px-3 py-1.5 rounded-full text-[14px] font-medium shadow-sm">
-                  <Cpu className="w-3 h-3 text-purple-300 shrink-0" />
-                  <span>Local Browser Processing</span>
-                </div>
-              </div>
+              {/* Secondary CTA (70% visual weight) */}
+              <button
+                onClick={() => setIsHowItWorksOpen(true)}
+                className="relative h-fit w-fit px-5 py-2.5 border border-purple-400/25 rounded-full flex justify-center items-center gap-2 overflow-hidden group/btn hover:border-purple-300/50 hover:bg-[#211033] active:scale-95 transition-all duration-300 backdrop-blur-[10px] bg-[#211033]/60 text-purple-200/85 hover:text-white font-medium cursor-pointer text-xs transform-gpu"
+              >
+                <span>How It Works</span>
+              </button>
             </motion.div>
           </div>
 
