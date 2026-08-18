@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PDF Editor — Annotate, Sign & Edit PDFs Locally</title>
+<title>PDF Editor — Edit Text, Annotate & Sign PDFs Locally</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -50,31 +50,73 @@
     display:flex; align-items:center; justify-content:center; line-height:1;
     box-shadow: 0 0 0 1px rgba(0,0,0,0.15); z-index:2;
   }
-  .thumb .thumb-remove{
-    position:absolute; top:4px; right:4px;
-    width:20px; height:20px; border-radius:9999px;
-    background:rgba(0,0,0,0.75); color:#fff; font-size:12px;
-    display:flex; align-items:center; justify-content:center; line-height:1;
-    z-index:2; cursor:pointer;
-  }
-  .thumb .thumb-remove:hover{ background: #000; }
 
   .edit-tool-btn{
     font-size:12px; border:1px solid rgba(0,0,0,0.15); border-radius:9999px;
-    padding:6px 14px; background:#fff; cursor:pointer; transition: all .15s ease;
+    padding:6px 13px; background:#fff; cursor:pointer; transition: all .15s ease; display:inline-flex; align-items:center; gap:5px;
   }
-  .edit-tool-btn.active{ background:#000; color:#fff; }
+  .edit-tool-btn.active{ background:#000; color:#fff; border-color:#000; }
   .edit-tool-btn:disabled{ opacity:.3; cursor:not-allowed; }
 
-  #canvasContainer{ position:relative; display:inline-block; max-width:100%; }
-  #pdfRenderCanvas{ display:block; max-width:100%; height:auto; box-shadow: 0 4px 20px rgba(0,0,0,0.08); border-radius: 6px; }
-  #drawCanvas{ position:absolute; top:0; left:0; width:100%; height:100%; cursor:crosshair; touch-action:none; }
+  #canvasContainer{ position:relative; display:inline-block; max-width:100%; user-select:none; }
+  #pdfRenderCanvas{ display:block; max-width:100%; height:auto; box-shadow: 0 4px 25px rgba(0,0,0,0.08); border-radius: 6px; background:#fff; }
+  #drawCanvas{ position:absolute; top:0; left:0; width:100%; height:100%; cursor:crosshair; touch-action:none; z-index: 10; }
+  #textOverlayContainer{ position:absolute; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index: 20; }
+
+  /* Floating Editable Text Item */
+  .pdf-text-item{
+    position:absolute; pointer-events:auto;
+    min-width: 40px; min-height: 20px;
+    border: 1px dashed rgba(59, 130, 246, 0.6);
+    background: rgba(255, 255, 255, 0.92);
+    border-radius: 4px; padding: 2px 5px;
+    cursor: move; transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  }
+  .pdf-text-item:hover, .pdf-text-item.selected{
+    border: 1.5px solid #2563eb;
+    box-shadow: 0 4px 14px rgba(37, 99, 235, 0.2);
+    z-index: 30;
+  }
+  .pdf-text-content{
+    outline: none; min-width: 30px; word-break: break-word; white-space: pre-wrap; cursor: text;
+  }
+  .pdf-text-del{
+    position: absolute; top: -9px; right: -9px;
+    width: 18px; height: 18px; border-radius: 9999px;
+    background: #ef4444; color: #fff; font-size: 11px;
+    display: none; align-items: center; justify-content: center; line-height: 1;
+    cursor: pointer; box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+  }
+  .pdf-text-item:hover .pdf-text-del, .pdf-text-item.selected .pdf-text-del{
+    display: flex;
+  }
+
+  /* Auto-detected Text Highlight Box */
+  .detected-text-box{
+    position: absolute; pointer-events: auto;
+    background: rgba(254, 240, 138, 0.35);
+    border: 1px solid rgba(234, 179, 8, 0.6);
+    border-radius: 2px; cursor: pointer; transition: all 0.15s ease;
+  }
+  .detected-text-box:hover{
+    background: rgba(253, 224, 71, 0.7);
+    border-color: #ca8a04;
+  }
+
+  /* Whiteout Box */
+  .whiteout-box{
+    position: absolute; pointer-events: auto;
+    background: #ffffff; border: 1px dashed #94a3b8;
+    cursor: move;
+  }
+  .whiteout-box:hover{ border-color: #475569; }
 
   input[type=color]{ -webkit-appearance:none; appearance:none; border:none; padding:0; background:none; width:28px; height:28px; border-radius:9999px; overflow:hidden; cursor:pointer; }
   input[type=color]::-webkit-color-swatch-wrapper{ padding:0; }
   input[type=color]::-webkit-color-swatch{ border:1px solid rgba(0,0,0,0.12); border-radius:9999px; }
 
-  ::-webkit-scrollbar{ width:8px; }
+  ::-webkit-scrollbar{ width:8px; height:8px; }
   ::-webkit-scrollbar-thumb{ background:#ddd; border-radius:9999px; }
 </style>
 </head>
@@ -115,19 +157,19 @@
       <div>
         <div class="anim-subtitle flex items-center gap-2 mb-4">
           <span class="rounded-full bg-black" style="width:8px;height:8px;"></span>
-          <span class="text-[13px]" style="color:rgba(0,0,0,0.55);">Annotate, sign, highlight, and edit PDFs, right here</span>
+          <span class="text-[13px]" style="color:rgba(0,0,0,0.55);">Edit text content, sign, and annotate PDFs, right here</span>
         </div>
         <h1 class="anim-heading hero-heading mb-6">
-          PDF In,<br/>Zero Uploads.<br/>Edited Out.
+          PDF In,<br/>Edit Content & Text.<br/>PDF Out.
         </h1>
         <div class="anim-buttons flex items-center gap-3">
           <a href="#how-it-works" class="bg-black text-white text-[13px] rounded-full px-5 py-2.5">How It Works</a>
         </div>
       </div>
       <div class="flex items-center gap-2 md:justify-end flex-wrap">
-        <span class="text-[11px] rounded-full px-3 py-1.5 bg-white border" style="border-color:rgba(0,0,0,0.12);">Sign & Draw</span>
-        <span class="text-[11px] rounded-full px-3 py-1.5 bg-white border" style="border-color:rgba(0,0,0,0.12);">Add Text & Watermark</span>
-        <span class="text-[11px] rounded-full px-3 py-1.5 bg-white border" style="border-color:rgba(0,0,0,0.12);">Rotate & Organize</span>
+        <span class="text-[11px] rounded-full px-3 py-1.5 bg-white border" style="border-color:rgba(0,0,0,0.12);">Edit Existing Text</span>
+        <span class="text-[11px] rounded-full px-3 py-1.5 bg-white border" style="border-color:rgba(0,0,0,0.12);">Add Text & Sign</span>
+        <span class="text-[11px] rounded-full px-3 py-1.5 bg-white border" style="border-color:rgba(0,0,0,0.12);">Whiteout / Erase</span>
       </div>
     </div>
   </div>
@@ -137,13 +179,13 @@
 <section id="tool" class="w-full max-w-6xl mx-auto px-4 md:px-8 py-16">
 
   <div class="mb-10">
-    <h2 class="text-2xl md:text-3xl font-light tracking-tight mb-2">Edit your PDF document</h2>
-    <p class="text-sm text-black/50">Upload any PDF file, write custom text, draw signatures, highlight paragraphs, add watermarks, and export — nothing ever leaves your browser.</p>
+    <h2 class="text-2xl md:text-3xl font-light tracking-tight mb-2">Edit PDF text and content</h2>
+    <p class="text-sm text-black/50">Modify existing text in your PDF, type new text boxes anywhere, erase unwanted content with whiteout, sign, draw, and export — 100% locally in your browser.</p>
   </div>
 
-  <div class="grid grid-cols-1 lg:grid-cols-12 gap-10">
+  <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
 
-    <!-- LEFT: Upload & Page Thumbnails (4 cols) -->
+    <!-- LEFT: Upload & Page List (4 cols) -->
     <div class="lg:col-span-4 flex flex-col gap-6">
       
       <!-- Upload area -->
@@ -155,7 +197,7 @@
             <path d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
           <p class="text-xs font-semibold text-neutral-800">Drag & drop PDF, or click to browse</p>
-          <p class="text-[11px] text-black/40 mt-0.5">Select a single PDF file</p>
+          <p class="text-[11px] text-black/40 mt-0.5">Select a PDF file to edit</p>
           <input id="fileInput" type="file" accept="application/pdf" class="hidden">
         </div>
         <p id="pageInfo" class="text-xs text-black/40 mt-2">No PDF loaded yet</p>
@@ -165,40 +207,38 @@
       <div>
         <div class="flex items-center justify-between mb-2">
           <h3 class="text-sm font-medium">Pages</h3>
-          <span class="text-[11px] text-black/40">Click to select page</span>
+          <span class="text-[11px] text-black/40">Select page to edit</span>
         </div>
-        <div id="thumbGrid" class="grid grid-cols-3 gap-2 max-h-72 overflow-y-auto p-1 border border-black/10 rounded-2xl bg-black/[0.02]"></div>
+        <div id="thumbGrid" class="grid grid-cols-3 gap-2 max-h-64 overflow-y-auto p-1 border border-black/10 rounded-2xl bg-black/[0.02]"></div>
       </div>
 
-      <!-- Page Operations -->
+      <!-- Page Tools -->
       <div>
-        <h3 class="text-sm font-medium mb-2">Page Operations</h3>
+        <h3 class="text-sm font-medium mb-2">Page Controls</h3>
         <div class="border border-black/10 rounded-2xl p-4 flex flex-col gap-2.5">
-          <div class="flex items-center gap-2 flex-wrap">
-            <button id="rotLeftBtn" class="edit-tool-btn flex-1 text-center" disabled>⟲ Rotate Left</button>
-            <button id="rotRightBtn" class="edit-tool-btn flex-1 text-center" disabled>⟳ Rotate Right</button>
+          <div class="flex items-center gap-2">
+            <button id="rotLeftBtn" class="edit-tool-btn flex-1 justify-center" disabled>⟲ Rotate Left</button>
+            <button id="rotRightBtn" class="edit-tool-btn flex-1 justify-center" disabled>⟳ Rotate Right</button>
           </div>
-          <div class="flex items-center gap-2 flex-wrap">
-            <button id="deletePageBtn" class="edit-tool-btn flex-1 text-center hover:border-red-500 hover:text-red-600" disabled>🗑 Delete Page</button>
-          </div>
+          <button id="deletePageBtn" class="edit-tool-btn justify-center hover:border-red-500 hover:text-red-600" disabled>🗑 Delete This Page</button>
         </div>
       </div>
 
       <!-- Export Card -->
       <div>
-        <h3 class="text-sm font-medium mb-2">Export Document</h3>
+        <h3 class="text-sm font-medium mb-2">Export Edited PDF</h3>
         <div class="border border-black/10 rounded-2xl p-4 flex flex-col gap-3">
           <button id="exportBtn" class="w-full bg-black text-white text-[13px] rounded-full py-2.5 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer shadow-md hover:bg-neutral-800 transition-colors" disabled>
             Download Edited PDF
           </button>
           <div id="progressWrap" class="hidden">
             <div class="w-full h-1.5 bg-black/10 rounded-full overflow-hidden">
-              <div id="progressBar" class="h-full bg-black" style="width:0%;"></div>
+              <div id="progressBar" class="h-full bg-black transition-all duration-150" style="width:0%;"></div>
             </div>
             <p id="progressLabel" class="text-[11px] text-black/40 mt-1 text-center">Saving…</p>
           </div>
           <p class="text-[11px] text-black/40 leading-relaxed">
-            All edits and drawings are compiled locally on your device with high resolution.
+            All text changes, whiteouts, and signatures are compiled directly inside your browser.
           </p>
         </div>
       </div>
@@ -206,44 +246,69 @@
     </div>
 
     <!-- RIGHT: Canvas Editor Area (8 cols) -->
-    <div class="lg:col-span-8 flex flex-col gap-6">
+    <div class="lg:col-span-8 flex flex-col gap-4">
 
-      <!-- Editor Toolbar -->
-      <div class="border border-black/10 rounded-2xl p-3 bg-neutral-50 flex items-center justify-between gap-3 flex-wrap shadow-sm">
+      <!-- Interactive Toolbar -->
+      <div class="border border-black/10 rounded-2xl p-3 bg-neutral-50 flex items-center justify-between gap-2 flex-wrap shadow-sm">
+        
+        <!-- Primary editing modes -->
         <div class="flex items-center gap-1.5 flex-wrap">
-          <button data-tool="pen" class="tool-btn edit-tool-btn active">✏️ Draw / Sign</button>
+          <button data-tool="text" class="tool-btn edit-tool-btn active">🔤 Add Text</button>
+          <button id="autoDetectTextBtn" class="edit-tool-btn bg-amber-50 hover:bg-amber-100 border-amber-300 text-amber-900" disabled>🔍 Auto-Detect Text</button>
+          <button data-tool="whiteout" class="tool-btn edit-tool-btn">⬜ Whiteout / Cover</button>
+          <button data-tool="pen" class="tool-btn edit-tool-btn">✏️ Sign / Draw</button>
           <button data-tool="highlighter" class="tool-btn edit-tool-btn">🖍 Highlight</button>
-          <button data-tool="text" class="tool-btn edit-tool-btn">🔤 Add Text</button>
-          <button id="clearAnnotationsBtn" class="edit-tool-btn">🧹 Clear Page</button>
         </div>
 
-        <div class="flex items-center gap-3">
+        <!-- Text/Drawing Styling Controls -->
+        <div class="flex items-center gap-3 flex-wrap">
+          <div class="flex items-center gap-1.5">
+            <label class="text-xs text-black/60 font-medium">Font/Size</label>
+            <select id="fontSizeSelect" class="text-xs border border-black/15 rounded-lg px-2 py-1 bg-white">
+              <option value="12">12 px</option>
+              <option value="14">14 px</option>
+              <option value="16" selected>16 px</option>
+              <option value="18">18 px</option>
+              <option value="22">22 px</option>
+              <option value="28">28 px</option>
+              <option value="36">36 px</option>
+            </select>
+          </div>
+
           <div class="flex items-center gap-1.5">
             <label class="text-xs text-black/60 font-medium">Color</label>
             <input id="colorPicker" type="color" value="#000000">
           </div>
-          <div class="flex items-center gap-1.5">
-            <label class="text-xs text-black/60 font-medium">Size</label>
-            <input id="strokeWidth" type="range" min="1" max="25" value="3" class="w-20 cursor-pointer">
-          </div>
+
+          <button id="clearAnnotationsBtn" class="edit-tool-btn hover:bg-neutral-200">Clear Edits</button>
         </div>
       </div>
 
-      <!-- Watermark Bar -->
-      <div class="border border-black/10 rounded-2xl p-3 bg-white flex items-center gap-3">
-        <label class="text-xs text-black/60 font-medium shrink-0">Add Watermark:</label>
-        <input id="watermarkInput" type="text" placeholder="e.g. CONFIDENTIAL / DRAFT" class="flex-1 border border-black/10 rounded-xl px-3 py-1.5 text-xs">
-        <button id="applyWatermarkBtn" class="edit-tool-btn bg-black text-white hover:bg-neutral-800" disabled>Apply to All</button>
+      <!-- Hint banner -->
+      <div id="toolTipBanner" class="text-xs text-neutral-600 bg-blue-50/80 border border-blue-200/80 rounded-xl px-3.5 py-2 flex items-center justify-between">
+        <span>💡 <b>Text Mode Active:</b> Click anywhere on the page to type new text, or click "Auto-Detect Text" to edit existing PDF sentences.</span>
       </div>
 
       <!-- Main Interactive Page Viewport -->
-      <div class="border border-black/10 rounded-2xl min-h-[500px] flex items-center justify-center p-4 bg-neutral-100 overflow-auto">
+      <div class="border border-black/10 rounded-2xl min-h-[540px] flex items-center justify-center p-4 bg-neutral-200/60 overflow-auto">
         <div id="canvasContainer" class="hidden">
           <canvas id="pdfRenderCanvas"></canvas>
           <canvas id="drawCanvas"></canvas>
+          <!-- Live Interactive Text & Annotation HTML Overlay -->
+          <div id="textOverlayContainer"></div>
         </div>
         <div id="editorPlaceholder" class="text-center py-20">
-          <p class="text-xs text-black/40">Upload a PDF to view and edit pages here</p>
+          <div class="w-12 h-12 rounded-2xl bg-white border border-neutral-300 mx-auto flex items-center justify-center text-neutral-400 mb-3 shadow-sm">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <line x1="16" y1="13" x2="8" y2="13"></line>
+              <line x1="16" y1="17" x2="8" y2="17"></line>
+              <polyline points="10 9 9 9 8 9"></polyline>
+            </svg>
+          </div>
+          <p class="text-xs font-medium text-neutral-700">Upload a PDF document to begin editing text and pages</p>
+          <p class="text-[11px] text-neutral-400 mt-1">100% private — files remain in your browser memory</p>
         </div>
       </div>
 
@@ -257,29 +322,29 @@
   <div class="max-w-6xl mx-auto px-4 md:px-8 py-16">
     <div class="mb-10">
       <h2 class="text-2xl md:text-3xl font-light tracking-tight mb-2">How it works</h2>
-      <p class="text-sm text-black/50 max-w-2xl">PDF Editor operates entirely inside your web browser. No documents are ever uploaded to an external server — everything happens locally on your CPU and GPU.</p>
+      <p class="text-sm text-black/50 max-w-2xl">PDF Editor reads, modifies, and re-renders text and drawing layers entirely inside your web browser. No files are ever sent to remote servers.</p>
     </div>
 
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
       <div>
         <div class="flex items-center justify-center rounded-full bg-black text-white text-sm font-medium mb-4" style="width:32px;height:32px;">1</div>
         <h3 class="text-sm font-medium mb-2">Upload your PDF</h3>
-        <p class="text-xs text-black/50 leading-relaxed">Drag and drop any PDF file. Your browser reads each page locally and creates high-res interactive previews.</p>
+        <p class="text-xs text-black/50 leading-relaxed">Drag and drop any PDF file. Your browser parses the font glyphs, layout structure, and pages in real-time.</p>
       </div>
       <div>
         <div class="flex items-center justify-center rounded-full bg-black text-white text-sm font-medium mb-4" style="width:32px;height:32px;">2</div>
-        <h3 class="text-sm font-medium mb-2">Draw, sign & annotate</h3>
-        <p class="text-xs text-black/50 leading-relaxed">Add signatures, text boxes, highlighter strokes, or custom watermarks on any page with customizable colors and line weights.</p>
+        <h3 class="text-sm font-medium mb-2">Edit or replace text</h3>
+        <p class="text-xs text-black/50 leading-relaxed">Click "Auto-Detect Text" to turn original text into clickable editable blocks, or click anywhere to type additional paragraphs.</p>
       </div>
       <div>
         <div class="flex items-center justify-center rounded-full bg-black text-white text-sm font-medium mb-4" style="width:32px;height:32px;">3</div>
-        <h3 class="text-sm font-medium mb-2">Reorganize pages</h3>
-        <p class="text-xs text-black/50 leading-relaxed">Rotate sideways pages or delete unnecessary pages directly from the thumbnail preview list.</p>
+        <h3 class="text-sm font-medium mb-2">Whiteout & Sign</h3>
+        <p class="text-xs text-black/50 leading-relaxed">Cover unwanted text or logos with the whiteout tool, then draw signatures or highlight key terms with smooth vector pens.</p>
       </div>
       <div>
         <div class="flex items-center justify-center rounded-full bg-black text-white text-sm font-medium mb-4" style="width:32px;height:32px;">4</div>
-        <h3 class="text-sm font-medium mb-2">Export & download</h3>
-        <p class="text-xs text-black/50 leading-relaxed">Download your finished document in crisp vector resolution. No files ever leave your computer.</p>
+        <h3 class="text-sm font-medium mb-2">Download PDF</h3>
+        <p class="text-xs text-black/50 leading-relaxed">Download your finished document in high resolution. Your edited PDF is completely ready to share.</p>
       </div>
     </div>
 
@@ -290,7 +355,7 @@
 </section>
 
 <footer class="text-center text-xs text-black/30 py-8">
-  Built entirely client-side — your document never leaves this browser.
+  Built entirely client-side — your documents never leave this browser.
 </footer>
 
 <script>
@@ -305,43 +370,58 @@
   const editorPlaceholder = document.getElementById('editorPlaceholder');
   const pdfRenderCanvas = document.getElementById('pdfRenderCanvas');
   const drawCanvas = document.getElementById('drawCanvas');
+  const textOverlayContainer = document.getElementById('textOverlayContainer');
   const rotLeftBtn = document.getElementById('rotLeftBtn');
   const rotRightBtn = document.getElementById('rotRightBtn');
   const deletePageBtn = document.getElementById('deletePageBtn');
+  const autoDetectTextBtn = document.getElementById('autoDetectTextBtn');
   const clearAnnotationsBtn = document.getElementById('clearAnnotationsBtn');
-  const watermarkInput = document.getElementById('watermarkInput');
-  const applyWatermarkBtn = document.getElementById('applyWatermarkBtn');
   const exportBtn = document.getElementById('exportBtn');
   const progressWrap = document.getElementById('progressWrap');
   const progressBar = document.getElementById('progressBar');
   const progressLabel = document.getElementById('progressLabel');
   const colorPicker = document.getElementById('colorPicker');
-  const strokeWidth = document.getElementById('strokeWidth');
+  const fontSizeSelect = document.getElementById('fontSizeSelect');
+  const toolTipBanner = document.getElementById('toolTipBanner');
 
   if (window.pdfjsLib) {
     pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
   }
 
   let pdfDoc = null;
-  let pages = []; // { pageNumber, rotation, thumbUrl, drawCanvasData, width, height }
+  let pages = []; 
+  // page item schema: { pageNumber, rotation, thumbUrl, drawCanvasData, textItems: [], whiteouts: [], detectedBoxes: [] }
   let activeIdx = 0;
-  let activeTool = 'pen';
+  let activeTool = 'text'; // 'text' | 'whiteout' | 'pen' | 'highlighter'
   let isDrawing = false;
-  let lastX = 0;
-  let lastY = 0;
-  let watermarkText = '';
+  let lastX = 0, lastY = 0;
+  let whiteoutStart = null;
 
-  // Setup tools
+  // Tool Selection
   document.querySelectorAll('.tool-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       document.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
       activeTool = btn.dataset.tool;
+      updateToolTip();
+      drawCanvas.style.pointerEvents = (activeTool === 'pen' || activeTool === 'highlighter' || activeTool === 'whiteout') ? 'auto' : 'none';
     });
   });
 
+  function updateToolTip(){
+    if (activeTool === 'text') {
+      toolTipBanner.innerHTML = '<span>💡 <b>Text Mode:</b> Click anywhere to type new text, or click existing text boxes to modify them.</span>';
+    } else if (activeTool === 'whiteout') {
+      toolTipBanner.innerHTML = '<span>⬜ <b>Whiteout Mode:</b> Drag a box over any existing text to cleanly erase/cover it up.</span>';
+    } else if (activeTool === 'pen') {
+      toolTipBanner.innerHTML = '<span>✏️ <b>Sign / Draw Mode:</b> Draw signatures or freehand annotations directly on the document.</span>';
+    } else if (activeTool === 'highlighter') {
+      toolTipBanner.innerHTML = '<span>🖍 <b>Highlighter Mode:</b> Drag over important text passages to highlight them.</span>';
+    }
+  }
+
   async function loadPdf(file){
-    pageInfo.textContent = 'Reading ' + file.name + '…';
+    pageInfo.textContent = 'Loading ' + file.name + '…';
     try {
       const buf = await file.arrayBuffer();
       pdfDoc = await pdfjsLib.getDocument({ data: buf }).promise;
@@ -352,8 +432,9 @@
           rotation: 0,
           thumbUrl: '',
           drawCanvasData: null,
-          width: 0,
-          height: 0
+          textItems: [],
+          whiteouts: [],
+          detectedBoxes: []
         });
       }
       activeIdx = 0;
@@ -363,8 +444,9 @@
       rotLeftBtn.disabled = false;
       rotRightBtn.disabled = false;
       deletePageBtn.disabled = false;
-      applyWatermarkBtn.disabled = false;
+      autoDetectTextBtn.disabled = false;
       exportBtn.disabled = false;
+      drawCanvas.style.pointerEvents = 'none'; // Default to text mode
     } catch(err){
       console.error(err);
       pageInfo.textContent = 'Could not load PDF: ' + err.message;
@@ -396,7 +478,7 @@
         <img src="${p.thumbUrl}" class="max-w-full max-h-full object-contain pointer-events-none">
       `;
       wrap.onclick = () => {
-        saveDrawCanvas();
+        saveCurrentState();
         activeIdx = idx;
         renderThumbActive();
         renderActivePage();
@@ -419,8 +501,6 @@
 
     pdfRenderCanvas.width = viewport.width;
     pdfRenderCanvas.height = viewport.height;
-    p.width = viewport.width;
-    p.height = viewport.height;
 
     const ctx = pdfRenderCanvas.getContext('2d');
     await page.render({ canvasContext: ctx, viewport }).promise;
@@ -436,51 +516,245 @@
       img.src = p.drawCanvasData;
     }
 
+    renderHtmlOverlay();
     canvasContainer.classList.remove('hidden');
     editorPlaceholder.classList.add('hidden');
   }
 
-  function saveDrawCanvas(){
+  function saveCurrentState(){
     if (pages[activeIdx]) {
       pages[activeIdx].drawCanvasData = drawCanvas.toDataURL('image/png');
     }
   }
 
-  // Drawing event handlers
-  function getPos(e){
+  // Render text boxes, whiteouts, and detected elements
+  function renderHtmlOverlay(){
+    textOverlayContainer.innerHTML = '';
+    const p = pages[activeIdx];
+    if (!p) return;
+
+    // Render Whiteouts
+    p.whiteouts.forEach((w, idx) => {
+      const el = document.createElement('div');
+      el.className = 'whiteout-box';
+      el.style.left = w.x + 'px';
+      el.style.top = w.y + 'px';
+      el.style.width = w.w + 'px';
+      el.style.height = w.h + 'px';
+      el.title = 'Whiteout / Cover Area (Right-click to remove)';
+      el.oncontextmenu = (e) => {
+        e.preventDefault();
+        p.whiteouts.splice(idx, 1);
+        renderHtmlOverlay();
+      };
+      textOverlayContainer.appendChild(el);
+    });
+
+    // Render Detected clickable text blocks
+    p.detectedBoxes.forEach((d) => {
+      const el = document.createElement('div');
+      el.className = 'detected-text-box';
+      el.style.left = d.x + 'px';
+      el.style.top = d.y + 'px';
+      el.style.width = d.w + 'px';
+      el.style.height = d.h + 'px';
+      el.title = 'Click to edit: "' + d.text + '"';
+      el.onclick = (e) => {
+        e.stopPropagation();
+        // Convert detected box into a whiteout + editable text overlay item
+        p.whiteouts.push({ x: d.x - 2, y: d.y - 2, w: d.w + 4, h: d.h + 4 });
+        p.textItems.push({
+          x: d.x,
+          y: d.y,
+          text: d.text,
+          fontSize: d.fontSize || 16,
+          color: colorPicker.value || '#000000',
+          bold: false
+        });
+        // Remove detected box once converted
+        p.detectedBoxes = p.detectedBoxes.filter(item => item !== d);
+        renderHtmlOverlay();
+      };
+      textOverlayContainer.appendChild(el);
+    });
+
+    // Render Floating Text Items
+    p.textItems.forEach((t, idx) => {
+      const el = document.createElement('div');
+      el.className = 'pdf-text-item';
+      el.style.left = t.x + 'px';
+      el.style.top = t.y + 'px';
+
+      const content = document.createElement('div');
+      content.className = 'pdf-text-content';
+      content.contentEditable = 'true';
+      content.style.fontSize = t.fontSize + 'px';
+      content.style.color = t.color;
+      content.style.fontWeight = t.bold ? 'bold' : 'normal';
+      content.innerText = t.text || ' ';
+      
+      content.oninput = () => {
+        t.text = content.innerText;
+      };
+
+      // Draggable logic
+      let dragStartX, dragStartY, initialLeft, initialTop;
+      el.onmousedown = (e) => {
+        if (e.target === content) return; // Allow text selection
+        e.preventDefault();
+        dragStartX = e.clientX;
+        dragStartY = e.clientY;
+        initialLeft = t.x;
+        initialTop = t.y;
+
+        function onMouseMove(moveEvent){
+          const dx = moveEvent.clientX - dragStartX;
+          const dy = moveEvent.clientY - dragStartY;
+          t.x = Math.max(0, initialLeft + dx);
+          t.y = Math.max(0, initialTop + dy);
+          el.style.left = t.x + 'px';
+          el.style.top = t.y + 'px';
+        }
+
+        function onMouseUp(){
+          window.removeEventListener('mousemove', onMouseMove);
+          window.removeEventListener('mouseup', onMouseUp);
+        }
+
+        window.addEventListener('mousemove', onMouseMove);
+        window.addEventListener('mouseup', onMouseUp);
+      };
+
+      const delBtn = document.createElement('button');
+      delBtn.className = 'pdf-text-del';
+      delBtn.innerHTML = '×';
+      delBtn.title = 'Delete Text Box';
+      delBtn.onclick = (e) => {
+        e.stopPropagation();
+        p.textItems.splice(idx, 1);
+        renderHtmlOverlay();
+      };
+
+      el.appendChild(content);
+      el.appendChild(delBtn);
+      textOverlayContainer.appendChild(el);
+    });
+  }
+
+  // Auto-Detect Text Content from PDF structure
+  autoDetectTextBtn.addEventListener('click', async () => {
+    if (!pages[activeIdx]) return;
+    const p = pages[activeIdx];
+    autoDetectTextBtn.disabled = true;
+    autoDetectTextBtn.textContent = 'Scanning…';
+
+    try {
+      const page = await pdfDoc.getPage(p.pageNumber);
+      const viewport = page.getViewport({ scale: 1.5, rotation: p.rotation });
+      const textContent = await page.getTextContent();
+
+      p.detectedBoxes = [];
+      textContent.items.forEach(item => {
+        if (!item.str || !item.str.trim()) return;
+        const tx = pdfjsLib.Util.transform(viewport.transform, item.transform);
+        const fontHeight = Math.sqrt((tx[2] * tx[2]) + (tx[3] * tx[3])) || 14;
+        const width = item.width * 1.5;
+        const height = fontHeight;
+
+        p.detectedBoxes.push({
+          text: item.str,
+          x: tx[4],
+          y: tx[5] - height,
+          w: Math.max(width, 20),
+          h: Math.max(height, 14),
+          fontSize: Math.round(fontHeight)
+        });
+      });
+
+      renderHtmlOverlay();
+      toolTipBanner.innerHTML = '<span>✨ <b>Detected ' + p.detectedBoxes.length + ' text passages:</b> Click any yellow highlighted box to edit its text!</span>';
+    } catch(err){
+      console.error(err);
+      alert('Could not detect text: ' + err.message);
+    } finally {
+      autoDetectTextBtn.disabled = false;
+      autoDetectTextBtn.textContent = '🔍 Auto-Detect Text';
+    }
+  });
+
+  // Canvas interaction & coordinates
+  function getCanvasCoords(e){
     const rect = drawCanvas.getBoundingClientRect();
     const scaleX = drawCanvas.width / rect.width;
     const scaleY = drawCanvas.height / rect.height;
-    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
     return {
-      x: (clientX - rect.left) * scaleX,
-      y: (clientY - rect.top) * scaleY
+      x: (e.clientX - rect.left) * scaleX,
+      y: (e.clientY - rect.top) * scaleY
     };
   }
 
+  // Click on canvas to add text box in text mode
+  canvasContainer.addEventListener('click', (e) => {
+    if (activeTool !== 'text') return;
+    if (e.target.closest('.pdf-text-item') || e.target.closest('.detected-text-box')) return;
+    
+    const rect = canvasContainer.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+
+    const p = pages[activeIdx];
+    if (p) {
+      p.textItems.push({
+        x: Math.max(0, x - 10),
+        y: Math.max(0, y - 10),
+        text: 'Type text here...',
+        fontSize: parseInt(fontSizeSelect.value, 10) || 16,
+        color: colorPicker.value || '#000000',
+        bold: false
+      });
+      renderHtmlOverlay();
+    }
+  });
+
+  // Drawing & Whiteout Handlers
   drawCanvas.addEventListener('mousedown', e => {
-    if (activeTool === 'text') {
-      const pos = getPos(e);
-      const text = prompt('Enter text to insert:');
-      if (text) {
-        const dctx = drawCanvas.getContext('2d');
-        dctx.font = 'bold ' + (parseInt(strokeWidth.value, 10) * 6) + 'px sans-serif';
-        dctx.fillStyle = colorPicker.value;
-        dctx.fillText(text, pos.x, pos.y);
-        saveDrawCanvas();
-      }
+    const pos = getCanvasCoords(e);
+    if (activeTool === 'whiteout') {
+      whiteoutStart = pos;
+      isDrawing = true;
       return;
     }
-    isDrawing = true;
-    const pos = getPos(e);
-    lastX = pos.x;
-    lastY = pos.y;
+
+    if (activeTool === 'pen' || activeTool === 'highlighter') {
+      isDrawing = true;
+      lastX = pos.x;
+      lastY = pos.y;
+    }
   });
 
   drawCanvas.addEventListener('mousemove', e => {
     if (!isDrawing) return;
-    const pos = getPos(e);
+    const pos = getCanvasCoords(e);
+
+    if (activeTool === 'whiteout') {
+      const dctx = drawCanvas.getContext('2d');
+      dctx.clearRect(0, 0, drawCanvas.width, drawCanvas.height);
+      if (pages[activeIdx] && pages[activeIdx].drawCanvasData) {
+        const img = new Image();
+        img.src = pages[activeIdx].drawCanvasData;
+        dctx.drawImage(img, 0, 0);
+      }
+      dctx.fillStyle = 'rgba(255, 255, 255, 0.85)';
+      dctx.strokeStyle = '#94a3b8';
+      dctx.setLineDash([4, 4]);
+      const w = pos.x - whiteoutStart.x;
+      const h = pos.y - whiteoutStart.y;
+      dctx.fillRect(whiteoutStart.x, whiteoutStart.y, w, h);
+      dctx.strokeRect(whiteoutStart.x, whiteoutStart.y, w, h);
+      dctx.setLineDash([]);
+      return;
+    }
+
     const dctx = drawCanvas.getContext('2d');
     dctx.beginPath();
     dctx.moveTo(lastX, lastY);
@@ -491,11 +765,11 @@
     if (activeTool === 'highlighter') {
       dctx.strokeStyle = colorPicker.value;
       dctx.globalAlpha = 0.35;
-      dctx.lineWidth = parseInt(strokeWidth.value, 10) * 4;
+      dctx.lineWidth = 20;
     } else {
       dctx.strokeStyle = colorPicker.value;
       dctx.globalAlpha = 1.0;
-      dctx.lineWidth = parseInt(strokeWidth.value, 10);
+      dctx.lineWidth = 3;
     }
 
     dctx.stroke();
@@ -504,23 +778,50 @@
     lastY = pos.y;
   });
 
-  window.addEventListener('mouseup', () => {
+  window.addEventListener('mouseup', e => {
+    if (isDrawing && activeTool === 'whiteout' && whiteoutStart) {
+      const pos = getCanvasCoords(e);
+      const x = Math.min(whiteoutStart.x, pos.x);
+      const y = Math.min(whiteoutStart.y, pos.y);
+      const w = Math.abs(pos.x - whiteoutStart.x);
+      const h = Math.abs(pos.y - whiteoutStart.y);
+
+      if (w > 5 && h > 5 && pages[activeIdx]) {
+        pages[activeIdx].whiteouts.push({ x, y, w, h });
+        renderHtmlOverlay();
+      }
+      const dctx = drawCanvas.getContext('2d');
+      dctx.clearRect(0, 0, drawCanvas.width, drawCanvas.height);
+      if (pages[activeIdx] && pages[activeIdx].drawCanvasData) {
+        const img = new Image();
+        img.src = pages[activeIdx].drawCanvasData;
+        dctx.drawImage(img, 0, 0);
+      }
+      whiteoutStart = null;
+    }
+
     if (isDrawing) {
       isDrawing = false;
-      saveDrawCanvas();
+      saveCurrentState();
     }
   });
 
   clearAnnotationsBtn.addEventListener('click', () => {
-    const dctx = drawCanvas.getContext('2d');
-    dctx.clearRect(0, 0, drawCanvas.width, drawCanvas.height);
-    if (pages[activeIdx]) pages[activeIdx].drawCanvasData = null;
+    const p = pages[activeIdx];
+    if (p) {
+      p.drawCanvasData = null;
+      p.textItems = [];
+      p.whiteouts = [];
+      p.detectedBoxes = [];
+      const dctx = drawCanvas.getContext('2d');
+      dctx.clearRect(0, 0, drawCanvas.width, drawCanvas.height);
+      renderHtmlOverlay();
+    }
   });
 
   rotLeftBtn.addEventListener('click', async () => {
     if (!pages[activeIdx]) return;
     pages[activeIdx].rotation = (pages[activeIdx].rotation - 90 + 360) % 360;
-    pages[activeIdx].drawCanvasData = null;
     await renderThumb(activeIdx);
     renderThumbGrid();
     renderActivePage();
@@ -529,7 +830,6 @@
   rotRightBtn.addEventListener('click', async () => {
     if (!pages[activeIdx]) return;
     pages[activeIdx].rotation = (pages[activeIdx].rotation + 90) % 360;
-    pages[activeIdx].drawCanvasData = null;
     await renderThumb(activeIdx);
     renderThumbGrid();
     renderActivePage();
@@ -546,14 +846,7 @@
     renderActivePage();
   });
 
-  applyWatermarkBtn.addEventListener('click', () => {
-    watermarkText = watermarkInput.value.trim();
-    if (watermarkText) {
-      alert('Watermark "' + watermarkText + '" will be applied to all pages upon export!');
-    }
-  });
-
-  // Dropzone handling
+  // Dropzone file handling
   dropZone.addEventListener('click', () => fileInput.click());
   fileInput.addEventListener('change', e => {
     if (e.target.files && e.target.files[0]) loadPdf(e.target.files[0]);
@@ -565,14 +858,14 @@
     if (e.dataTransfer.files && e.dataTransfer.files[0]) loadPdf(e.dataTransfer.files[0]);
   });
 
-  // Export PDF
+  // Export PDF compilation with all layers
   exportBtn.addEventListener('click', async () => {
     if (!pages.length || !window.jspdf) return;
-    saveDrawCanvas();
+    saveCurrentState();
     exportBtn.disabled = true;
     progressWrap.classList.remove('hidden');
     progressBar.style.width = '0%';
-    progressLabel.textContent = 'Assembling pages…';
+    progressLabel.textContent = 'Compiling PDF...';
 
     try {
       const { jsPDF } = window.jspdf;
@@ -590,7 +883,15 @@
         const ctx = canvas.getContext('2d');
         await page.render({ canvasContext: ctx, viewport }).promise;
 
-        // Overlay draw annotations
+        const scaleFactor = 2.0 / 1.5; // Scale from editor 1.5x to export 2.0x
+
+        // 1. Draw Whiteouts
+        p.whiteouts.forEach(w => {
+          ctx.fillStyle = '#ffffff';
+          ctx.fillRect(w.x * scaleFactor, w.y * scaleFactor, w.w * scaleFactor, w.h * scaleFactor);
+        });
+
+        // 2. Draw Drawings / Highlighter Annotations
         if (p.drawCanvasData) {
           const img = new Image();
           await new Promise(r => {
@@ -602,17 +903,18 @@
           });
         }
 
-        // Overlay watermark if specified
-        if (watermarkText) {
-          ctx.save();
-          ctx.translate(canvas.width / 2, canvas.height / 2);
-          ctx.rotate(-Math.PI / 4);
-          ctx.font = 'bold ' + Math.round(canvas.width / 12) + 'px sans-serif';
-          ctx.fillStyle = 'rgba(200, 200, 200, 0.4)';
-          ctx.textAlign = 'center';
-          ctx.fillText(watermarkText, 0, 0);
-          ctx.restore();
-        }
+        // 3. Draw Text Items
+        p.textItems.forEach(t => {
+          ctx.fillStyle = t.color || '#000000';
+          const fontSize = (t.fontSize || 16) * scaleFactor;
+          ctx.font = (t.bold ? 'bold ' : '') + fontSize + 'px sans-serif';
+          ctx.textBaseline = 'top';
+
+          const lines = (t.text || '').split('\n');
+          lines.forEach((line, lineIdx) => {
+            ctx.fillText(line, t.x * scaleFactor, (t.y * scaleFactor) + (lineIdx * (fontSize * 1.25)));
+          });
+        });
 
         const wPt = canvas.width * PX_TO_PT * 0.5;
         const hPt = canvas.height * PX_TO_PT * 0.5;
@@ -620,11 +922,11 @@
         if (!doc) doc = new jsPDF({ unit: 'pt', format: [wPt, hPt] });
         else doc.addPage([wPt, hPt]);
 
-        const dataUrl = canvas.toDataURL('image/jpeg', 0.92);
+        const dataUrl = canvas.toDataURL('image/jpeg', 0.95);
         doc.addImage(dataUrl, 'JPEG', 0, 0, wPt, hPt);
 
         progressBar.style.width = Math.round(((i + 1) / pages.length) * 100) + '%';
-        progressLabel.textContent = 'Exporting page ' + (i + 1) + ' / ' + pages.length + '…';
+        progressLabel.textContent = 'Processing page ' + (i + 1) + ' / ' + pages.length + '…';
         await new Promise(r => setTimeout(r, 0));
       }
 
