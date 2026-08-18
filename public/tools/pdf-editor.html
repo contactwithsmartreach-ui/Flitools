@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PDF Document Editor — Edit Original PDF Text Locally</title>
+<title>PDF Document Editor — Edit PDF Text Locally</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -25,95 +25,39 @@
   .drop-zone{ transition: border-color .2s ease, background-color .2s ease, transform .2s ease; }
   .drop-zone.dragover{ border-color:#a855f7; background-color:rgba(168,85,247,0.12); transform: scale(1.01); }
 
-  /* Workspace page layout */
-  .pdf-page-container{
-    position: relative;
-    box-shadow: 0 10px 40px -10px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.1);
-    background: #ffffff;
-    border-radius: 8px;
-    margin-bottom: 2rem;
-    overflow: visible;
-  }
-
-  .pdf-bg-canvas{
-    position: absolute;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    border-radius: 8px;
-    pointer-events: none;
-    z-index: 1;
-  }
-
-  .pdf-text-layer{
-    position: absolute;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    z-index: 10;
-    pointer-events: auto;
-  }
-
-  /* Live In-Place Editable Line Block */
-  .editable-pdf-line{
-    position: absolute;
-    color: #111827;
-    background: transparent;
-    border-radius: 3px;
-    padding: 1px 3px;
-    margin-left: -3px;
-    margin-top: -1px;
-    line-height: 1.15;
-    outline: none;
-    cursor: text;
-    white-space: pre-wrap;
-    word-break: break-word;
-    border: 1px solid transparent;
-    transition: background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
-  }
-
-  .editable-pdf-line:hover{
-    background: rgba(238, 242, 255, 0.85);
-    border: 1px dashed rgba(99, 102, 241, 0.6);
-    box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.15);
-  }
-
-  .editable-pdf-line:focus{
-    background: #ffffff;
-    color: #000000;
-    border: 1px solid #6366f1;
-    box-shadow: 0 4px 14px rgba(99, 102, 241, 0.25);
-    z-index: 50;
-  }
-
-  .editable-pdf-line.modified{
-    background: rgba(254, 240, 138, 0.35);
-    border-bottom: 1.5px solid #ca8a04;
-  }
-
-  /* Text mode switch buttons */
-  .workspace-tab-btn{
-    transition: all .15s ease;
-  }
-  .workspace-tab-btn.active{
-    background: rgba(168, 85, 247, 0.25);
-    color: #ffffff;
-    border-color: rgba(168, 85, 247, 0.8);
-    box-shadow: 0 0 12px rgba(168, 85, 247, 0.3);
-  }
-
-  /* Document Flow Editor */
+  /* Document Flow Editor Canvas */
   .doc-flow-editor {
     outline: none;
-    line-height: 1.7;
+    line-height: 1.8;
     color: #1e1b4b;
+    font-size: 15px;
   }
-  .doc-flow-editor h1 { font-size: 1.85rem; font-weight: 700; margin-bottom: 0.75rem; color: #0f172a; }
-  .doc-flow-editor h2 { font-size: 1.4rem; font-weight: 600; margin-top: 1rem; margin-bottom: 0.5rem; color: #1e293b; }
-  .doc-flow-editor p { margin-bottom: 0.85rem; }
+  .doc-flow-editor h1 { font-size: 1.85rem; font-weight: 700; margin-top: 1.2rem; margin-bottom: 0.75rem; color: #0f172a; }
+  .doc-flow-editor h2 { font-size: 1.35rem; font-weight: 600; margin-top: 1rem; margin-bottom: 0.5rem; color: #1e293b; }
+  .doc-flow-editor p { margin-bottom: 0.9rem; }
+  .doc-flow-editor ul { list-style-type: disc; margin-left: 1.5rem; margin-bottom: 0.9rem; }
+  .doc-flow-editor ol { list-style-type: decimal; margin-left: 1.5rem; margin-bottom: 0.9rem; }
+  .doc-flow-editor blockquote { border-left: 3px solid #cbd5e1; padding-left: 1rem; color: #64748b; font-style: italic; margin-bottom: 0.9rem; }
+
+  .page-divider-banner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 6px 12px;
+    background: #f1f5f9;
+    border-radius: 8px;
+    border: 1px dashed #cbd5e1;
+    font-size: 11px;
+    font-weight: 600;
+    color: #64748b;
+    margin: 1.8rem 0 1rem 0;
+    user-select: none;
+  }
 
   /* Custom Color picker */
   input[type=color]{
     -webkit-appearance:none; appearance:none; border:none; padding:0; background:none;
-    width:24px; height:24px; border-radius:9999px; overflow:hidden; cursor:pointer;
+    width:22px; height:22px; border-radius:9999px; overflow:hidden; cursor:pointer;
   }
   input[type=color]::-webkit-color-swatch-wrapper{ padding:0; }
   input[type=color]::-webkit-color-swatch{ border:1px solid rgba(255,255,255,0.3); border-radius:9999px; }
@@ -137,7 +81,7 @@
         <span class="font-semibold text-sm tracking-tight text-white">FliTools</span>
       </a>
       <span class="text-purple-400/40 text-xs">/</span>
-      <span class="text-xs text-purple-200 font-medium">PDF Text Workspace Editor</span>
+      <span class="text-xs text-purple-200 font-medium">PDF Document Flow Editor</span>
       <span class="hidden sm:inline bg-purple-950/80 border border-purple-400/30 text-purple-200 text-[10px] uppercase font-semibold px-2 py-0.5 rounded-full">
         100% In-Browser
       </span>
@@ -168,35 +112,35 @@
   <!-- ============ EDITING WORKSPACE TOOLBAR ============ -->
   <div id="editorToolbar" class="sticky top-0 z-40 bg-[#12052b]/95 border-b border-purple-900/40 backdrop-blur-md px-4 py-2 flex items-center justify-between gap-3 flex-wrap shadow-md">
     
-    <!-- View Switcher -->
-    <div class="flex items-center gap-1 bg-purple-950/60 p-0.5 rounded-xl border border-purple-400/20 text-xs">
-      <button id="viewVisualBtn" class="workspace-tab-btn active px-3 py-1 rounded-lg text-purple-200 font-medium">
-        📄 Page Layout (In-Place Edit)
-      </button>
-      <button id="viewDocFlowBtn" class="workspace-tab-btn px-3 py-1 rounded-lg text-purple-200 font-medium">
-        📝 Document Flow Editor
-      </button>
-    </div>
+    <!-- Rich Text Tools -->
+    <div class="flex items-center gap-1.5 flex-wrap text-xs">
+      
+      <!-- Headings / Paragraph selector -->
+      <select id="headingSelect" class="bg-purple-950/60 border border-purple-400/20 text-purple-100 rounded-lg px-2.5 py-1 text-xs outline-none cursor-pointer">
+        <option value="p" class="bg-[#1a0836]">Paragraph</option>
+        <option value="h1" class="bg-[#1a0836]">Heading 1</option>
+        <option value="h2" class="bg-[#1a0836]">Heading 2</option>
+      </select>
 
-    <!-- Formatting Tools -->
-    <div class="flex items-center gap-2 flex-wrap text-xs">
-      <!-- Add New Text Paragraph -->
-      <button id="addNewTextBtn" class="bg-purple-900/40 hover:bg-purple-800/60 border border-purple-400/20 text-purple-200 px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-colors cursor-pointer" title="Click to add new text paragraph to active page">
-        <span>+ Add Text Block</span>
-      </button>
+      <!-- Bold, Italic, Underline, Strikethrough -->
+      <div class="flex items-center border border-purple-400/20 rounded-lg overflow-hidden bg-purple-950/40">
+        <button id="boldBtn" class="px-2.5 py-1 font-bold hover:bg-purple-800/50 transition-colors" title="Bold (Ctrl+B)">B</button>
+        <button id="italicBtn" class="px-2.5 py-1 italic font-serif hover:bg-purple-800/50 border-l border-purple-400/20 transition-colors" title="Italic (Ctrl+I)">I</button>
+        <button id="underlineBtn" class="px-2.5 py-1 underline hover:bg-purple-800/50 border-l border-purple-400/20 transition-colors" title="Underline (Ctrl+U)">U</button>
+        <button id="strikeBtn" class="px-2.5 py-1 line-through hover:bg-purple-800/50 border-l border-purple-400/20 transition-colors" title="Strikethrough">S</button>
+      </div>
 
-      <!-- Font Size -->
-      <div class="flex items-center gap-1.5 bg-purple-950/40 border border-purple-400/20 px-2.5 py-1 rounded-lg">
-        <span class="text-purple-300/70 text-[11px]">Size:</span>
-        <select id="fontSizeSelect" class="bg-transparent text-purple-100 outline-none text-xs cursor-pointer">
-          <option value="12" class="bg-[#1a0836]">12 px</option>
-          <option value="14" class="bg-[#1a0836]">14 px</option>
-          <option value="16" selected class="bg-[#1a0836]">16 px</option>
-          <option value="18" class="bg-[#1a0836]">18 px</option>
-          <option value="22" class="bg-[#1a0836]">22 px</option>
-          <option value="26" class="bg-[#1a0836]">26 px</option>
-          <option value="32" class="bg-[#1a0836]">32 px</option>
-        </select>
+      <!-- Lists -->
+      <div class="flex items-center border border-purple-400/20 rounded-lg overflow-hidden bg-purple-950/40">
+        <button id="bulletListBtn" class="px-2.5 py-1 hover:bg-purple-800/50 transition-colors" title="Bullet List">• List</button>
+        <button id="numberListBtn" class="px-2.5 py-1 hover:bg-purple-800/50 border-l border-purple-400/20 transition-colors" title="Numbered List">1. List</button>
+      </div>
+
+      <!-- Alignment -->
+      <div class="flex items-center border border-purple-400/20 rounded-lg overflow-hidden bg-purple-950/40">
+        <button id="alignLeftBtn" class="px-2.5 py-1 hover:bg-purple-800/50 transition-colors" title="Align Left">Left</button>
+        <button id="alignCenterBtn" class="px-2.5 py-1 hover:bg-purple-800/50 border-l border-purple-400/20 transition-colors" title="Align Center">Center</button>
+        <button id="alignRightBtn" class="px-2.5 py-1 hover:bg-purple-800/50 border-l border-purple-400/20 transition-colors" title="Align Right">Right</button>
       </div>
 
       <!-- Text Color Picker -->
@@ -205,28 +149,22 @@
         <input id="textColorPicker" type="color" value="#000000" title="Selected Text Color">
       </div>
 
-      <!-- Quick Formatting (Bold, Italic) -->
-      <div class="flex items-center border border-purple-400/20 rounded-lg overflow-hidden bg-purple-950/40">
-        <button id="boldBtn" class="px-2.5 py-1 font-bold hover:bg-purple-800/50 transition-colors" title="Bold">B</button>
-        <button id="italicBtn" class="px-2.5 py-1 italic font-serif hover:bg-purple-800/50 border-l border-purple-400/20 transition-colors" title="Italic">I</button>
-      </div>
-
-      <!-- Whiteout Overlay Button -->
-      <button id="addWhiteoutBtn" class="bg-purple-900/40 hover:bg-purple-800/60 border border-purple-400/20 text-purple-200 px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-colors cursor-pointer" title="Add blank whiteout to erase/cover graphics or headers">
-        <span>⬜ Whiteout Eraser</span>
+      <!-- Insert Page Break -->
+      <button id="insertPageBreakBtn" class="bg-purple-900/40 hover:bg-purple-800/60 border border-purple-400/20 text-purple-200 px-3 py-1 rounded-lg transition-colors cursor-pointer text-xs" title="Insert a page break at cursor position">
+        + Page Break
       </button>
 
-      <!-- Reset Edits on Active Page -->
-      <button id="resetPageEditsBtn" class="text-purple-300/60 hover:text-purple-200 px-2 py-1 text-xs transition-colors" title="Revert edits on this page">
-        Revert Page
+      <!-- Clear Document formatting -->
+      <button id="clearFormatBtn" class="text-purple-300/60 hover:text-purple-200 px-2 py-1 text-xs transition-colors" title="Clear Formatting">
+        Clear Format
       </button>
     </div>
 
     <!-- Status / Stats -->
     <div id="statsBadge" class="hidden md:flex items-center gap-2 text-[11px] text-purple-300/70 font-mono">
-      <span id="pageCountStat">0 pages</span>
+      <span id="wordCountStat">0 words</span>
       <span>•</span>
-      <span id="lineCountStat">0 text lines parsed</span>
+      <span id="charCountStat">0 characters</span>
     </div>
   </div>
 
@@ -246,10 +184,10 @@
       </div>
 
       <h1 class="text-2xl md:text-3xl font-light tracking-tight text-white mb-3">
-        Direct In-Place PDF Text Editor
+        PDF Document Flow Editor
       </h1>
       <p class="text-xs md:text-sm text-purple-200/70 max-w-lg mb-8 leading-relaxed">
-        Drop any PDF below. The workspace converts every word and sentence of the original PDF into editable text on the page so you can click, delete, and rewrite directly.
+        Drop any PDF below. The workspace extracts and formats all original text from your PDF into a full rich document editor so you can edit, rewrite, type more paragraphs, and export.
       </p>
 
       <div id="dropZone" class="drop-zone w-full p-10 md:p-14 rounded-3xl border-2 border-dashed border-purple-400/40 hover:border-purple-300 bg-purple-950/30 backdrop-blur-md cursor-pointer flex flex-col items-center justify-center transition-all shadow-2xl">
@@ -267,37 +205,25 @@
 
       <div class="flex items-center gap-6 mt-8 text-xs text-purple-300/70">
         <span class="flex items-center gap-1.5">🔒 100% Client-Side</span>
-        <span class="flex items-center gap-1.5">✏️ In-Place Text Editing</span>
-        <span class="flex items-center gap-1.5">⚡ High-Res Vector Export</span>
+        <span class="flex items-center gap-1.5">📝 Full Document Flow Editor</span>
+        <span class="flex items-center gap-1.5">⚡ Instant Vector PDF Export</span>
       </div>
     </div>
 
-    <!-- Active Workspace (Visible after PDF loaded) -->
-    <div id="workspaceContainer" class="hidden max-w-5xl mx-auto w-full flex flex-col items-center">
+    <!-- Active Document Flow Workspace (Visible after PDF loaded) -->
+    <div id="workspaceContainer" class="hidden max-w-4xl mx-auto w-full flex flex-col items-center">
       
       <!-- Informational guidance alert -->
       <div class="w-full bg-gradient-to-r from-purple-950/80 via-purple-900/60 to-purple-950/80 border border-purple-300/20 rounded-2xl p-3.5 mb-6 flex items-center justify-between text-xs text-purple-200">
         <div class="flex items-center gap-2.5">
           <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-          <span><b>Original Text Unlocked:</b> Click directly on any text line or word below to edit, delete, or rewrite.</span>
+          <span><b>Original PDF Text Loaded:</b> Edit sentences, add new headings or paragraphs anywhere in the document, and click Save / Export PDF when finished.</span>
         </div>
-        <button id="addPageBtn" class="bg-purple-900/60 hover:bg-purple-800/80 border border-purple-300/20 text-purple-200 px-3 py-1 rounded-lg transition-colors cursor-pointer text-xs">
-          + Add Blank Page
-        </button>
       </div>
 
-      <!-- Mode 1: Visual In-Place Pages Stack -->
-      <div id="visualPagesStack" class="w-full flex flex-col items-center">
-        <!-- Rendered PDF Pages with in-place text containers are appended here -->
-      </div>
-
-      <!-- Mode 2: Word-like Document Flow Workspace -->
-      <div id="docFlowContainer" class="hidden w-full max-w-3xl bg-white text-slate-900 rounded-2xl shadow-2xl p-8 md:p-12 mb-12">
-        <div class="border-b border-slate-200 pb-3 mb-4 flex items-center justify-between">
-          <span class="text-xs font-semibold uppercase tracking-wider text-slate-500">Document Flow Content (All Pages Combined)</span>
-          <span class="text-xs text-slate-400">Edits sync back to PDF export</span>
-        </div>
-        <div id="docFlowEditor" contenteditable="true" class="doc-flow-editor min-h-[500px]"></div>
+      <!-- Word-like Document Flow Paper Sheet -->
+      <div class="w-full bg-white text-slate-900 rounded-2xl shadow-2xl p-8 md:p-14 mb-12 border border-purple-300/10">
+        <div id="docFlowEditor" contenteditable="true" class="doc-flow-editor min-h-[600px]" spellcheck="false"></div>
       </div>
     </div>
 
@@ -312,7 +238,7 @@
         </svg>
       </div>
       <h3 class="text-lg font-medium text-white">Rendering Modified PDF</h3>
-      <p id="exportProgressLabel" class="text-xs text-purple-200/70">Rebuilding text and layout geometry…</p>
+      <p id="exportProgressLabel" class="text-xs text-purple-200/70">Building pages and vector typography…</p>
       <div class="w-full h-2 bg-purple-950 rounded-full overflow-hidden border border-purple-400/20">
         <div id="exportProgressBar" class="h-full bg-gradient-to-r from-purple-500 to-indigo-500 transition-all duration-150" style="width: 0%;"></div>
       </div>
@@ -332,451 +258,163 @@
   const fileInput = document.getElementById('fileInput');
   const uploadHero = document.getElementById('uploadHero');
   const workspaceContainer = document.getElementById('workspaceContainer');
-  const visualPagesStack = document.getElementById('visualPagesStack');
-  const docFlowContainer = document.getElementById('docFlowContainer');
   const docFlowEditor = document.getElementById('docFlowEditor');
-  const viewVisualBtn = document.getElementById('viewVisualBtn');
-  const viewDocFlowBtn = document.getElementById('viewDocFlowBtn');
   const exportPdfBtn = document.getElementById('exportPdfBtn');
   const navOpenBtn = document.getElementById('navOpenBtn');
-  const addNewTextBtn = document.getElementById('addNewTextBtn');
-  const addWhiteoutBtn = document.getElementById('addWhiteoutBtn');
-  const addPageBtn = document.getElementById('addPageBtn');
-  const resetPageEditsBtn = document.getElementById('resetPageEditsBtn');
-  const fontSizeSelect = document.getElementById('fontSizeSelect');
-  const textColorPicker = document.getElementById('textColorPicker');
+
+  const headingSelect = document.getElementById('headingSelect');
   const boldBtn = document.getElementById('boldBtn');
   const italicBtn = document.getElementById('italicBtn');
+  const underlineBtn = document.getElementById('underlineBtn');
+  const strikeBtn = document.getElementById('strikeBtn');
+  const bulletListBtn = document.getElementById('bulletListBtn');
+  const numberListBtn = document.getElementById('numberListBtn');
+  const alignLeftBtn = document.getElementById('alignLeftBtn');
+  const alignCenterBtn = document.getElementById('alignCenterBtn');
+  const alignRightBtn = document.getElementById('alignRightBtn');
+  const textColorPicker = document.getElementById('textColorPicker');
+  const insertPageBreakBtn = document.getElementById('insertPageBreakBtn');
+  const clearFormatBtn = document.getElementById('clearFormatBtn');
+
   const statsBadge = document.getElementById('statsBadge');
-  const pageCountStat = document.getElementById('pageCountStat');
-  const lineCountStat = document.getElementById('lineCountStat');
+  const wordCountStat = document.getElementById('wordCountStat');
+  const charCountStat = document.getElementById('charCountStat');
   const exportProgressModal = document.getElementById('exportProgressModal');
   const exportProgressBar = document.getElementById('exportProgressBar');
   const exportProgressLabel = document.getElementById('exportProgressLabel');
 
-  let pdfDoc = null;
-  let parsedPages = [];
-  // Each page schema:
-  // {
-  //   pageNumber: number,
-  //   widthPt: number,
-  //   heightPt: number,
-  //   scale: number,
-  //   lines: [ { id, text, originalText, x, y, width, height, fontSize, fontName, color, bold, italic, modified } ],
-  //   whiteouts: [ { id, x, y, width, height } ],
-  //   bgDataUrl: string
-  // }
-  let activeView = 'visual'; // 'visual' | 'docflow'
-  let activePageIdx = 0;
-  let currentSelectionLine = null;
+  let originalFileName = 'document';
 
-  // View Switching
-  viewVisualBtn.addEventListener('click', () => {
-    activeView = 'visual';
-    viewVisualBtn.classList.add('active');
-    viewDocFlowBtn.classList.remove('active');
-    visualPagesStack.classList.remove('hidden');
-    docFlowContainer.classList.add('hidden');
-  });
-
-  viewDocFlowBtn.addEventListener('click', () => {
-    activeView = 'docflow';
-    viewDocFlowBtn.classList.add('active');
-    viewVisualBtn.classList.remove('active');
-    visualPagesStack.classList.add('hidden');
-    docFlowContainer.classList.remove('hidden');
-    syncToDocFlow();
-  });
-
-  // Group raw glyphs into coherent sentences/lines by geometric proximity
-  function groupTextItemsIntoLines(items, viewport) {
-    if (!items || items.length === 0) return [];
+  // Group raw glyphs into coherent paragraphs & headings
+  function parseTextContentToHtml(items, viewport) {
+    if (!items || items.length === 0) return '<p></p>';
     
-    // Convert PDF coordinates to viewport pixel space
-    const transformed = items.filter(it => it.str && it.str.trim().length > 0).map(it => {
+    // Sort glyphs primarily by Y (top to bottom) and secondarily by X (left to right)
+    const glyphs = items.filter(it => it.str && it.str.trim().length > 0).map(it => {
       const tx = pdfjsLib.Util.transform(viewport.transform, it.transform);
       const fontHeight = Math.sqrt((tx[2] * tx[2]) + (tx[3] * tx[3])) || 14;
-      const x = tx[4];
-      const y = tx[5] - fontHeight;
       return {
         text: it.str,
-        x: x,
-        y: y,
-        width: it.width * (viewport.scale || 1.5),
-        height: fontHeight,
-        fontSize: Math.round(fontHeight),
-        fontName: it.fontName || 'sans-serif'
+        x: tx[4],
+        y: tx[5] - fontHeight,
+        fontHeight: Math.round(fontHeight)
       };
     });
 
-    // Cluster glyphs into lines by Y-position
-    transformed.sort((a, b) => a.y - b.y || a.x - b.x);
+    glyphs.sort((a, b) => a.y - b.y || a.x - b.x);
+
+    // Group into horizontal lines
     const lines = [];
     const Y_TOLERANCE = 6;
 
-    transformed.forEach(item => {
-      let line = lines.find(l => Math.abs(l.y - item.y) <= Y_TOLERANCE);
+    glyphs.forEach(g => {
+      let line = lines.find(l => Math.abs(l.y - g.y) <= Y_TOLERANCE);
       if (!line) {
         line = {
-          id: 'line_' + Math.random().toString(36).substr(2, 9),
-          text: item.text,
-          originalText: item.text,
-          x: item.x,
-          y: item.y,
-          width: item.width,
-          height: item.height,
-          fontSize: item.fontSize,
-          fontName: item.fontName,
-          color: '#111827',
-          bold: false,
-          italic: false,
-          modified: false
+          y: g.y,
+          fontHeight: g.fontHeight,
+          text: g.text
         };
         lines.push(line);
       } else {
-        // Append horizontally
-        line.text += ' ' + item.text;
-        line.originalText = line.text;
-        line.width += item.width + 8;
-        line.height = Math.max(line.height, item.height);
+        line.text += ' ' + g.text;
+        line.fontHeight = Math.max(line.fontHeight, g.fontHeight);
       }
     });
 
-    return lines;
+    lines.sort((a, b) => a.y - b.y);
+
+    let html = '';
+    lines.forEach(l => {
+      const clean = l.text.replace(/&/g, '&').replace(/</g, '<').replace(/>/g, '>').trim();
+      if (!clean) return;
+      if (l.fontHeight >= 22) {
+        html += `<h1>${clean}</h1>`;
+      } else if (l.fontHeight >= 17) {
+        html += `<h2>${clean}</h2>`;
+      } else {
+        html += `<p>${clean}</p>`;
+      }
+    });
+
+    return html || '<p></p>';
   }
 
   // Load and Parse PDF
   async function loadPdfFile(file) {
     try {
+      originalFileName = file.name.replace(/\.pdf$/i, '');
       const buf = await file.arrayBuffer();
-      pdfDoc = await pdfjsLib.getDocument({ data: buf }).promise;
-      parsedPages = [];
-      const RENDER_SCALE = 1.5;
+      const pdfDoc = await pdfjsLib.getDocument({ data: buf }).promise;
+      let fullDocumentHtml = '';
 
       for (let i = 1; i <= pdfDoc.numPages; i++) {
         const page = await pdfDoc.getPage(i);
-        const viewport = page.getViewport({ scale: RENDER_SCALE });
+        const viewport = page.getViewport({ scale: 1.5 });
         const textContent = await page.getTextContent();
+        const pageHtml = parseTextContentToHtml(textContent.items, viewport);
 
-        // Render clean background canvas without original text artifacts
-        const canvas = document.createElement('canvas');
-        canvas.width = viewport.width;
-        canvas.height = viewport.height;
-        const ctx = canvas.getContext('2d');
-        await page.render({ canvasContext: ctx, viewport }).promise;
-
-        const lines = groupTextItemsIntoLines(textContent.items, viewport);
-
-        // Blank out original text zones on background canvas so newly edited text has zero ghosting
-        lines.forEach(l => {
-          ctx.fillStyle = '#ffffff';
-          ctx.fillRect(l.x - 2, l.y - 1, l.width + 6, l.height + 4);
-        });
-
-        parsedPages.push({
-          pageNumber: i,
-          widthPt: viewport.width / RENDER_SCALE,
-          heightPt: viewport.height / RENDER_SCALE,
-          scale: RENDER_SCALE,
-          lines: lines,
-          whiteouts: [],
-          bgDataUrl: canvas.toDataURL('image/png')
-        });
+        if (i > 1) {
+          fullDocumentHtml += `<div class="page-divider-banner" contenteditable="false"><span>PAGE ${i}</span><span>--- Page Break ---</span></div>`;
+        }
+        fullDocumentHtml += pageHtml;
       }
 
+      docFlowEditor.innerHTML = fullDocumentHtml;
       uploadHero.classList.add('hidden');
       workspaceContainer.classList.remove('hidden');
       exportPdfBtn.disabled = false;
       statsBadge.classList.remove('hidden');
       updateStats();
-      renderVisualWorkspace();
     } catch (err) {
       console.error(err);
-      alert('Could not read PDF: ' + err.message);
+      alert('Could not parse PDF text: ' + err.message);
     }
   }
 
   function updateStats() {
-    pageCountStat.textContent = parsedPages.length + ' page' + (parsedPages.length === 1 ? '' : 's');
-    const totalLines = parsedPages.reduce((acc, p) => acc + p.lines.length, 0);
-    lineCountStat.textContent = totalLines + ' text lines parsed';
+    const text = docFlowEditor.innerText || '';
+    const words = text.trim().length ? text.trim().split(/\s+/).length : 0;
+    const chars = text.length;
+    wordCountStat.textContent = words + ' word' + (words === 1 ? '' : 's');
+    charCountStat.textContent = chars + ' character' + (chars === 1 ? '' : 's');
   }
 
-  // Render Visual In-Place Pages
-  function renderVisualWorkspace() {
-    visualPagesStack.innerHTML = '';
+  docFlowEditor.addEventListener('input', updateStats);
 
-    parsedPages.forEach((page, pageIdx) => {
-      const pageWrapper = document.createElement('div');
-      pageWrapper.className = 'pdf-page-container';
-      pageWrapper.style.width = (page.widthPt * page.scale) + 'px';
-      pageWrapper.style.height = (page.heightPt * page.scale) + 'px';
-
-      // Page Header Pill
-      const pageHeader = document.createElement('div');
-      pageHeader.className = 'absolute -top-7 left-0 right-0 flex items-center justify-between text-[11px] text-purple-300/70 font-mono px-1';
-      pageHeader.innerHTML = `
-        <span>Page ${page.pageNumber}</span>
-        <button class="hover:text-red-400 cursor-pointer" onclick="deletePage(${pageIdx})">Delete Page</button>
-      `;
-      pageWrapper.appendChild(pageHeader);
-
-      // Background Canvas Image
-      const bgImg = document.createElement('img');
-      bgImg.src = page.bgDataUrl;
-      bgImg.className = 'pdf-bg-canvas';
-      pageWrapper.appendChild(bgImg);
-
-      // Interactive Text & Whiteout Overlay Layer
-      const textLayer = document.createElement('div');
-      textLayer.className = 'pdf-text-layer';
-      textLayer.dataset.pageIdx = pageIdx;
-
-      // Render Whiteouts
-      page.whiteouts.forEach((w, wIdx) => {
-        const whiteoutEl = document.createElement('div');
-        whiteoutEl.className = 'absolute bg-white border border-dashed border-slate-300 cursor-move';
-        whiteoutEl.style.left = w.x + 'px';
-        whiteoutEl.style.top = w.y + 'px';
-        whiteoutEl.style.width = w.width + 'px';
-        whiteoutEl.style.height = w.height + 'px';
-        whiteoutEl.title = 'Whiteout Box (Right-click to remove)';
-        whiteoutEl.oncontextmenu = (e) => {
-          e.preventDefault();
-          page.whiteouts.splice(wIdx, 1);
-          renderVisualWorkspace();
-        };
-        textLayer.appendChild(whiteoutEl);
-      });
-
-      // Render Editable Lines
-      page.lines.forEach((line) => {
-        const lineEl = document.createElement('div');
-        lineEl.className = 'editable-pdf-line' + (line.modified ? ' modified' : '');
-        lineEl.contentEditable = 'true';
-        lineEl.spellcheck = false;
-        lineEl.innerText = line.text;
-        lineEl.style.left = line.x + 'px';
-        lineEl.style.top = line.y + 'px';
-        lineEl.style.fontSize = line.fontSize + 'px';
-        lineEl.style.color = line.color;
-        lineEl.style.fontWeight = line.bold ? 'bold' : 'normal';
-        lineEl.style.fontStyle = line.italic ? 'italic' : 'normal';
-
-        // Track live edits to text
-        lineEl.oninput = () => {
-          line.text = lineEl.innerText;
-          line.modified = line.text !== line.originalText;
-          lineEl.classList.toggle('modified', line.modified);
-        };
-
-        lineEl.onfocus = () => {
-          activePageIdx = pageIdx;
-          currentSelectionLine = line;
-          fontSizeSelect.value = String(line.fontSize || 16);
-          textColorPicker.value = line.color || '#000000';
-        };
-
-        textLayer.appendChild(lineEl);
-      });
-
-      // Click on blank area to add new text line at click position
-      textLayer.addEventListener('click', (e) => {
-        if (e.target !== textLayer) return;
-        const rect = textLayer.getBoundingClientRect();
-        const clickX = e.clientX - rect.left;
-        const clickY = e.clientY - rect.top;
-
-        const newLine = {
-          id: 'line_' + Math.random().toString(36).substr(2, 9),
-          text: 'Type new text here...',
-          originalText: '',
-          x: Math.max(10, clickX),
-          y: Math.max(10, clickY),
-          width: 180,
-          height: parseInt(fontSizeSelect.value, 10) || 16,
-          fontSize: parseInt(fontSizeSelect.value, 10) || 16,
-          fontName: 'sans-serif',
-          color: textColorPicker.value || '#000000',
-          bold: false,
-          italic: false,
-          modified: true
-        };
-
-        page.lines.push(newLine);
-        renderVisualWorkspace();
-      });
-
-      pageWrapper.appendChild(textLayer);
-      visualPagesStack.appendChild(pageWrapper);
-    });
+  // Formatting commands
+  function formatDoc(cmd, value = null) {
+    document.execCommand(cmd, false, value);
+    docFlowEditor.focus();
   }
 
-  // Delete Page Helper
-  window.deletePage = function(idx) {
-    if (parsedPages.length <= 1) {
-      alert('Document must have at least one page.');
-      return;
-    }
-    parsedPages.splice(idx, 1);
-    parsedPages.forEach((p, i) => p.pageNumber = i + 1);
-    updateStats();
-    renderVisualWorkspace();
-  };
-
-  // Sync to Document Flow view
-  function syncToDocFlow() {
-    let combinedHtml = '';
-    parsedPages.forEach((p) => {
-      combinedHtml += `<h2 class="text-xs uppercase font-bold text-slate-400 border-b border-slate-200 pb-1 mb-3">--- Page ${p.pageNumber} ---</h2>`;
-      p.lines.forEach(line => {
-        const isHeading = line.fontSize >= 20;
-        if (isHeading) {
-          combinedHtml += `<h1 data-line-id="${line.id}">${line.text}</h1>`;
-        } else {
-          combinedHtml += `<p data-line-id="${line.id}">${line.text}</p>`;
-        }
-      });
-      combinedHtml += '<br/>';
-    });
-    docFlowEditor.innerHTML = combinedHtml;
-  }
-
-  // Sync back from Document Flow view
-  docFlowEditor.addEventListener('input', () => {
-    const nodes = docFlowEditor.querySelectorAll('[data-line-id]');
-    nodes.forEach(node => {
-      const lineId = node.dataset.lineId;
-      parsedPages.forEach(p => {
-        const line = p.lines.find(l => l.id === lineId);
-        if (line) {
-          line.text = node.innerText;
-          line.modified = line.text !== line.originalText;
-        }
-      });
-    });
+  headingSelect.addEventListener('change', () => {
+    const val = headingSelect.value;
+    if (val === 'h1') formatDoc('formatBlock', '<h1>');
+    else if (val === 'h2') formatDoc('formatBlock', '<h2>');
+    else formatDoc('formatBlock', '<p>');
+    headingSelect.value = 'p';
   });
 
-  // Toolbar actions
-  addNewTextBtn.addEventListener('click', () => {
-    if (!parsedPages[activePageIdx]) return;
-    const p = parsedPages[activePageIdx];
-    p.lines.push({
-      id: 'line_' + Math.random().toString(36).substr(2, 9),
-      text: 'New Paragraph Text',
-      originalText: '',
-      x: 50,
-      y: 60,
-      width: 200,
-      height: 18,
-      fontSize: parseInt(fontSizeSelect.value, 10) || 16,
-      fontName: 'sans-serif',
-      color: textColorPicker.value || '#000000',
-      bold: false,
-      italic: false,
-      modified: true
-    });
-    renderVisualWorkspace();
-  });
-
-  addWhiteoutBtn.addEventListener('click', () => {
-    if (!parsedPages[activePageIdx]) return;
-    const p = parsedPages[activePageIdx];
-    p.whiteouts.push({
-      id: 'w_' + Math.random().toString(36).substr(2, 9),
-      x: 40,
-      y: 40,
-      width: 240,
-      height: 40
-    });
-    renderVisualWorkspace();
-  });
-
-  addPageBtn.addEventListener('click', () => {
-    const lastPage = parsedPages[parsedPages.length - 1];
-    const widthPt = lastPage ? lastPage.widthPt : 595.28;
-    const heightPt = lastPage ? lastPage.heightPt : 841.89;
-    const scale = lastPage ? lastPage.scale : 1.5;
-
-    const blankCanvas = document.createElement('canvas');
-    blankCanvas.width = widthPt * scale;
-    blankCanvas.height = heightPt * scale;
-    const ctx = blankCanvas.getContext('2d');
-    ctx.fillStyle = '#ffffff';
-    ctx.fillRect(0, 0, blankCanvas.width, blankCanvas.height);
-
-    parsedPages.push({
-      pageNumber: parsedPages.length + 1,
-      widthPt: widthPt,
-      heightPt: heightPt,
-      scale: scale,
-      lines: [
-        {
-          id: 'line_' + Math.random().toString(36).substr(2, 9),
-          text: 'Blank Page Header',
-          originalText: '',
-          x: 40,
-          y: 50,
-          width: 200,
-          height: 24,
-          fontSize: 22,
-          fontName: 'sans-serif',
-          color: '#111827',
-          bold: true,
-          italic: false,
-          modified: true
-        }
-      ],
-      whiteouts: [],
-      bgDataUrl: blankCanvas.toDataURL('image/png')
-    });
-
-    updateStats();
-    renderVisualWorkspace();
-  });
-
-  resetPageEditsBtn.addEventListener('click', () => {
-    if (!parsedPages[activePageIdx]) return;
-    const p = parsedPages[activePageIdx];
-    p.lines.forEach(l => {
-      l.text = l.originalText;
-      l.modified = false;
-    });
-    p.whiteouts = [];
-    renderVisualWorkspace();
-  });
-
-  // Formatting changes on active selected line
-  fontSizeSelect.addEventListener('change', () => {
-    if (currentSelectionLine) {
-      currentSelectionLine.fontSize = parseInt(fontSizeSelect.value, 10);
-      currentSelectionLine.modified = true;
-      renderVisualWorkspace();
-    }
-  });
+  boldBtn.addEventListener('click', () => formatDoc('bold'));
+  italicBtn.addEventListener('click', () => formatDoc('italic'));
+  underlineBtn.addEventListener('click', () => formatDoc('underline'));
+  strikeBtn.addEventListener('click', () => formatDoc('strikeThrough'));
+  bulletListBtn.addEventListener('click', () => formatDoc('insertUnorderedList'));
+  numberListBtn.addEventListener('click', () => formatDoc('insertOrderedList'));
+  alignLeftBtn.addEventListener('click', () => formatDoc('justifyLeft'));
+  alignCenterBtn.addEventListener('click', () => formatDoc('justifyCenter'));
+  alignRightBtn.addEventListener('click', () => formatDoc('justifyRight'));
+  clearFormatBtn.addEventListener('click', () => formatDoc('removeFormat'));
 
   textColorPicker.addEventListener('input', () => {
-    if (currentSelectionLine) {
-      currentSelectionLine.color = textColorPicker.value;
-      currentSelectionLine.modified = true;
-      renderVisualWorkspace();
-    }
+    formatDoc('foreColor', textColorPicker.value);
   });
 
-  boldBtn.addEventListener('click', () => {
-    if (currentSelectionLine) {
-      currentSelectionLine.bold = !currentSelectionLine.bold;
-      currentSelectionLine.modified = true;
-      renderVisualWorkspace();
-    }
-  });
-
-  italicBtn.addEventListener('click', () => {
-    if (currentSelectionLine) {
-      currentSelectionLine.italic = !currentSelectionLine.italic;
-      currentSelectionLine.modified = true;
-      renderVisualWorkspace();
-    }
+  insertPageBreakBtn.addEventListener('click', () => {
+    const divider = `<div class="page-divider-banner" contenteditable="false"><span>PAGE BREAK</span><span>--- Page Break ---</span></div><p></p>`;
+    document.execCommand('insertHTML', false, divider);
+    docFlowEditor.focus();
   });
 
   // Dropzone Events
@@ -806,83 +444,95 @@
     }
   });
 
-  // Export Modified PDF with exact vectors & typography
+  // Export Document Flow to high quality vector PDF
   exportPdfBtn.addEventListener('click', async () => {
-    if (!parsedPages.length || !window.jspdf) return;
+    if (!window.jspdf) return;
 
     exportProgressModal.classList.remove('hidden');
-    exportProgressBar.style.width = '0%';
-    exportProgressLabel.textContent = 'Rendering modified pages…';
+    exportProgressBar.style.width = '20%';
+    exportProgressLabel.textContent = 'Formatting document pages…';
 
     try {
       const { jsPDF } = window.jspdf;
-      let doc = null;
-      const PX_TO_PT = 0.75;
+      const doc = new jsPDF({ unit: 'pt', format: 'a4' });
+      const margin = 48;
+      const pageWidth = doc.internal.pageSize.getWidth();
+      const pageHeight = doc.internal.pageSize.getHeight();
+      const usableWidth = pageWidth - margin * 2;
+      let currentY = margin;
 
-      for (let i = 0; i < parsedPages.length; i++) {
-        const page = parsedPages[i];
-        const wPt = page.widthPt;
-        const hPt = page.heightPt;
+      exportProgressBar.style.width = '45%';
 
-        if (!doc) {
-          doc = new jsPDF({ unit: 'pt', format: [wPt, hPt] });
-        } else {
-          doc.addPage([wPt, hPt]);
+      // Iterate through child nodes of docFlowEditor
+      const childNodes = Array.from(docFlowEditor.children);
+
+      childNodes.forEach((node) => {
+        if (node.classList && node.classList.contains('page-divider-banner')) {
+          doc.addPage();
+          currentY = margin;
+          return;
         }
 
-        // Render Base Canvas with whiteouts
-        const renderCanvas = document.createElement('canvas');
-        renderCanvas.width = wPt * 2.0;
-        renderCanvas.height = hPt * 2.0;
-        const ctx = renderCanvas.getContext('2d');
+        const tag = node.tagName ? node.tagName.toLowerCase() : 'p';
+        const text = node.innerText ? node.innerText.trim() : '';
+        if (!text) return;
 
-        // Draw clean base background
-        const bgImg = new Image();
-        await new Promise(r => {
-          bgImg.onload = () => {
-            ctx.drawImage(bgImg, 0, 0, renderCanvas.width, renderCanvas.height);
-            r();
-          };
-          bgImg.src = page.bgDataUrl;
+        let fontSize = 11;
+        let fontStyle = 'normal';
+        let lineSpacing = 16;
+        let topGap = 6;
+        let bottomGap = 6;
+
+        if (tag === 'h1') {
+          fontSize = 18;
+          fontStyle = 'bold';
+          lineSpacing = 24;
+          topGap = 14;
+          bottomGap = 8;
+        } else if (tag === 'h2') {
+          fontSize = 14;
+          fontStyle = 'bold';
+          lineSpacing = 20;
+          topGap = 10;
+          bottomGap = 6;
+        } else if (tag === 'blockquote') {
+          fontSize = 10.5;
+          fontStyle = 'italic';
+          lineSpacing = 15;
+        }
+
+        doc.setFont('helvetica', fontStyle);
+        doc.setFontSize(fontSize);
+        doc.setTextColor(20, 20, 20);
+
+        const wrappedLines = doc.splitTextToSize(text, usableWidth);
+        const blockHeight = (wrappedLines.length * lineSpacing) + topGap + bottomGap;
+
+        if (currentY + blockHeight > pageHeight - margin) {
+          doc.addPage();
+          currentY = margin;
+        }
+
+        currentY += topGap;
+        wrappedLines.forEach((line) => {
+          doc.text(line, margin, currentY);
+          currentY += lineSpacing;
         });
+        currentY += bottomGap;
+      });
 
-        // Apply whiteouts
-        const scaleMult = 2.0 / page.scale;
-        page.whiteouts.forEach(w => {
-          ctx.fillStyle = '#ffffff';
-          ctx.fillRect(w.x * scaleMult, w.y * scaleMult, w.width * scaleMult, w.height * scaleMult);
-        });
-
-        const bgData = renderCanvas.toDataURL('image/jpeg', 0.95);
-        doc.addImage(bgData, 'JPEG', 0, 0, wPt, hPt);
-
-        // Print crisp native vector typography over page
-        page.lines.forEach(line => {
-          if (!line.text || line.text.trim().length === 0) return;
-          const fontSizePt = (line.fontSize / page.scale) * PX_TO_PT * 1.33;
-          doc.setFontSize(fontSizePt);
-          doc.setTextColor(line.color || '#000000');
-          doc.setFont('helvetica', line.bold ? 'bold' : (line.italic ? 'italic' : 'normal'));
-
-          const xPt = (line.x / page.scale);
-          const yPt = (line.y / page.scale) + fontSizePt;
-          doc.text(line.text, xPt, yPt);
-        });
-
-        exportProgressBar.style.width = Math.round(((i + 1) / parsedPages.length) * 100) + '%';
-        exportProgressLabel.textContent = `Compiled Page ${i + 1} of ${parsedPages.length}…`;
-        await new Promise(r => setTimeout(r, 0));
-      }
+      exportProgressBar.style.width = '90%';
+      await new Promise(r => setTimeout(r, 200));
 
       window.open(DIRECT_LINK_URL, '_blank');
-      doc.save('edited-document.pdf');
+      doc.save(originalFileName + '-edited.pdf');
     } catch (err) {
       console.error(err);
       alert('Error generating PDF: ' + err.message);
     } finally {
       setTimeout(() => {
         exportProgressModal.classList.add('hidden');
-      }, 500);
+      }, 400);
     }
   });
 
