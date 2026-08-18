@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PDF Studio — Turn Images into a PDF</title>
+<title>Image to PDF Converter — FliTools</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -12,59 +12,21 @@
 <script>(function(s){s.dataset.zone='11579038',s.src='https://n6wxm.com/vignette.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
-  :root{
-    --ease: cubic-bezier(0.16, 1, 0.3, 1);
-  }
+  :root{ --ease: cubic-bezier(0.16, 1, 0.3, 1); }
   *{ font-family: 'Inter', sans-serif; }
-  body{ background:#fff; color:#000; }
+  body{ background:#080314; color:#ffffff; }
 
-  @keyframes fadeSlideDown{
-    from{ opacity:0; transform: translateY(-16px); }
-    to{ opacity:1; transform: translateY(0); }
-  }
-  @keyframes fadeSlideUp{
-    from{ opacity:0; transform: translateY(20px); }
-    to{ opacity:1; transform: translateY(0); }
-  }
-  @keyframes fadeScaleIn{
-    from{ opacity:0; transform: scale(1.05); }
-    to{ opacity:1; transform: scale(1); }
-  }
+  @keyframes fadeSlideDown{ from{ opacity:0; transform: translateY(-16px); } to{ opacity:1; transform: translateY(0); } }
+  @keyframes fadeSlideUp{ from{ opacity:0; transform: translateY(20px); } to{ opacity:1; transform: translateY(0); } }
   .anim-navbar{ animation: fadeSlideDown 0.8s var(--ease) both; }
-  .anim-bg{ animation: fadeScaleIn 1.8s var(--ease) both; }
-  .anim-footer{ animation: fadeSlideUp 1s var(--ease) both; animation-delay: .5s; }
-  .anim-subtitle{ animation: fadeSlideUp .8s var(--ease) both; animation-delay: .6s; }
-  .anim-heading{ animation: fadeSlideUp .8s var(--ease) both; animation-delay: .8s; }
-  .anim-buttons{ animation: fadeSlideUp .8s var(--ease) both; animation-delay: 1s; }
+  .anim-content{ animation: fadeSlideUp 0.8s var(--ease) both; }
 
-  .hero-heading{
-    font-weight:300;
-    letter-spacing:-0.03em;
-    line-height:1;
-    font-size: clamp(2rem, 8vw, 4.5rem);
-  }
-  @media (min-width:768px){
-    .hero-heading{ font-size: clamp(2.5rem, 5.5vw, 4.5rem); }
-  }
+  .drop-zone{ transition: border-color .2s ease, background-color .2s ease; }
+  .drop-zone.dragover{ border-color:#c084fc; background-color:rgba(168,85,247,0.15); }
 
-  .hero-gradient-bg{
-    background:
-      radial-gradient(circle at 20% 20%, rgba(0,0,0,0.06), transparent 45%),
-      radial-gradient(circle at 80% 30%, rgba(0,0,0,0.04), transparent 50%),
-      linear-gradient(135deg, #fafafa 0%, #f0f0f2 100%);
-  }
-  .hero-fade{
-    background: linear-gradient(to top, #ffffff 0%, rgba(255,255,255,0.85) 55%, transparent 100%);
-  }
-
-  .drop-zone{ transition: border-color .2s ease, background-color .2s ease, transform .2s ease; }
-  .drop-zone.dragover{ border-color:#000; background-color:#f1f1f4; transform: scale(1.01); }
-
-  .thumb{ position:relative; cursor:grab; transition: transform .15s ease, opacity .15s ease, box-shadow .15s ease; }
+  .thumb{ position:relative; cursor:grab; }
   .thumb:active{ cursor:grabbing; }
-  .thumb.dragging{ opacity: 0.35; transform: scale(0.95); }
-  .thumb.drag-over{ outline: 2px dashed #000; outline-offset: 2px; }
-  .thumb.active{ outline:2px solid #000; outline-offset:2px; }
+  .thumb.active{ outline:2px solid #c084fc; outline-offset:2px; }
   
   .thumb .thumb-remove{
     position:absolute; top:4px; right:4px;
@@ -73,299 +35,150 @@
     display:flex; align-items:center; justify-content:center; line-height:1;
     z-index:2; cursor:pointer;
   }
-  .thumb .thumb-remove:hover{ background: #000; }
-
-  .thumb .thumb-order{
-    position:absolute; bottom:4px; left:4px; right:4px;
-    display:flex; justify-content:space-between; gap:2px;
-    z-index:2;
-  }
-  .thumb .thumb-order button{
-    width:18px; height:18px; border-radius:9999px;
-    background:rgba(255,255,255,0.95); color:#000; font-size:10px;
-    display:flex; align-items:center; justify-content:center; line-height:1;
-    box-shadow: 0 0 0 1px rgba(0,0,0,0.15); cursor:pointer;
-  }
-  .thumb .thumb-order button:disabled{ opacity:.25; cursor:not-allowed; }
-  .thumb .thumb-order button:hover:not(:disabled){ background:#000; color:#fff; }
-
   .thumb .thumb-page{
     position:absolute; top:4px; left:4px;
     width:18px; height:18px; border-radius:9999px;
-    background:rgba(255,255,255,0.95); color:#000; font-size:10px; font-weight:600;
+    background:rgba(0,0,0,0.85); color:#c084fc; font-size:10px; font-weight:700;
     display:flex; align-items:center; justify-content:center; line-height:1;
-    box-shadow: 0 0 0 1px rgba(0,0,0,0.15);
+    border:1px solid rgba(192,132,252,0.4);
     z-index:2;
   }
 
-  input[type=range]{ accent-color:#000; }
+  select{ background:#1a0836; color:#ffffff; }
 
-  #previewWrap{ position:relative; width:100%; height:100%; display:flex; align-items:center; justify-content:center; }
-  #cropBox{
-    position:absolute; border:1.5px solid #000;
-    box-shadow: 0 0 0 9999px rgba(0,0,0,0.45);
-    display:none; touch-action:none; cursor:move;
-  }
-  .crop-handle{
-    position:absolute; width:16px; height:16px; background:#000; border:2px solid #fff;
-    border-radius:9999px; touch-action:none;
-  }
-  .crop-handle[data-handle="nw"]{ top:-9px; left:-9px; cursor:nwse-resize; }
-  .crop-handle[data-handle="ne"]{ top:-9px; right:-9px; cursor:nesw-resize; }
-  .crop-handle[data-handle="sw"]{ bottom:-9px; left:-9px; cursor:nesw-resize; }
-  .crop-handle[data-handle="se"]{ bottom:-9px; right:-9px; cursor:nwse-resize; }
-  .edit-tool-btn{
-    font-size:12px; border:1px solid rgba(0,0,0,0.15); border-radius:9999px;
-    padding:6px 14px; background:#fff; cursor:pointer;
-  }
-  .edit-tool-btn.active{ background:#000; color:#fff; }
-  .edit-tool-btn:disabled{ opacity:.3; cursor:not-allowed; }
-
-  ::-webkit-scrollbar{ width:8px; }
-  ::-webkit-scrollbar-thumb{ background:#ddd; border-radius:9999px; }
+  ::-webkit-scrollbar{ width:6px; }
+  ::-webkit-scrollbar-track{ background: rgba(15, 5, 29, 0.6); }
+  ::-webkit-scrollbar-thumb{ background: rgba(168, 85, 247, 0.4); border-radius:9999px; }
 </style>
 </head>
-<body class="min-h-screen flex flex-col">
+<body class="min-h-screen flex flex-col bg-[#080314] text-white">
 
-<!-- ============ HERO ============ -->
-<section class="relative w-full min-h-screen flex flex-col justify-between overflow-hidden">
-
-  <!-- background -->
-  <div class="anim-bg absolute inset-0 z-0 hero-gradient-bg"></div>
-
-  <!-- navbar -->
-  <nav class="anim-navbar relative z-50 flex items-center justify-between px-4 py-4 md:px-8 md:py-6" style="pointer-events:none;">
-    <div class="flex items-center gap-3 md:gap-5" style="pointer-events:auto;">
-      <!-- logo -->
-      <div class="flex items-center gap-2">
+  <!-- NAVBAR -->
+  <nav class="anim-navbar relative z-50 flex items-center justify-between px-4 py-3 md:px-8 border-b border-purple-900/40 bg-[#0d0422]/90 backdrop-blur-md">
+    <div class="flex items-center gap-3">
+      <a href="/" class="flex items-center gap-2">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-          <rect x="3" y="2" width="18" height="20" rx="2" stroke="black" stroke-width="1.6"/>
-          <path d="M8 8h5a2 2 0 010 4H8z" stroke="black" stroke-width="1.6" stroke-linejoin="round"/>
-          <line x1="8" y1="16" x2="14" y2="16" stroke="black" stroke-width="1.6" stroke-linecap="round"/>
+          <rect x="5" y="4" width="6" height="14" rx="2.5" fill="#e9d5ff" transform="rotate(-35 8 11)" />
+          <rect x="12" y="4" width="6" height="14" rx="2.5" fill="#c084fc" transform="rotate(-35 15 11)" />
         </svg>
-        <span class="hidden md:inline text-sm font-medium tracking-tight">PDF Studio</span>
-      </div>
-
-      <!-- tags pill -->
-      <div class="hidden md:flex items-center gap-3 rounded-full px-4 py-2" style="background:#F4F4F6;">
-        <span class="text-[11px] text-black/70">In-Browser</span>
-        <span class="text-[11px] text-black/70">No Uploads</span>
-      </div>
-    </div>
-
-    <div class="hidden md:flex items-center gap-3" style="pointer-events:auto;">
-      <div class="flex items-center gap-2 rounded-full pl-2 pr-4 py-1.5" style="background:#F4F4F6;">
-        <span class="flex items-center justify-center bg-black rounded-full" style="width:28px;height:28px;">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="white">
-            <rect x="2" y="2" width="7" height="7" rx="1.5"/><rect x="15" y="2" width="7" height="7" rx="1.5"/>
-            <rect x="2" y="15" width="7" height="7" rx="1.5"/><rect x="15" y="15" width="7" height="7" rx="1.5"/>
-          </svg>
-        </span>
-        <span class="text-[11px] text-black/70">100% Client-Side</span>
-      </div>
+        <span class="font-semibold text-sm tracking-tight text-white">FliTools</span>
+      </a>
+      <span class="text-purple-400/40 text-xs">/</span>
+      <span class="text-xs text-purple-200 font-medium">Image to PDF Converter</span>
+      <span class="hidden sm:inline bg-purple-950/80 border border-purple-400/30 text-purple-200 text-[10px] uppercase font-semibold px-2 py-0.5 rounded-full">
+        100% Client-Side
+      </span>
     </div>
   </nav>
 
-  <!-- footer content -->
-  <div class="anim-footer relative z-30 hero-fade px-4 pb-8 pt-12 md:px-8 md:pb-10">
-    <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-8">
-      <div>
-        <div class="anim-subtitle flex items-center gap-2 mb-4">
-          <span class="rounded-full bg-black" style="width:8px;height:8px;"></span>
-          <span class="text-[13px]" style="color:rgba(0,0,0,0.55);">Turn photos & scans into one clean PDF, right here</span>
-        </div>
-        <h1 class="anim-heading hero-heading mb-6">
-          Images In,<br/>Zero Uploads.<br/>PDF Out.
-        </h1>
-        <div class="anim-buttons flex items-center gap-3">
-          <a href="#how-it-works" class="bg-black text-white text-[13px] rounded-full px-5 py-2.5">How It Works</a>
-        </div>
-      </div>
+  <!-- TOOL -->
+  <section class="anim-content w-full max-w-6xl mx-auto px-4 md:px-8 py-8 flex-1 flex flex-col">
 
-      <div class="flex items-center gap-2 md:justify-end flex-wrap">
-        <span class="text-[11px] rounded-full px-3 py-1.5 bg-white border" style="border-color:rgba(0,0,0,0.12);">Drag & Drop</span>
-        <span class="text-[11px] rounded-full px-3 py-1.5 bg-white border" style="border-color:rgba(0,0,0,0.12);">Crop & Rotate</span>
-        <span class="text-[11px] rounded-full px-3 py-1.5 bg-white border" style="border-color:rgba(0,0,0,0.12);">Reorder Pages</span>
-      </div>
+    <div class="mb-8 border-b border-purple-900/40 pb-5">
+      <h1 class="text-2xl md:text-3xl font-light tracking-tight text-white mb-1">Convert Images to PDF</h1>
+      <p class="text-xs text-purple-200/70">Combine JPG, PNG, and WebP images into a formatted PDF with custom margins and page sizes.</p>
     </div>
-  </div>
-</section>
 
-<!-- ============ TOOL ============ -->
-<section id="tool" class="w-full max-w-6xl mx-auto px-4 md:px-8 py-16">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
 
-  <div class="mb-10">
-    <h2 class="text-2xl md:text-3xl font-light tracking-tight mb-2">Build your PDF</h2>
-    <p class="text-sm text-black/50">Upload images, crop and rotate each page, put them in order, then export — nothing ever leaves your browser.</p>
-  </div>
+      <!-- LEFT: upload + pages -->
+      <div class="flex flex-col gap-6">
+        <div class="bg-[#12052b]/90 border border-purple-300/20 rounded-2xl p-5 shadow-xl">
+          <h3 class="text-xs font-bold uppercase tracking-wider text-purple-200 mb-3">1. Upload Images</h3>
+          <div id="dropZone" class="drop-zone border-2 border-dashed border-purple-400/40 hover:border-purple-300 rounded-xl flex flex-col items-center justify-center text-center py-10 px-4 cursor-pointer bg-purple-950/30">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="mb-2 text-purple-300">
+              <path d="M12 16V4M12 4l-4 4M12 4l4 4" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <p class="text-xs font-semibold text-white">Drag & drop photos, or click to browse</p>
+            <input id="fileInput" type="file" accept="image/*" multiple class="hidden">
+          </div>
 
-  <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
-
-    <!-- LEFT: upload + pages -->
-    <div class="flex flex-col gap-8">
-
-      <!-- upload zone -->
-      <div>
-        <h3 class="text-sm font-medium mb-3">1. Upload images</h3>
-        <div id="dropZone" class="drop-zone border-2 border-dashed border-black/20 hover:border-black/50 rounded-2xl flex flex-col items-center justify-center text-center py-12 px-6 cursor-pointer bg-neutral-50/50">
-          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="1.5" class="mb-3 opacity-60">
-            <path d="M12 16V4M12 4l-4 4M12 4l4 4" stroke-linecap="round" stroke-linejoin="round"/>
-            <path d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-          <p class="text-sm font-medium text-neutral-900">Drag & drop images here, or click to browse</p>
-          <p class="text-xs text-black/40 mt-1">Supports JPG, PNG, WebP, GIF, SVG</p>
-          <p class="text-[11px] text-black/40 mt-1">Drag thumbnails below to rearrange page order</p>
-          <input id="fileInput" type="file" accept="image/*" multiple class="hidden">
+          <div id="thumbGrid" class="grid grid-cols-4 sm:grid-cols-5 gap-2.5 mt-4"></div>
+          <p id="frameCount" class="text-xs text-purple-300/70 mt-2 font-mono">0 pages added</p>
         </div>
 
-        <div id="thumbGrid" class="grid grid-cols-4 sm:grid-cols-5 gap-2.5 mt-4"></div>
-        <p id="frameCount" class="text-xs text-black/40 mt-2">0 pages added</p>
-      </div>
+        <div class="bg-[#12052b]/90 border border-purple-300/20 rounded-2xl p-5 shadow-xl flex flex-col gap-4">
+          <h3 class="text-xs font-bold uppercase tracking-wider text-purple-200">2. PDF Settings</h3>
 
-      <!-- settings -->
-      <div>
-        <h3 class="text-sm font-medium mb-3">2. PDF settings</h3>
-        <div class="border border-black/10 rounded-2xl p-5 flex flex-col gap-5">
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="text-xs text-purple-200/80 block mb-1">Page size</label>
+              <select id="pageSizeSelect" class="w-full text-xs border border-purple-400/20 rounded-xl px-3 py-2">
+                <option value="a4" selected>A4</option>
+                <option value="letter">US Letter</option>
+                <option value="fit">Fit to image</option>
+              </select>
+            </div>
 
-          <div>
-            <label class="text-xs text-black/60 block mb-1">Page size</label>
-            <select id="pageSizeSelect" class="w-full text-[13px] border border-black/15 rounded-lg px-3 py-2 bg-white">
-              <option value="a4" selected>A4</option>
-              <option value="letter">US Letter</option>
-              <option value="fit">Fit to each image</option>
-            </select>
+            <div>
+              <label class="text-xs text-purple-200/80 block mb-1">Orientation</label>
+              <select id="orientationSelect" class="w-full text-xs border border-purple-400/20 rounded-xl px-3 py-2">
+                <option value="auto" selected>Auto</option>
+                <option value="portrait">Portrait</option>
+                <option value="landscape">Landscape</option>
+              </select>
+            </div>
           </div>
 
-          <div>
-            <label class="text-xs text-black/60 block mb-1">Orientation</label>
-            <select id="orientationSelect" class="w-full text-[13px] border border-black/15 rounded-lg px-3 py-2 bg-white">
-              <option value="auto" selected>Auto — match each image</option>
-              <option value="portrait">Portrait</option>
-              <option value="landscape">Landscape</option>
-            </select>
-          </div>
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="text-xs text-purple-200/80 block mb-1">Margin</label>
+              <select id="marginSelect" class="w-full text-xs border border-purple-400/20 rounded-xl px-3 py-2">
+                <option value="none">None</option>
+                <option value="small" selected>Small</option>
+                <option value="medium">Medium</option>
+              </select>
+            </div>
 
-          <div>
-            <label class="text-xs text-black/60 block mb-1">Margin</label>
-            <select id="marginSelect" class="w-full text-[13px] border border-black/15 rounded-lg px-3 py-2 bg-white">
-              <option value="none">None — edge to edge</option>
-              <option value="small" selected>Small</option>
-              <option value="medium">Medium</option>
-            </select>
-          </div>
-
-          <div>
-            <label class="text-xs text-black/60 block mb-1">Image quality</label>
-            <select id="qualitySelect" class="w-full text-[13px] border border-black/15 rounded-lg px-3 py-2 bg-white">
-              <option value="0.92" selected>High</option>
-              <option value="0.8">Balanced</option>
-              <option value="0.6">Smaller file</option>
-            </select>
+            <div>
+              <label class="text-xs text-purple-200/80 block mb-1">Quality</label>
+              <select id="qualitySelect" class="w-full text-xs border border-purple-400/20 rounded-xl px-3 py-2">
+                <option value="0.92" selected>High</option>
+                <option value="0.8">Balanced</option>
+                <option value="0.6">Smaller file</option>
+              </select>
+            </div>
           </div>
 
           <div class="flex items-center justify-between">
-            <label class="text-xs text-black/60">Add page numbers</label>
-            <input id="pageNumberCheckbox" type="checkbox" class="accent-black w-4 h-4">
+            <label class="text-xs text-purple-200/80">Add page numbers</label>
+            <input id="pageNumberCheckbox" type="checkbox" class="accent-purple-500 w-4 h-4 cursor-pointer">
           </div>
+        </div>
+      </div>
 
-          <button id="exportBtn" class="bg-black text-white text-[13px] rounded-full px-5 py-2.5 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer" disabled>
-            Download PDF
-          </button>
-          <div id="progressWrap" class="hidden">
-            <div class="w-full h-1.5 bg-black/10 rounded-full overflow-hidden">
-              <div id="progressBar" class="h-full bg-black" style="width:0%;"></div>
+      <!-- RIGHT: Preview & Download -->
+      <div class="flex flex-col gap-6">
+        <div class="bg-[#12052b]/90 border border-purple-300/20 rounded-2xl p-5 shadow-xl flex-1 flex flex-col justify-between">
+          <div>
+            <h3 class="text-xs font-bold uppercase tracking-wider text-purple-200 mb-3">3. Active Page Preview</h3>
+            <div class="border border-purple-400/20 rounded-xl aspect-square flex items-center justify-center bg-[#0a0218] overflow-hidden p-4">
+              <img id="previewImg" class="max-w-full max-h-full hidden rounded-lg" alt="Preview">
+              <span id="previewPlaceholder" class="text-xs text-purple-300/40">Uploaded photos will appear here</span>
             </div>
-            <p id="progressLabel" class="text-xs text-black/40 mt-1">Building…</p>
           </div>
-        </div>
-      </div>
-    </div>
 
-    <!-- RIGHT: preview + edit -->
-    <div class="flex flex-col gap-8">
-      <div>
-        <div class="flex items-center justify-between mb-3">
-          <h3 class="text-sm font-medium">3. Preview & edit page</h3>
-        </div>
-        <div id="previewFrame" class="border border-black/10 rounded-2xl aspect-square flex items-center justify-center bg-black/[0.02] overflow-hidden">
-          <div id="previewWrap">
-            <img id="previewImg" class="max-w-full max-h-full hidden" alt="Page preview" draggable="false">
-            <div id="cropBox">
-              <div class="crop-handle" data-handle="nw"></div>
-              <div class="crop-handle" data-handle="ne"></div>
-              <div class="crop-handle" data-handle="sw"></div>
-              <div class="crop-handle" data-handle="se"></div>
+          <div class="border-t border-purple-900/40 pt-4 mt-4">
+            <h3 class="text-xs font-bold uppercase tracking-wider text-purple-200 mb-2">4. Export PDF</h3>
+            <button id="exportBtn" class="w-full bg-gradient-to-r from-purple-700 to-indigo-600 hover:from-purple-600 hover:to-indigo-500 text-white text-xs font-semibold rounded-xl py-3 disabled:opacity-30 disabled:cursor-not-allowed shadow-lg shadow-purple-950/60 cursor-pointer" disabled>
+              Download PDF Document
+            </button>
+            <div id="progressWrap" class="hidden mt-3">
+              <div class="w-full h-1.5 bg-purple-950 rounded-full overflow-hidden border border-purple-400/20">
+                <div id="progressBar" class="h-full bg-gradient-to-r from-purple-500 to-indigo-500" style="width:0%;"></div>
+              </div>
+              <p id="progressLabel" class="text-xs text-purple-300/70 mt-1 text-center font-mono">Building…</p>
             </div>
-            <span id="previewPlaceholder" class="text-xs text-black/30">Uploaded pages will appear here</span>
           </div>
         </div>
-        <p id="cropHint" class="text-xs text-black/40 mt-2 hidden">Drag any corner to resize, or drag inside the box to move it.</p>
-        <div class="flex items-center gap-2 flex-wrap mt-3">
-          <button id="rotateLeftBtn" class="edit-tool-btn" disabled>⟲ Rotate Left</button>
-          <button id="rotateRightBtn" class="edit-tool-btn" disabled>⟳ Rotate Right</button>
-          <button id="cropToggleBtn" class="edit-tool-btn" disabled>▢ Crop</button>
-          <button id="applyCropBtn" class="edit-tool-btn hidden">Apply Crop</button>
-          <button id="grayscaleBtn" class="edit-tool-btn" disabled>◐ Grayscale</button>
-          <button id="resetPageBtn" class="edit-tool-btn" disabled>Reset Page</button>
-        </div>
-      </div>
-
-      <div>
-        <h3 class="text-sm font-medium mb-3">4. Pages</h3>
-        <div class="border border-black/10 rounded-2xl p-5 flex flex-col gap-3">
-          <p class="text-sm text-black/60">
-            <span id="pageSummary">No pages yet — upload images to get started.</span>
-          </p>
-          <div class="flex items-center gap-2 flex-wrap">
-            <button id="clearAllBtn" class="text-[12px] border border-black/15 rounded-full px-4 py-1.5 cursor-pointer hover:bg-black hover:text-white transition-colors">Remove All</button>
-          </div>
-          <p class="text-xs text-black/40">PDF assembly runs locally with an open-source library (jsPDF) — no images are ever uploaded anywhere.</p>
-        </div>
       </div>
     </div>
-  </div>
-</section>
+  </section>
 
-<!-- ============ HOW IT WORKS ============ -->
-<section id="how-it-works" class="w-full bg-black/[0.02] border-t border-black/10">
-  <div class="max-w-6xl mx-auto px-4 md:px-8 py-16">
-    <div class="mb-10">
-      <h2 class="text-2xl md:text-3xl font-light tracking-tight mb-2">How it works</h2>
-      <p class="text-sm text-black/50 max-w-2xl">PDF Studio turns your photos and scans into a single downloadable PDF, entirely inside your browser. No files are ever sent to a server — everything below happens on your own device.</p>
-    </div>
-
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-      <div>
-        <div class="flex items-center justify-center rounded-full bg-black text-white text-sm font-medium mb-4" style="width:32px;height:32px;">1</div>
-        <h3 class="text-sm font-medium mb-2">Upload your images</h3>
-        <p class="text-xs text-black/50 leading-relaxed">Drag and drop, or click to browse, any number of photos or scans. Each one becomes a page, added in the order you drop them.</p>
-      </div>
-      <div>
-        <div class="flex items-center justify-center rounded-full bg-black text-white text-sm font-medium mb-4" style="width:32px;height:32px;">2</div>
-        <h3 class="text-sm font-medium mb-2">Crop, rotate & reorder</h3>
-        <p class="text-xs text-black/50 leading-relaxed">Straighten a sideways scan, crop out anything you don't need, or drag pages into the right order using drag-and-drop or the arrows.</p>
-      </div>
-      <div>
-        <div class="flex items-center justify-center rounded-full bg-black text-white text-sm font-medium mb-4" style="width:32px;height:32px;">3</div>
-        <h3 class="text-sm font-medium mb-2">Choose your layout</h3>
-        <p class="text-xs text-black/50 leading-relaxed">Pick a page size, orientation and margin, or let each page fit its image exactly. Everything renders locally, right in your browser.</p>
-      </div>
-      <div>
-        <div class="flex items-center justify-center rounded-full bg-black text-white text-sm font-medium mb-4" style="width:32px;height:32px;">4</div>
-        <h3 class="text-sm font-medium mb-2">Download your PDF</h3>
-        <p class="text-xs text-black/50 leading-relaxed">Hit "Download PDF" and your finished document is assembled and saved straight to your device. Your images never leave your computer.</p>
-      </div>
-    </div>
-
-    <div class="mt-10">
-      <a href="#tool" class="bg-black text-white text-[13px] rounded-full px-5 py-2.5 inline-block">Get Started</a>
-    </div>
-  </div>
-</section>
-
-<footer class="text-center text-xs text-black/30 py-8">
-  Built entirely client-side — your images never leave this browser.
-</footer>
+  <footer class="text-center text-[11px] text-purple-400/50 py-4 border-t border-purple-900/30 bg-[#080314]">
+    FliTools — 100% Client-Side Image to PDF Studio
+  </footer>
 
 <script>
 (function(){
@@ -384,173 +197,64 @@
   const progressWrap = document.getElementById('progressWrap');
   const progressBar = document.getElementById('progressBar');
   const progressLabel = document.getElementById('progressLabel');
-  const previewWrap = document.getElementById('previewWrap');
   const previewImg = document.getElementById('previewImg');
   const previewPlaceholder = document.getElementById('previewPlaceholder');
-  const cropBox = document.getElementById('cropBox');
-  const cropHint = document.getElementById('cropHint');
-  const rotateLeftBtn = document.getElementById('rotateLeftBtn');
-  const rotateRightBtn = document.getElementById('rotateRightBtn');
-  const cropToggleBtn = document.getElementById('cropToggleBtn');
-  const applyCropBtn = document.getElementById('applyCropBtn');
-  const grayscaleBtn = document.getElementById('grayscaleBtn');
-  const resetPageBtn = document.getElementById('resetPageBtn');
-  const pageSummary = document.getElementById('pageSummary');
-  const clearAllBtn = document.getElementById('clearAllBtn');
 
   let images = [];
   let activeItem = null;
-  let dragSrcIdx = null;
-
-  function activeIdx(){
-    return activeItem ? images.indexOf(activeItem) : -1;
-  }
 
   function updateFrameCount(){
     frameCount.textContent = images.length + ' page' + (images.length===1?'':'s') + ' added';
     exportBtn.disabled = images.length < 1;
-    pageSummary.textContent = images.length
-      ? images.length + ' page' + (images.length===1?'':'s') + ' ready — export whenever you like.'
-      : 'No pages yet — upload images to get started.';
   }
 
   function setPreview(idx){
     if (idx < 0 || idx >= images.length) return;
     activeItem = images[idx];
-    exitCropMode();
     previewImg.src = images[idx].url;
     previewImg.classList.remove('hidden');
     previewPlaceholder.classList.add('hidden');
-    renderThumbActiveState();
-    [rotateLeftBtn, rotateRightBtn, cropToggleBtn, grayscaleBtn, resetPageBtn].forEach(b => b.disabled = false);
-    grayscaleBtn.classList.toggle('active', !!images[idx].grayscale);
-  }
-
-  function renderThumbActiveState(){
-    const idx = activeIdx();
     document.querySelectorAll('#thumbGrid .thumb').forEach((el,i) => {
       el.classList.toggle('active', i === idx);
     });
-  }
-
-  function disableEditTools(){
-    [rotateLeftBtn, rotateRightBtn, cropToggleBtn, grayscaleBtn, resetPageBtn].forEach(b => b.disabled = true);
-    exitCropMode();
   }
 
   function renderThumbs(){
     thumbGrid.innerHTML = '';
     images.forEach((item, idx) => {
       const wrap = document.createElement('div');
-      wrap.className = 'thumb rounded-lg overflow-hidden border border-black/10 aspect-square select-none';
-      wrap.title = item.name + ' (drag to reorder)';
-      wrap.draggable = true;
-      wrap.dataset.idx = idx;
+      wrap.className = 'thumb rounded-lg overflow-hidden border border-purple-400/20 aspect-square bg-purple-950/40';
+      wrap.title = item.name;
 
       const img = document.createElement('img');
       img.src = item.url;
-      img.className = 'w-full h-full object-cover pointer-events-none';
+      img.className = 'w-full h-full object-cover';
       wrap.appendChild(img);
 
       const pageBadge = document.createElement('span');
-      pageBadge.className = 'thumb-page pointer-events-none';
+      pageBadge.className = 'thumb-page';
       pageBadge.textContent = idx + 1;
       wrap.appendChild(pageBadge);
 
       const removeBtn = document.createElement('button');
       removeBtn.className = 'thumb-remove';
-      removeBtn.innerHTML = '×';
-      removeBtn.title = 'Remove page';
+      removeBtn.textContent = '×';
       removeBtn.onclick = (e) => {
         e.stopPropagation();
-        const wasActive = item === activeItem;
         images.splice(idx, 1);
-        if (wasActive) activeItem = null;
         renderThumbs();
       };
       wrap.appendChild(removeBtn);
-
-      const orderRow = document.createElement('div');
-      orderRow.className = 'thumb-order';
-      const upBtn = document.createElement('button');
-      upBtn.textContent = '←';
-      upBtn.title = 'Move left';
-      upBtn.disabled = idx === 0;
-      upBtn.onclick = (e) => {
-        e.stopPropagation();
-        if (idx === 0) return;
-        [images[idx-1], images[idx]] = [images[idx], images[idx-1]];
-        renderThumbs();
-      };
-      const downBtn = document.createElement('button');
-      downBtn.textContent = '→';
-      downBtn.title = 'Move right';
-      downBtn.disabled = idx === images.length - 1;
-      downBtn.onclick = (e) => {
-        e.stopPropagation();
-        if (idx === images.length - 1) return;
-        [images[idx+1], images[idx]] = [images[idx], images[idx+1]];
-        renderThumbs();
-      };
-      orderRow.appendChild(upBtn);
-      orderRow.appendChild(downBtn);
-      wrap.appendChild(orderRow);
-
-      // Drag and drop reordering events
-      wrap.addEventListener('dragstart', (e) => {
-        dragSrcIdx = idx;
-        wrap.classList.add('dragging');
-        e.dataTransfer.effectAllowed = 'move';
-        e.dataTransfer.setData('text/plain', String(idx));
-      });
-
-      wrap.addEventListener('dragend', () => {
-        wrap.classList.remove('dragging');
-        document.querySelectorAll('.thumb').forEach(t => t.classList.remove('drag-over'));
-        dragSrcIdx = null;
-      });
-
-      wrap.addEventListener('dragover', (e) => {
-        e.preventDefault();
-        e.dataTransfer.dropEffect = 'move';
-        wrap.classList.add('drag-over');
-      });
-
-      wrap.addEventListener('dragleave', () => {
-        wrap.classList.remove('drag-over');
-      });
-
-      wrap.addEventListener('drop', (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        wrap.classList.remove('drag-over');
-        
-        // Handle file drop onto a thumb
-        if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-          addFiles(e.dataTransfer.files);
-          return;
-        }
-
-        const targetIdx = idx;
-        if (dragSrcIdx === null || dragSrcIdx === targetIdx) return;
-        const [movedItem] = images.splice(dragSrcIdx, 1);
-        images.splice(targetIdx, 0, movedItem);
-        dragSrcIdx = null;
-        renderThumbs();
-      });
-
-      wrap.addEventListener('click', () => setPreview(idx));
+      wrap.onclick = () => setPreview(idx);
       thumbGrid.appendChild(wrap);
     });
 
     updateFrameCount();
     if (images.length && !activeItem) setPreview(0);
-    else renderThumbActiveState();
     if (!images.length) {
       activeItem = null;
       previewImg.classList.add('hidden');
       previewPlaceholder.classList.remove('hidden');
-      disableEditTools();
     }
   }
 
@@ -559,290 +263,20 @@
     const img = new Image();
     img.src = url;
     await new Promise(res => { if (img.complete) res(); else img.onload = res; });
-    images.push({ url, originalUrl: url, img, name: file.name, grayscale: false });
+    images.push({ url, originalUrl: url, img, name: file.name });
   }
 
   async function addFiles(fileList){
-    if (!fileList || fileList.length === 0) return;
     const files = Array.from(fileList).filter(f => f.type.startsWith('image/'));
-    for (const file of files) {
-      await addImageFile(file);
-    }
+    for (const file of files) await addImageFile(file);
     renderThumbs();
-    fileInput.value = '';
   }
 
-  // Drop zone events
   dropZone.addEventListener('click', () => fileInput.click());
-  fileInput.addEventListener('change', e => {
-    if (e.target.files && e.target.files.length) {
-      addFiles(e.target.files);
-    }
-  });
-
-  ['dragenter', 'dragover'].forEach(evt => {
-    dropZone.addEventListener(evt, e => {
-      e.preventDefault();
-      e.stopPropagation();
-      dropZone.classList.add('dragover');
-    });
-  });
-
-  ['dragleave', 'dragend'].forEach(evt => {
-    dropZone.addEventListener(evt, e => {
-      e.preventDefault();
-      e.stopPropagation();
-      dropZone.classList.remove('dragover');
-    });
-  });
-
-  dropZone.addEventListener('drop', e => {
-    e.preventDefault();
-    e.stopPropagation();
-    dropZone.classList.remove('dragover');
-    if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length) {
-      addFiles(e.dataTransfer.files);
-    }
-  });
-
-  // Global window drop prevention so dropped images never replace the webpage
-  window.addEventListener('dragover', e => e.preventDefault(), false);
-  window.addEventListener('drop', e => e.preventDefault(), false);
-
-  clearAllBtn.addEventListener('click', () => {
-    images = [];
-    activeItem = null;
-    renderThumbs();
-  });
-
-  function loadImageFromUrl(url){
-    return new Promise(res => {
-      const img = new Image();
-      img.onload = () => res(img);
-      img.src = url;
-    });
-  }
-
-  async function rotateActive(deg){
-    const idx = activeIdx();
-    if (idx < 0) return;
-    const item = images[idx];
-    const img = item.img;
-    const canvas = document.createElement('canvas');
-    const swap = Math.abs(deg) === 90;
-    canvas.width = swap ? img.naturalHeight : img.naturalWidth;
-    canvas.height = swap ? img.naturalWidth : img.naturalHeight;
-    const ctx = canvas.getContext('2d');
-    ctx.translate(canvas.width / 2, canvas.height / 2);
-    ctx.rotate(deg * Math.PI / 180);
-    ctx.drawImage(img, -img.naturalWidth / 2, -img.naturalHeight / 2);
-    const url = canvas.toDataURL('image/png');
-    item.url = url;
-    item.img = await loadImageFromUrl(url);
-    renderThumbs();
-    setPreview(idx);
-  }
-  rotateLeftBtn.addEventListener('click', () => rotateActive(-90));
-  rotateRightBtn.addEventListener('click', () => rotateActive(90));
-
-  grayscaleBtn.addEventListener('click', async () => {
-    const idx = activeIdx();
-    if (idx < 0) return;
-    const item = images[idx];
-    const img = item.img;
-    const canvas = document.createElement('canvas');
-    canvas.width = img.naturalWidth;
-    canvas.height = img.naturalHeight;
-    const ctx = canvas.getContext('2d');
-    ctx.drawImage(img, 0, 0);
-    if (!item.grayscale) {
-      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-      const data = imageData.data;
-      for (let i = 0; i < data.length; i += 4) {
-        const gray = 0.299*data[i] + 0.587*data[i+1] + 0.114*data[i+2];
-        data[i] = data[i+1] = data[i+2] = gray;
-      }
-      ctx.putImageData(imageData, 0, 0);
-      item.grayscale = true;
-    } else {
-      item.grayscale = false;
-      const url = item.originalUrl;
-      item.url = url;
-      item.img = await loadImageFromUrl(url);
-      renderThumbs();
-      setPreview(idx);
-      return;
-    }
-    const url = canvas.toDataURL('image/png');
-    item.url = url;
-    item.img = await loadImageFromUrl(url);
-    renderThumbs();
-    setPreview(idx);
-  });
-
-  resetPageBtn.addEventListener('click', async () => {
-    const idx = activeIdx();
-    if (idx < 0) return;
-    const item = images[idx];
-    item.url = item.originalUrl;
-    item.img = await loadImageFromUrl(item.originalUrl);
-    item.grayscale = false;
-    renderThumbs();
-    setPreview(idx);
-  });
-
-  let cropMode = false;
-  let cropRect = null;
-  let dragMode = null;
-  let dragStartPointer = null;
-  let dragStartRect = null;
-  const MIN_CROP = 24;
-
-  function imgBox(){
-    return {
-      left: previewImg.offsetLeft,
-      top: previewImg.offsetTop,
-      width: previewImg.clientWidth,
-      height: previewImg.clientHeight
-    };
-  }
-
-  function renderCropBox(){
-    if (!cropRect) return;
-    const box = imgBox();
-    cropBox.style.left = (box.left + cropRect.x) + 'px';
-    cropBox.style.top = (box.top + cropRect.y) + 'px';
-    cropBox.style.width = cropRect.w + 'px';
-    cropBox.style.height = cropRect.h + 'px';
-  }
-
-  function exitCropMode(){
-    cropMode = false;
-    dragMode = null;
-    cropRect = null;
-    cropBox.style.display = 'none';
-    cropToggleBtn.classList.remove('active');
-    applyCropBtn.classList.add('hidden');
-    cropHint.classList.add('hidden');
-  }
-
-  cropToggleBtn.addEventListener('click', () => {
-    if (activeIdx() < 0) return;
-    cropMode = !cropMode;
-    cropToggleBtn.classList.toggle('active', cropMode);
-    applyCropBtn.classList.toggle('hidden', !cropMode);
-    cropHint.classList.toggle('hidden', !cropMode);
-    if (cropMode) {
-      const box = imgBox();
-      const inset = 0.1;
-      cropRect = {
-        x: box.width * inset,
-        y: box.height * inset,
-        w: box.width * (1 - inset * 2),
-        h: box.height * (1 - inset * 2)
-      };
-      cropBox.style.display = 'block';
-      renderCropBox();
-    } else {
-      cropBox.style.display = 'none';
-      cropRect = null;
-    }
-  });
-
-  function pointerXY(e){
-    const point = e.touches ? (e.touches[0] || e.changedTouches[0]) : e;
-    return { x: point.clientX, y: point.clientY };
-  }
-
-  function onDragStart(e, mode){
-    if (!cropMode || !cropRect) return;
-    e.preventDefault();
-    e.stopPropagation();
-    dragMode = mode;
-    dragStartPointer = pointerXY(e);
-    dragStartRect = { x: cropRect.x, y: cropRect.y, w: cropRect.w, h: cropRect.h };
-  }
-
-  cropBox.addEventListener('mousedown', e => { if (e.target === cropBox) onDragStart(e, 'move'); });
-  cropBox.addEventListener('touchstart', e => { if (e.target === cropBox) onDragStart(e, 'move'); }, { passive:false });
-  document.querySelectorAll('.crop-handle').forEach(h => {
-    h.addEventListener('mousedown', e => onDragStart(e, h.dataset.handle));
-    h.addEventListener('touchstart', e => onDragStart(e, h.dataset.handle), { passive:false });
-  });
-
-  function onDragMove(e){
-    if (!dragMode || !cropRect) return;
-    e.preventDefault();
-    const box = imgBox();
-    const p = pointerXY(e);
-    const dx = p.x - dragStartPointer.x;
-    const dy = p.y - dragStartPointer.y;
-    let { x, y, w, h } = dragStartRect;
-
-    if (dragMode === 'move') {
-      x = dragStartRect.x + dx;
-      y = dragStartRect.y + dy;
-      x = Math.max(0, Math.min(x, box.width - w));
-      y = Math.max(0, Math.min(y, box.height - h));
-    } else {
-      if (dragMode.includes('w')) {
-        const right = dragStartRect.x + dragStartRect.w;
-        x = Math.max(0, Math.min(dragStartRect.x + dx, right - MIN_CROP));
-        w = right - x;
-      }
-      if (dragMode.includes('e')) {
-        w = Math.max(MIN_CROP, Math.min(dragStartRect.w + dx, box.width - dragStartRect.x));
-      }
-      if (dragMode.includes('n')) {
-        const bottom = dragStartRect.y + dragStartRect.h;
-        y = Math.max(0, Math.min(dragStartRect.y + dy, bottom - MIN_CROP));
-        h = bottom - y;
-      }
-      if (dragMode.includes('s')) {
-        h = Math.max(MIN_CROP, Math.min(dragStartRect.h + dy, box.height - dragStartRect.y));
-      }
-    }
-
-    cropRect = { x, y, w, h };
-    renderCropBox();
-  }
-
-  function onDragEnd(){
-    dragMode = null;
-  }
-
-  window.addEventListener('mousemove', onDragMove);
-  window.addEventListener('touchmove', onDragMove, { passive:false });
-  window.addEventListener('mouseup', onDragEnd);
-  window.addEventListener('touchend', onDragEnd);
-  window.addEventListener('resize', renderCropBox);
-
-  applyCropBtn.addEventListener('click', async () => {
-    const idx = activeIdx();
-    if (idx < 0 || !cropRect || cropRect.w < MIN_CROP || cropRect.h < MIN_CROP) return;
-    const item = images[idx];
-    const img = item.img;
-    const box = imgBox();
-    const scaleX = img.naturalWidth / box.width;
-    const scaleY = img.naturalHeight / box.height;
-    const sx = cropRect.x * scaleX;
-    const sy = cropRect.y * scaleY;
-    const sw = cropRect.w * scaleX;
-    const sh = cropRect.h * scaleY;
-
-    const canvas = document.createElement('canvas');
-    canvas.width = sw;
-    canvas.height = sh;
-    const ctx = canvas.getContext('2d');
-    ctx.drawImage(img, sx, sy, sw, sh, 0, 0, sw, sh);
-    const url = canvas.toDataURL('image/png');
-    item.url = url;
-    item.img = await loadImageFromUrl(url);
-
-    exitCropMode();
-    renderThumbs();
-    setPreview(idx);
-  });
+  fileInput.addEventListener('change', e => addFiles(e.target.files));
+  ['dragenter','dragover'].forEach(evt => dropZone.addEventListener(evt, e => { e.preventDefault(); dropZone.classList.add('dragover'); }));
+  ['dragleave','drop'].forEach(evt => dropZone.addEventListener(evt, e => { e.preventDefault(); dropZone.classList.remove('dragover'); }));
+  dropZone.addEventListener('drop', e => { if (e.dataTransfer.files) addFiles(e.dataTransfer.files); });
 
   const A4_PT = { w: 595.28, h: 841.89 };
   const LETTER_PT = { w: 612, h: 792 };
@@ -854,21 +288,10 @@
       return { w: imgWpx * PX_TO_PT + marginPt * 2, h: imgHpx * PX_TO_PT + marginPt * 2 };
     }
     let { w, h } = sizeKey === 'letter' ? LETTER_PT : A4_PT;
-    let landscape = orientation === 'landscape' ? true
-      : orientation === 'portrait' ? false
-      : imgWpx > imgHpx;
+    let landscape = orientation === 'landscape' ? true : orientation === 'portrait' ? false : imgWpx > imgHpx;
     if (landscape && w < h) { const t = w; w = h; h = t; }
     if (!landscape && w > h) { const t = w; w = h; h = t; }
     return { w, h };
-  }
-
-  function canvasDataUrlFor(img, quality){
-    const canvas = document.createElement('canvas');
-    canvas.width = img.naturalWidth;
-    canvas.height = img.naturalHeight;
-    const ctx = canvas.getContext('2d');
-    ctx.drawImage(img, 0, 0);
-    return canvas.toDataURL('image/jpeg', quality);
   }
 
   exportBtn.addEventListener('click', async () => {
@@ -876,7 +299,7 @@
     exportBtn.disabled = true;
     progressWrap.classList.remove('hidden');
     progressBar.style.width = '0%';
-    progressLabel.textContent = 'Building…';
+    progressLabel.textContent = 'Building PDF…';
 
     try {
       const sizeKey = pageSizeSelect.value;
@@ -893,11 +316,8 @@
         const img = item.img;
         const dims = pageDimsFor(sizeKey, orientation, img.naturalWidth, img.naturalHeight, marginPt);
 
-        if (!doc) {
-          doc = new jsPDF({ unit: 'pt', format: [dims.w, dims.h] });
-        } else {
-          doc.addPage([dims.w, dims.h]);
-        }
+        if (!doc) doc = new jsPDF({ unit: 'pt', format: [dims.w, dims.h] });
+        else doc.addPage([dims.w, dims.h]);
 
         const availW = dims.w - marginPt * 2;
         const availH = dims.h - marginPt * 2;
@@ -909,7 +329,13 @@
         const x = marginPt + (availW - drawW) / 2;
         const y = marginPt + (availH - drawH) / 2;
 
-        const dataUrl = canvasDataUrlFor(img, quality);
+        const canvas = document.createElement('canvas');
+        canvas.width = img.naturalWidth;
+        canvas.height = img.naturalHeight;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0);
+        const dataUrl = canvas.toDataURL('image/jpeg', quality);
+
         doc.addImage(dataUrl, 'JPEG', x, y, drawW, drawH);
 
         if (withPageNumbers) {
@@ -925,7 +351,7 @@
 
       window.open(DIRECT_LINK_URL, '_blank');
       doc.save('images.pdf');
-      progressLabel.textContent = 'Done! Downloaded a ' + images.length + '-page PDF.';
+      progressLabel.textContent = 'Done! Downloaded PDF.';
     } catch (err) {
       console.error(err);
       progressLabel.textContent = 'Error: ' + err.message;
@@ -933,10 +359,7 @@
       exportBtn.disabled = false;
     }
   });
-
-  updateFrameCount();
 })();
 </script>
-
 </body>
 </html>

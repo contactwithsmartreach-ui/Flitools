@@ -3,143 +3,86 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Encode Studio — Base64 & URL Encoder/Decoder Locally</title>
+<title>Encode Studio — Base64 & URL Encoder Locally</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdn.tailwindcss.com"></script>
 <!-- Monetag Vignette / Interstitial Tag Script -->
 <script>(function(s){s.dataset.zone='11579038',s.src='https://n6wxm.com/vignette.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))</script>
 <style>
   :root{ --ease: cubic-bezier(0.16, 1, 0.3, 1); }
   *{ font-family: 'Inter', sans-serif; }
-  body{ background:#fff; color:#000; }
+  body{ background:#080314; color:#ffffff; }
   .mono{ font-family: 'JetBrains Mono', monospace; }
 
   @keyframes fadeSlideDown{ from{ opacity:0; transform: translateY(-16px); } to{ opacity:1; transform: translateY(0); } }
   @keyframes fadeSlideUp{ from{ opacity:0; transform: translateY(20px); } to{ opacity:1; transform: translateY(0); } }
-  @keyframes fadeScaleIn{ from{ opacity:0; transform: scale(1.05); } to{ opacity:1; transform: scale(1); } }
   .anim-navbar{ animation: fadeSlideDown 0.8s var(--ease) both; }
-  .anim-bg{ animation: fadeScaleIn 1.8s var(--ease) both; }
-  .anim-footer{ animation: fadeSlideUp 1s var(--ease) both; animation-delay: .5s; }
-  .anim-subtitle{ animation: fadeSlideUp .8s var(--ease) both; animation-delay: .6s; }
-  .anim-heading{ animation: fadeSlideUp .8s var(--ease) both; animation-delay: .8s; }
-  .anim-buttons{ animation: fadeSlideUp .8s var(--ease) both; animation-delay: 1s; }
+  .anim-content{ animation: fadeSlideUp 0.8s var(--ease) both; }
 
-  .hero-heading{ font-weight:300; letter-spacing:-0.03em; line-height:1; font-size: clamp(2rem, 8vw, 4.5rem); }
-  @media (min-width:768px){ .hero-heading{ font-size: clamp(2.5rem, 5.5vw, 4.5rem); } }
-
-  .hero-gradient-bg{
-    background:
-      radial-gradient(circle at 20% 20%, rgba(0,0,0,0.06), transparent 45%),
-      radial-gradient(circle at 80% 30%, rgba(0,0,0,0.04), transparent 50%),
-      linear-gradient(135deg, #fafafa 0%, #f0f0f2 100%);
-  }
-  .hero-fade{ background: linear-gradient(to top, #ffffff 0%, rgba(255,255,255,0.85) 55%, transparent 100%); }
-
-  textarea{ transition: border-color .15s ease; }
-  textarea:focus{ outline:none; border-color:#000; }
-  ::-webkit-scrollbar{ width:8px; height:8px; }
-  ::-webkit-scrollbar-thumb{ background:#ddd; border-radius:9999px; }
+  textarea{ transition: border-color .15s ease; background:#1a0836; color:#ffffff; }
+  textarea:focus{ outline:none; border-color:#c084fc; }
+  ::-webkit-scrollbar{ width:6px; height:6px; }
+  ::-webkit-scrollbar-track{ background: rgba(15, 5, 29, 0.6); }
+  ::-webkit-scrollbar-thumb{ background: rgba(168, 85, 247, 0.4); border-radius:9999px; }
   .tab-btn{ transition: background-color .15s ease, color .15s ease; }
 </style>
 </head>
-<body class="min-h-screen flex flex-col">
+<body class="min-h-screen flex flex-col bg-[#080314] text-white">
 
-<section class="relative w-full min-h-screen flex flex-col justify-between overflow-hidden">
-  <div class="anim-bg absolute inset-0 z-0 hero-gradient-bg"></div>
-
-  <nav class="anim-navbar relative z-50 flex items-center justify-between px-4 py-4 md:px-8 md:py-6" style="pointer-events:none;">
-    <div class="flex items-center gap-3 md:gap-5" style="pointer-events:auto;">
-      <div class="flex items-center gap-2">
+  <!-- NAVBAR -->
+  <nav class="anim-navbar relative z-50 flex items-center justify-between px-4 py-3 md:px-8 border-b border-purple-900/40 bg-[#0d0422]/90 backdrop-blur-md">
+    <div class="flex items-center gap-3">
+      <a href="/" class="flex items-center gap-2">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-          <path d="M16 18l6-6-6-6M8 6l-6 6 6 6" stroke="black" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+          <rect x="5" y="4" width="6" height="14" rx="2.5" fill="#e9d5ff" transform="rotate(-35 8 11)" />
+          <rect x="12" y="4" width="6" height="14" rx="2.5" fill="#c084fc" transform="rotate(-35 15 11)" />
         </svg>
-        <span class="hidden md:inline text-sm font-medium tracking-tight">Encode Studio</span>
-      </div>
-      <div class="hidden md:flex items-center gap-3 rounded-full px-4 py-2" style="background:#F4F4F6;">
-        <span class="text-[11px] text-black/70">In-Browser</span>
-        <span class="text-[11px] text-black/70">No Uploads</span>
-      </div>
-    </div>
-    <div class="hidden md:flex items-center gap-3" style="pointer-events:auto;">
-      <div class="flex items-center gap-2 rounded-full pl-2 pr-4 py-1.5" style="background:#F4F4F6;">
-        <span class="flex items-center justify-center bg-black rounded-full" style="width:28px;height:28px;">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="white">
-            <rect x="2" y="2" width="7" height="7" rx="1.5"/><rect x="15" y="2" width="7" height="7" rx="1.5"/>
-            <rect x="2" y="15" width="7" height="7" rx="1.5"/><rect x="15" y="15" width="7" height="7" rx="1.5"/>
-          </svg>
-        </span>
-        <span class="text-[11px] text-black/70">100% Client-Side</span>
-      </div>
+        <span class="font-semibold text-sm tracking-tight text-white">FliTools</span>
+      </a>
+      <span class="text-purple-400/40 text-xs">/</span>
+      <span class="text-xs text-purple-200 font-medium">Encode Studio</span>
+      <span class="hidden sm:inline bg-purple-950/80 border border-purple-400/30 text-purple-200 text-[10px] uppercase font-semibold px-2 py-0.5 rounded-full">
+        100% Client-Side
+      </span>
     </div>
   </nav>
 
-  <div class="anim-footer relative z-30 hero-fade px-4 pb-8 pt-12 md:px-8 md:pb-10">
-    <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-8">
-      <div>
-        <div class="anim-subtitle flex items-center gap-2 mb-4">
-          <span class="rounded-full bg-black" style="width:8px;height:8px;"></span>
-          <span class="text-[13px]" style="color:rgba(0,0,0,0.55);">Encode and decode text and URLs, right here</span>
+  <!-- TOOL -->
+  <section class="anim-content w-full max-w-6xl mx-auto px-4 md:px-8 py-8 flex-1 flex flex-col">
+
+    <div class="mb-8 border-b border-purple-900/40 pb-5">
+      <h1 class="text-2xl md:text-3xl font-light tracking-tight text-white mb-1">Encode & Decode Strings</h1>
+      <p class="text-xs text-purple-200/70">Convert data between plain text, Base64, and URL encoding instantly inside your browser.</p>
+    </div>
+
+    <div class="flex rounded-xl overflow-hidden border border-purple-400/20 text-xs mb-8 w-fit bg-purple-950/60 p-1">
+      <button data-mode="b64enc" class="tab-btn mode-tab px-4 py-2 rounded-lg bg-gradient-to-r from-purple-700 to-indigo-600 text-white font-medium shadow-md">Base64 Encode</button>
+      <button data-mode="b64dec" class="tab-btn mode-tab px-4 py-2 rounded-lg text-purple-300 hover:text-white font-medium">Base64 Decode</button>
+      <button data-mode="urlenc" class="tab-btn mode-tab px-4 py-2 rounded-lg text-purple-300 hover:text-white font-medium">URL Encode</button>
+      <button data-mode="urldec" class="tab-btn mode-tab px-4 py-2 rounded-lg text-purple-300 hover:text-white font-medium">URL Decode</button>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <div class="bg-[#12052b]/90 border border-purple-300/20 rounded-2xl p-5 shadow-xl flex flex-col gap-3">
+        <h3 class="text-xs font-bold uppercase tracking-wider text-purple-200" id="inputLabel">1. Input Text (Base64 Encode)</h3>
+        <textarea id="inputTxt" spellcheck="false" placeholder="Type or paste text here..." class="mono w-full h-72 border border-purple-400/20 rounded-xl p-3.5 text-xs leading-relaxed resize-none">Hello World!</textarea>
+      </div>
+
+      <div class="bg-[#12052b]/90 border border-purple-300/20 rounded-2xl p-5 shadow-xl flex flex-col gap-3">
+        <div class="flex items-center justify-between">
+          <h3 class="text-xs font-bold uppercase tracking-wider text-purple-200">2. Output Result</h3>
+          <button id="copyBtn" class="text-[11px] rounded-lg px-3 py-1.5 border border-purple-400/30 bg-purple-900/40 hover:bg-purple-600 text-white transition-colors pointer-events-none opacity-30 cursor-pointer">Copy Output</button>
         </div>
-        <h1 class="anim-heading hero-heading mb-6">
-          Text In,<br/>Zero Uploads.<br/>Encoded Out.
-        </h1>
-        <div class="anim-buttons flex items-center gap-3">
-          <a href="#how-it-works" class="bg-black text-white text-[13px] rounded-full px-5 py-2.5">How It Works</a>
-        </div>
-      </div>
-      <div class="flex items-center gap-2 md:justify-end flex-wrap">
-        <span class="text-[11px] rounded-full px-3 py-1.5 bg-white border" style="border-color:rgba(0,0,0,0.12);">Base64</span>
-        <span class="text-[11px] rounded-full px-3 py-1.5 bg-white border" style="border-color:rgba(0,0,0,0.12);">URL Component</span>
-        <span class="text-[11px] rounded-full px-3 py-1.5 bg-white border" style="border-color:rgba(0,0,0,0.12);">Instant Copy</span>
+        <pre id="outputPre" class="mono w-full h-72 border border-purple-400/20 rounded-xl p-3.5 text-xs leading-relaxed overflow-auto bg-[#0a0218] text-purple-100 select-all">SGVsbG8gV29ybGQh</pre>
       </div>
     </div>
-  </div>
-</section>
+  </section>
 
-<section id="tool" class="w-full max-w-6xl mx-auto px-4 md:px-8 py-16">
-  <div class="mb-10">
-    <h2 class="text-2xl md:text-3xl font-light tracking-tight mb-2">Encode & Decode Strings</h2>
-    <p class="text-sm text-black/50">Convert data between plain text, Base64, and URL encoding instantly inside your browser.</p>
-  </div>
-
-  <div class="flex rounded-full overflow-hidden border border-black/10 text-xs mb-10 w-fit">
-    <button data-mode="b64enc" class="tab-btn mode-tab px-5 py-2.5 bg-black text-white">Base64 Encode</button>
-    <button data-mode="b64dec" class="tab-btn mode-tab px-5 py-2.5">Base64 Decode</button>
-    <button data-mode="urlenc" class="tab-btn mode-tab px-5 py-2.5">URL Encode</button>
-    <button data-mode="urldec" class="tab-btn mode-tab px-5 py-2.5">URL Decode</button>
-  </div>
-
-  <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
-    <div class="flex flex-col gap-4">
-      <h3 class="text-sm font-medium" id="inputLabel">1. Input text</h3>
-      <textarea id="inputTxt" spellcheck="false" placeholder="Type or paste text here..." class="mono w-full h-72 border border-black/10 rounded-2xl p-4 text-xs leading-relaxed resize-none">Hello World!</textarea>
-    </div>
-
-    <div class="flex flex-col gap-4">
-      <div class="flex items-center justify-between">
-        <h3 class="text-sm font-medium">2. Output result</h3>
-        <button id="copyBtn" class="text-[11px] rounded-full px-3 py-1.5 border border-black/15 hover:bg-black hover:text-white transition-colors pointer-events-none opacity-30 cursor-pointer">Copy Output</button>
-      </div>
-      <pre id="outputPre" class="mono w-full h-72 border border-black/10 rounded-2xl p-4 text-xs leading-relaxed overflow-auto bg-black/[0.02] text-black/80">SGVsbG8gV29ybGQh</pre>
-    </div>
-  </div>
-</section>
-
-<section id="how-it-works" class="w-full bg-black/[0.02] border-t border-black/10">
-  <div class="max-w-6xl mx-auto px-4 md:px-8 py-16">
-    <h2 class="text-2xl font-light tracking-tight mb-4">How it works</h2>
-    <p class="text-sm text-black/50 max-w-2xl leading-relaxed">
-      Encode Studio uses native browser JavaScript APIs (`btoa`, `atob`, `encodeURIComponent`, `decodeURIComponent`) to transform text securely on your machine without server requests.
-    </p>
-  </div>
-</section>
-
-<footer class="text-center text-xs text-black/30 py-8">
-  Built entirely client-side — your text never leaves this browser.
-</footer>
+  <footer class="text-center text-[11px] text-purple-400/50 py-4 border-t border-purple-900/30 bg-[#080314]">
+    FliTools — 100% Client-Side Encode Studio
+  </footer>
 
 <script>
 (function(){
@@ -154,10 +97,14 @@
 
   tabs.forEach(t => {
     t.addEventListener('click', () => {
-      tabs.forEach(b => b.classList.remove('bg-black','text-white'));
-      t.classList.add('bg-black','text-white');
+      tabs.forEach(b => {
+        b.classList.remove('bg-gradient-to-r','from-purple-700','to-indigo-600','text-white','shadow-md');
+        b.classList.add('text-purple-300');
+      });
+      t.classList.add('bg-gradient-to-r','from-purple-700','to-indigo-600','text-white','shadow-md');
+      t.classList.remove('text-purple-300');
       mode = t.dataset.mode;
-      inputLabel.textContent = '1. Input text (' + t.textContent + ')';
+      inputLabel.textContent = '1. Input Text (' + t.textContent + ')';
       process();
     });
   });
@@ -177,11 +124,11 @@
       else if (mode === 'urldec') res = decodeURIComponent(val);
 
       outputPre.textContent = res;
-      outputPre.className = 'mono w-full h-72 border border-black/10 rounded-2xl p-4 text-xs leading-relaxed overflow-auto bg-black/[0.02] text-black/80';
+      outputPre.className = 'mono w-full h-72 border border-purple-400/20 rounded-xl p-3.5 text-xs leading-relaxed overflow-auto bg-[#0a0218] text-purple-100 select-all';
       copyBtn.classList.remove('pointer-events-none','opacity-30');
     } catch(err) {
       outputPre.textContent = 'Error: ' + err.message;
-      outputPre.className = 'mono w-full h-72 border border-red-200 rounded-2xl p-4 text-xs leading-relaxed overflow-auto bg-red-50 text-red-600';
+      outputPre.className = 'mono w-full h-72 border border-red-500/40 rounded-xl p-3.5 text-xs leading-relaxed overflow-auto bg-red-950/30 text-red-400';
       copyBtn.classList.add('pointer-events-none','opacity-30');
     }
   }

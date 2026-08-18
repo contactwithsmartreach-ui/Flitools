@@ -13,261 +13,163 @@
 <style>
   :root{ --ease: cubic-bezier(0.16, 1, 0.3, 1); }
   *{ font-family: 'Inter', sans-serif; }
-  body{ background:#fff; color:#000; }
+  body{ background:#080314; color:#ffffff; }
 
   @keyframes fadeSlideDown{ from{ opacity:0; transform: translateY(-16px); } to{ opacity:1; transform: translateY(0); } }
   @keyframes fadeSlideUp{ from{ opacity:0; transform: translateY(20px); } to{ opacity:1; transform: translateY(0); } }
-  @keyframes fadeScaleIn{ from{ opacity:0; transform: scale(1.05); } to{ opacity:1; transform: scale(1); } }
   .anim-navbar{ animation: fadeSlideDown 0.8s var(--ease) both; }
-  .anim-bg{ animation: fadeScaleIn 1.8s var(--ease) both; }
-  .anim-footer{ animation: fadeSlideUp 1s var(--ease) both; animation-delay: .5s; }
-  .anim-subtitle{ animation: fadeSlideUp .8s var(--ease) both; animation-delay: .6s; }
-  .anim-heading{ animation: fadeSlideUp .8s var(--ease) both; animation-delay: .8s; }
-  .anim-buttons{ animation: fadeSlideUp .8s var(--ease) both; animation-delay: 1s; }
+  .anim-content{ animation: fadeSlideUp 0.8s var(--ease) both; }
 
-  .hero-heading{ font-weight:300; letter-spacing:-0.03em; line-height:1; font-size: clamp(2rem, 8vw, 4.5rem); }
-  @media (min-width:768px){ .hero-heading{ font-size: clamp(2.5rem, 5.5vw, 4.5rem); } }
-
-  .hero-gradient-bg{
-    background:
-      radial-gradient(circle at 20% 20%, rgba(0,0,0,0.06), transparent 45%),
-      radial-gradient(circle at 80% 30%, rgba(0,0,0,0.04), transparent 50%),
-      linear-gradient(135deg, #fafafa 0%, #f0f0f2 100%);
-  }
-  .hero-fade{ background: linear-gradient(to top, #ffffff 0%, rgba(255,255,255,0.85) 55%, transparent 100%); }
-
-  input[type=range]{ accent-color:#000; }
-  input[type=text], input[type=url], textarea{ transition: border-color .15s ease; }
-  input[type=text]:focus, input[type=url]:focus, textarea:focus{ outline:none; border-color:#000; }
-  input[type=color]{ -webkit-appearance:none; appearance:none; border:none; padding:0; background:none; width:36px; height:36px; border-radius:9999px; overflow:hidden; }
+  input[type=range]{ accent-color:#c084fc; }
+  input[type=text], input[type=url], textarea, select{ transition: border-color .15s ease; background:#1a0836; color:#ffffff; }
+  input[type=text]:focus, input[type=url]:focus, textarea:focus, select:focus{ outline:none; border-color:#c084fc; }
+  input[type=color]{ -webkit-appearance:none; appearance:none; border:none; padding:0; background:none; width:36px; height:36px; border-radius:9999px; overflow:hidden; cursor:pointer; }
   input[type=color]::-webkit-color-swatch-wrapper{ padding:0; }
-  input[type=color]::-webkit-color-swatch{ border:1px solid rgba(0,0,0,0.12); border-radius:9999px; }
+  input[type=color]::-webkit-color-swatch{ border:1px solid rgba(255,255,255,0.2); border-radius:9999px; }
 
-  ::-webkit-scrollbar{ width:8px; }
-  ::-webkit-scrollbar-thumb{ background:#ddd; border-radius:9999px; }
+  ::-webkit-scrollbar{ width:6px; }
+  ::-webkit-scrollbar-track{ background: rgba(15, 5, 29, 0.6); }
+  ::-webkit-scrollbar-thumb{ background: rgba(168, 85, 247, 0.4); border-radius:9999px; }
 
   .seg-btn{ transition: background-color .15s ease, color .15s ease; }
   .tab-btn{ transition: background-color .15s ease, color .15s ease; }
 </style>
 </head>
-<body class="min-h-screen flex flex-col">
+<body class="min-h-screen flex flex-col bg-[#080314] text-white">
 
-<!-- ============ HERO ============ -->
-<section class="relative w-full min-h-screen flex flex-col justify-between overflow-hidden">
-  <div class="anim-bg absolute inset-0 z-0 hero-gradient-bg"></div>
-
-  <nav class="anim-navbar relative z-50 flex items-center justify-between px-4 py-4 md:px-8 md:py-6" style="pointer-events:none;">
-    <div class="flex items-center gap-3 md:gap-5" style="pointer-events:auto;">
-      <div class="flex items-center gap-2">
+  <!-- NAVBAR -->
+  <nav class="anim-navbar relative z-50 flex items-center justify-between px-4 py-3 md:px-8 border-b border-purple-900/40 bg-[#0d0422]/90 backdrop-blur-md">
+    <div class="flex items-center gap-3">
+      <a href="/" class="flex items-center gap-2">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-          <rect x="3" y="3" width="7" height="7" rx="1" fill="black"/>
-          <rect x="14" y="3" width="7" height="7" rx="1" fill="black"/>
-          <rect x="3" y="14" width="7" height="7" rx="1" fill="black"/>
-          <rect x="14" y="14" width="3" height="3" fill="black"/>
-          <rect x="18" y="14" width="3" height="3" fill="black"/>
-          <rect x="14" y="18" width="3" height="3" fill="black"/>
-          <rect x="18" y="18" width="3" height="3" fill="black"/>
+          <rect x="5" y="4" width="6" height="14" rx="2.5" fill="#e9d5ff" transform="rotate(-35 8 11)" />
+          <rect x="12" y="4" width="6" height="14" rx="2.5" fill="#c084fc" transform="rotate(-35 15 11)" />
         </svg>
-        <span class="hidden md:inline text-sm font-medium tracking-tight">QR Studio</span>
-      </div>
-      <div class="hidden md:flex items-center gap-3 rounded-full px-4 py-2" style="background:#F4F4F6;">
-        <span class="text-[11px] text-black/70">In-Browser</span>
-        <span class="text-[11px] text-black/70">No Uploads</span>
-      </div>
-    </div>
-    <div class="hidden md:flex items-center gap-3" style="pointer-events:auto;">
-      <div class="flex items-center gap-2 rounded-full pl-2 pr-4 py-1.5" style="background:#F4F4F6;">
-        <span class="flex items-center justify-center bg-black rounded-full" style="width:28px;height:28px;">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="white">
-            <rect x="2" y="2" width="7" height="7" rx="1.5"/><rect x="15" y="2" width="7" height="7" rx="1.5"/>
-            <rect x="2" y="15" width="7" height="7" rx="1.5"/><rect x="15" y="15" width="7" height="7" rx="1.5"/>
-          </svg>
-        </span>
-        <span class="text-[11px] text-black/70">100% Client-Side</span>
-      </div>
+        <span class="font-semibold text-sm tracking-tight text-white">FliTools</span>
+      </a>
+      <span class="text-purple-400/40 text-xs">/</span>
+      <span class="text-xs text-purple-200 font-medium">QR Studio</span>
+      <span class="hidden sm:inline bg-purple-950/80 border border-purple-400/30 text-purple-200 text-[10px] uppercase font-semibold px-2 py-0.5 rounded-full">
+        100% Client-Side
+      </span>
     </div>
   </nav>
 
-  <div class="anim-footer relative z-30 hero-fade px-4 pb-8 pt-12 md:px-8 md:pb-10">
-    <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-8">
-      <div>
-        <div class="anim-subtitle flex items-center gap-2 mb-4">
-          <span class="rounded-full bg-black" style="width:8px;height:8px;"></span>
-          <span class="text-[13px]" style="color:rgba(0,0,0,0.55);">Turn text and links into QR codes, right here</span>
-        </div>
-        <h1 class="anim-heading hero-heading mb-6">
-          Text In,<br/>Zero Uploads.<br/>QR Out.
-        </h1>
-        <div class="anim-buttons flex items-center gap-3">
-          <a href="#how-it-works" class="bg-black text-white text-[13px] rounded-full px-5 py-2.5">How It Works</a>
-        </div>
-      </div>
-      <div class="flex items-center gap-2 md:justify-end flex-wrap">
-        <span class="text-[11px] rounded-full px-3 py-1.5 bg-white border" style="border-color:rgba(0,0,0,0.12);">Live Preview</span>
-        <span class="text-[11px] rounded-full px-3 py-1.5 bg-white border" style="border-color:rgba(0,0,0,0.12);">Custom Colors</span>
-        <span class="text-[11px] rounded-full px-3 py-1.5 bg-white border" style="border-color:rgba(0,0,0,0.12);">PNG & SVG</span>
-      </div>
+  <!-- TOOL -->
+  <section class="anim-content w-full max-w-6xl mx-auto px-4 md:px-8 py-8 flex-1 flex flex-col">
+
+    <div class="mb-8 border-b border-purple-900/40 pb-5">
+      <h1 class="text-2xl md:text-3xl font-light tracking-tight text-white mb-1">Generate QR Codes</h1>
+      <p class="text-xs text-purple-200/70">Type or paste links, messages, Wi-Fi credentials, customize colors, and download SVG / PNG.</p>
     </div>
-  </div>
-</section>
 
-<!-- ============ TOOL ============ -->
-<section id="tool" class="w-full max-w-6xl mx-auto px-4 md:px-8 py-16">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
 
-  <div class="mb-10">
-    <h2 class="text-2xl md:text-3xl font-light tracking-tight mb-2">Build your QR code</h2>
-    <p class="text-sm text-black/50">Type or paste in a link, message, or contact details, style it, preview it live, then download — nothing ever leaves your browser.</p>
-  </div>
+      <!-- LEFT: content + style -->
+      <div class="flex flex-col gap-6">
 
-  <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
+        <div class="bg-[#12052b]/90 border border-purple-300/20 rounded-2xl p-5 shadow-xl">
+          <h3 class="text-xs font-bold uppercase tracking-wider text-purple-200 mb-3">1. Content</h3>
+          <div class="flex rounded-xl overflow-hidden border border-purple-400/20 text-xs mb-4 w-fit bg-purple-950/60 p-0.5">
+            <button data-type="url" class="tab-btn type-btn px-4 py-1.5 rounded-lg bg-gradient-to-r from-purple-700 to-indigo-600 text-white font-medium">URL</button>
+            <button data-type="text" class="tab-btn type-btn px-4 py-1.5 rounded-lg text-purple-300 hover:text-white">Text</button>
+            <button data-type="email" class="tab-btn type-btn px-4 py-1.5 rounded-lg text-purple-300 hover:text-white">Email</button>
+            <button data-type="wifi" class="tab-btn type-btn px-4 py-1.5 rounded-lg text-purple-300 hover:text-white">Wi-Fi</button>
+          </div>
 
-    <!-- LEFT: content + style -->
-    <div class="flex flex-col gap-8">
-
-      <div>
-        <h3 class="text-sm font-medium mb-3">1. Content</h3>
-        <div class="flex rounded-full overflow-hidden border border-black/10 text-xs mb-3 w-fit">
-          <button data-type="url" class="tab-btn type-btn px-4 py-2 bg-black text-white">URL</button>
-          <button data-type="text" class="tab-btn type-btn px-4 py-2">Text</button>
-          <button data-type="email" class="tab-btn type-btn px-4 py-2">Email</button>
-          <button data-type="wifi" class="tab-btn type-btn px-4 py-2">Wi-Fi</button>
+          <div id="fieldsUrl" class="type-fields">
+            <input id="urlInput" type="url" placeholder="https://example.com" class="w-full border border-purple-400/20 rounded-xl px-4 py-2.5 text-xs">
+          </div>
+          <div id="fieldsText" class="type-fields hidden">
+            <textarea id="textInput" rows="3" placeholder="Type any text or message…" class="w-full border border-purple-400/20 rounded-xl px-4 py-2.5 text-xs resize-none"></textarea>
+          </div>
+          <div id="fieldsEmail" class="type-fields hidden flex flex-col gap-2">
+            <input id="emailTo" type="text" placeholder="Recipient email" class="w-full border border-purple-400/20 rounded-xl px-4 py-2.5 text-xs">
+            <input id="emailSubject" type="text" placeholder="Subject (optional)" class="w-full border border-purple-400/20 rounded-xl px-4 py-2.5 text-xs">
+            <textarea id="emailBody" rows="2" placeholder="Message (optional)" class="w-full border border-purple-400/20 rounded-xl px-4 py-2.5 text-xs resize-none"></textarea>
+          </div>
+          <div id="fieldsWifi" class="type-fields hidden flex flex-col gap-2">
+            <input id="wifiSsid" type="text" placeholder="Network name (SSID)" class="w-full border border-purple-400/20 rounded-xl px-4 py-2.5 text-xs">
+            <input id="wifiPassword" type="text" placeholder="Password" class="w-full border border-purple-400/20 rounded-xl px-4 py-2.5 text-xs">
+            <select id="wifiEncryption" class="w-full border border-purple-400/20 rounded-xl px-4 py-2.5 text-xs">
+              <option value="WPA">WPA/WPA2</option>
+              <option value="WEP">WEP</option>
+              <option value="nopass">No password</option>
+            </select>
+          </div>
         </div>
 
-        <div id="fieldsUrl" class="type-fields">
-          <input id="urlInput" type="url" placeholder="https://example.com" class="w-full border border-black/10 rounded-xl px-4 py-3 text-sm">
-        </div>
-        <div id="fieldsText" class="type-fields hidden">
-          <textarea id="textInput" rows="3" placeholder="Type any text or message…" class="w-full border border-black/10 rounded-xl px-4 py-3 text-sm resize-none"></textarea>
-        </div>
-        <div id="fieldsEmail" class="type-fields hidden flex flex-col gap-2">
-          <input id="emailTo" type="text" placeholder="Recipient email" class="w-full border border-black/10 rounded-xl px-4 py-3 text-sm">
-          <input id="emailSubject" type="text" placeholder="Subject (optional)" class="w-full border border-black/10 rounded-xl px-4 py-3 text-sm">
-          <textarea id="emailBody" rows="2" placeholder="Message (optional)" class="w-full border border-black/10 rounded-xl px-4 py-3 text-sm resize-none"></textarea>
-        </div>
-        <div id="fieldsWifi" class="type-fields hidden flex flex-col gap-2">
-          <input id="wifiSsid" type="text" placeholder="Network name (SSID)" class="w-full border border-black/10 rounded-xl px-4 py-3 text-sm">
-          <input id="wifiPassword" type="text" placeholder="Password" class="w-full border border-black/10 rounded-xl px-4 py-3 text-sm">
-          <select id="wifiEncryption" class="w-full border border-black/10 rounded-xl px-4 py-3 text-sm bg-white">
-            <option value="WPA">WPA/WPA2</option>
-            <option value="WEP">WEP</option>
-            <option value="nopass">No password</option>
-          </select>
-        </div>
-      </div>
-
-      <div>
-        <h3 class="text-sm font-medium mb-3">2. Style</h3>
-        <div class="border border-black/10 rounded-2xl p-5 flex flex-col gap-5">
+        <div class="bg-[#12052b]/90 border border-purple-300/20 rounded-2xl p-5 shadow-xl flex flex-col gap-4">
+          <h3 class="text-xs font-bold uppercase tracking-wider text-purple-200">2. Styling Options</h3>
 
           <div class="flex items-center gap-6">
             <div class="flex items-center gap-2">
               <input id="fgColor" type="color" value="#000000">
-              <label class="text-xs text-black/60">Foreground</label>
+              <label class="text-xs text-purple-200/80">Foreground</label>
             </div>
             <div class="flex items-center gap-2">
               <input id="bgColor" type="color" value="#ffffff">
-              <label class="text-xs text-black/60">Background</label>
+              <label class="text-xs text-purple-200/80">Background</label>
             </div>
           </div>
 
           <div>
             <div class="flex items-center justify-between mb-1">
-              <label class="text-xs text-black/60">Size</label>
-              <span id="sizeValue" class="text-xs font-medium">400 px</span>
+              <label class="text-xs text-purple-200/80">Size</label>
+              <span id="sizeValue" class="text-xs font-medium text-purple-200">400 px</span>
             </div>
             <input id="sizeRange" type="range" min="120" max="1000" step="10" value="400" class="w-full">
           </div>
 
           <div>
             <div class="flex items-center justify-between mb-1">
-              <label class="text-xs text-black/60">Margin</label>
-              <span id="marginValue" class="text-xs font-medium">4</span>
+              <label class="text-xs text-purple-200/80">Margin</label>
+              <span id="marginValue" class="text-xs font-medium text-purple-200">4</span>
             </div>
             <input id="marginRange" type="range" min="0" max="100" step="1" value="4" class="w-full">
           </div>
 
           <div>
-            <label class="text-xs text-black/60 block mb-2">Error correction</label>
-            <div class="flex rounded-full overflow-hidden border border-black/10 text-xs">
-              <button data-ecl="L" class="seg-btn ecl-btn flex-1 py-2">L</button>
-              <button data-ecl="M" class="seg-btn ecl-btn flex-1 py-2 bg-black text-white">M</button>
-              <button data-ecl="Q" class="seg-btn ecl-btn flex-1 py-2">Q</button>
-              <button data-ecl="H" class="seg-btn ecl-btn flex-1 py-2">H</button>
+            <label class="text-xs text-purple-200/80 block mb-2">Error correction</label>
+            <div class="flex rounded-xl overflow-hidden border border-purple-400/20 text-xs bg-purple-950/60 p-0.5">
+              <button data-ecl="L" class="seg-btn ecl-btn flex-1 py-1 rounded-lg text-purple-300">L</button>
+              <button data-ecl="M" class="seg-btn ecl-btn flex-1 py-1 rounded-lg bg-purple-700 text-white font-semibold">M</button>
+              <button data-ecl="Q" class="seg-btn ecl-btn flex-1 py-1 rounded-lg text-purple-300">Q</button>
+              <button data-ecl="H" class="seg-btn ecl-btn flex-1 py-1 rounded-lg text-purple-300">H</button>
             </div>
-            <p class="text-[11px] text-black/30 mt-1">Higher levels tolerate more damage but produce denser codes.</p>
           </div>
         </div>
       </div>
-    </div>
 
-    <!-- RIGHT: preview + download -->
-    <div class="flex flex-col gap-8">
-      <div>
-        <h3 class="text-sm font-medium mb-3">3. Preview</h3>
-        <div class="border border-black/10 rounded-2xl aspect-square flex items-center justify-center bg-black/[0.02] overflow-hidden p-6">
-          <canvas id="qrCanvas" class="max-w-full max-h-full hidden"></canvas>
-          <span id="previewPlaceholder" class="text-xs text-black/30 text-center">Your QR code will appear here as you type</span>
+      <!-- RIGHT: preview + download -->
+      <div class="flex flex-col gap-6">
+        <div class="bg-[#12052b]/90 border border-purple-300/20 rounded-2xl p-5 shadow-xl flex flex-col items-center">
+          <h3 class="text-xs font-bold uppercase tracking-wider text-purple-200 self-start mb-3">3. Live Preview</h3>
+          <div class="border border-purple-400/20 rounded-2xl w-full aspect-square flex items-center justify-center bg-white/95 overflow-hidden p-6 shadow-inner">
+            <canvas id="qrCanvas" class="max-w-full max-h-full hidden rounded-lg"></canvas>
+            <span id="previewPlaceholder" class="text-xs text-slate-400 text-center">Your QR code will appear here as you type</span>
+          </div>
         </div>
-      </div>
 
-      <div>
-        <h3 class="text-sm font-medium mb-3">4. Download</h3>
-        <div class="border border-black/10 rounded-2xl p-5 flex flex-col gap-3">
+        <div class="bg-[#12052b]/90 border border-purple-300/20 rounded-2xl p-5 shadow-xl flex flex-col gap-3">
+          <h3 class="text-xs font-bold uppercase tracking-wider text-purple-200">4. Instant Download</h3>
           <div class="flex gap-3">
-            <button id="downloadPngBtn" class="pointer-events-none opacity-30 flex-1 bg-black text-white text-[13px] rounded-full px-5 py-2.5 text-center cursor-pointer">
+            <button id="downloadPngBtn" class="pointer-events-none opacity-30 flex-1 bg-gradient-to-r from-purple-700 to-indigo-600 hover:from-purple-600 hover:to-indigo-500 text-white text-xs font-medium rounded-xl py-3 text-center cursor-pointer shadow-lg shadow-purple-950/60">
               Download PNG
             </button>
-            <button id="downloadSvgBtn" class="pointer-events-none opacity-30 flex-1 bg-white text-black border border-black/15 text-[13px] rounded-full px-5 py-2.5 text-center cursor-pointer">
+            <button id="downloadSvgBtn" class="pointer-events-none opacity-30 flex-1 bg-purple-950/60 hover:bg-purple-900/80 border border-purple-300/30 text-white text-xs font-medium rounded-xl py-3 text-center cursor-pointer">
               Download SVG
             </button>
           </div>
-          <p class="text-xs text-black/40">Everything is generated locally with an open-source JavaScript library (qrcode) running on the main thread — nothing you type is ever sent anywhere.</p>
+          <p class="text-[10px] text-purple-300/60 text-center">Generated 100% in-browser without sending inputs to any remote server.</p>
         </div>
       </div>
     </div>
-  </div>
-</section>
+  </section>
 
-<!-- ============ HOW IT WORKS ============ -->
-<section id="how-it-works" class="w-full bg-black/[0.02] border-t border-black/10">
-  <div class="max-w-6xl mx-auto px-4 md:px-8 py-16">
-    <div class="mb-10">
-      <h2 class="text-2xl md:text-3xl font-light tracking-tight mb-2">How it works</h2>
-      <p class="text-sm text-black/50 max-w-2xl">QR Studio encodes your text, link, or contact details into a scannable QR code entirely inside your browser. Nothing is ever sent to a server — everything below happens on your own device.</p>
-    </div>
-
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-      <div>
-        <div class="flex items-center justify-center rounded-full bg-black text-white text-sm font-medium mb-4" style="width:32px;height:32px;">1</div>
-        <h3 class="text-sm font-medium mb-2">Choose a content type</h3>
-        <p class="text-xs text-black/50 leading-relaxed">Pick URL, plain text, email, or Wi-Fi, and fill in the fields. The QR payload is built for you in the right format automatically.</p>
-      </div>
-      <div>
-        <div class="flex items-center justify-center rounded-full bg-black text-white text-sm font-medium mb-4" style="width:32px;height:32px;">2</div>
-        <h3 class="text-sm font-medium mb-2">Style it</h3>
-        <p class="text-xs text-black/50 leading-relaxed">Set foreground and background colors, output size, margin, and error-correction level to balance density against damage tolerance.</p>
-      </div>
-      <div>
-        <div class="flex items-center justify-center rounded-full bg-black text-white text-sm font-medium mb-4" style="width:32px;height:32px;">3</div>
-        <h3 class="text-sm font-medium mb-2">Preview live</h3>
-        <p class="text-xs text-black/50 leading-relaxed">Your browser regenerates the code as you type using an open-source QR encoder — no upload, no waiting on a server.</p>
-      </div>
-      <div>
-        <div class="flex items-center justify-center rounded-full bg-black text-white text-sm font-medium mb-4" style="width:32px;height:32px;">4</div>
-        <h3 class="text-sm font-medium mb-2">Download</h3>
-        <p class="text-xs text-black/50 leading-relaxed">Save your code as a PNG for quick sharing or an SVG for crisp printing at any size. Nothing you typed ever leaves your computer.</p>
-      </div>
-    </div>
-
-    <div class="mt-10">
-      <a href="#tool" class="bg-black text-white text-[13px] rounded-full px-5 py-2.5 inline-block">Get Started</a>
-    </div>
-  </div>
-</section>
-
-<footer class="text-center text-xs text-black/30 py-8">
-  Built entirely client-side — what you type never leaves this browser.
-</footer>
+  <footer class="text-center text-[11px] text-purple-400/50 py-4 border-t border-purple-900/30 bg-[#080314]">
+    FliTools — 100% Client-Side QR Generator
+  </footer>
 
 <script>
 (function(){
@@ -296,8 +198,12 @@
 
   typeBtns.forEach(btn => {
     btn.addEventListener('click', () => {
-      typeBtns.forEach(b => b.classList.remove('bg-black','text-white'));
-      btn.classList.add('bg-black','text-white');
+      typeBtns.forEach(b => {
+        b.classList.remove('bg-gradient-to-r','from-purple-700','to-indigo-600','text-white','font-medium');
+        b.classList.add('text-purple-300');
+      });
+      btn.classList.add('bg-gradient-to-r','from-purple-700','to-indigo-600','text-white','font-medium');
+      btn.classList.remove('text-purple-300');
       currentType = btn.dataset.type;
       document.querySelectorAll('.type-fields').forEach(f => f.classList.add('hidden'));
       document.getElementById('fields' + currentType.charAt(0).toUpperCase() + currentType.slice(1)).classList.remove('hidden');
@@ -307,8 +213,12 @@
 
   eclBtns.forEach(btn => {
     btn.addEventListener('click', () => {
-      eclBtns.forEach(b => b.classList.remove('bg-black','text-white'));
-      btn.classList.add('bg-black','text-white');
+      eclBtns.forEach(b => {
+        b.classList.remove('bg-purple-700','text-white','font-semibold');
+        b.classList.add('text-purple-300');
+      });
+      btn.classList.add('bg-purple-700','text-white','font-semibold');
+      btn.classList.remove('text-purple-300');
       currentEcl = btn.dataset.ecl;
       scheduleGenerate();
     });
@@ -330,12 +240,8 @@
   }
 
   function buildPayload(){
-    if (currentType === 'url') {
-      return document.getElementById('urlInput').value.trim();
-    }
-    if (currentType === 'text') {
-      return document.getElementById('textInput').value;
-    }
+    if (currentType === 'url') return document.getElementById('urlInput').value.trim();
+    if (currentType === 'text') return document.getElementById('textInput').value;
     if (currentType === 'email') {
       const to = document.getElementById('emailTo').value.trim();
       const subject = encodeURIComponent(document.getElementById('emailSubject').value);
@@ -423,10 +329,9 @@
     a.click();
   });
 
-  document.getElementById('urlInput').value = 'https://example.com';
+  document.getElementById('urlInput').value = 'https://flitools.cyou';
   generate();
 })();
 </script>
-
 </body>
 </html>

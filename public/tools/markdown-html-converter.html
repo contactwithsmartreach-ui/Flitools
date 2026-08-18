@@ -6,218 +6,120 @@
 <title>Markdown Studio — Convert Markdown & HTML Locally</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdn.tailwindcss.com"></script>
 <!-- Monetag Vignette / Interstitial Tag Script -->
 <script>(function(s){s.dataset.zone='11579038',s.src='https://n6wxm.com/vignette.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))</script>
 <style>
   :root{ --ease: cubic-bezier(0.16, 1, 0.3, 1); }
   *{ font-family: 'Inter', sans-serif; }
-  body{ background:#fff; color:#000; }
+  body{ background:#080314; color:#ffffff; }
   .mono{ font-family: 'JetBrains Mono', monospace; }
 
   @keyframes fadeSlideDown{ from{ opacity:0; transform: translateY(-16px); } to{ opacity:1; transform: translateY(0); } }
   @keyframes fadeSlideUp{ from{ opacity:0; transform: translateY(20px); } to{ opacity:1; transform: translateY(0); } }
-  @keyframes fadeScaleIn{ from{ opacity:0; transform: scale(1.05); } to{ opacity:1; transform: scale(1); } }
   .anim-navbar{ animation: fadeSlideDown 0.8s var(--ease) both; }
-  .anim-bg{ animation: fadeScaleIn 1.8s var(--ease) both; }
-  .anim-footer{ animation: fadeSlideUp 1s var(--ease) both; animation-delay: .5s; }
-  .anim-subtitle{ animation: fadeSlideUp .8s var(--ease) both; animation-delay: .6s; }
-  .anim-heading{ animation: fadeSlideUp .8s var(--ease) both; animation-delay: .8s; }
-  .anim-buttons{ animation: fadeSlideUp .8s var(--ease) both; animation-delay: 1s; }
+  .anim-content{ animation: fadeSlideUp 0.8s var(--ease) both; }
 
-  .hero-heading{ font-weight:300; letter-spacing:-0.03em; line-height:1; font-size: clamp(2rem, 8vw, 4.5rem); }
-  @media (min-width:768px){ .hero-heading{ font-size: clamp(2.5rem, 5.5vw, 4.5rem); } }
+  textarea{ transition: border-color .15s ease; background:#1a0836; color:#ffffff; }
+  textarea:focus{ outline:none; border-color:#c084fc; }
 
-  .hero-gradient-bg{
-    background:
-      radial-gradient(circle at 20% 20%, rgba(0,0,0,0.06), transparent 45%),
-      radial-gradient(circle at 80% 30%, rgba(0,0,0,0.04), transparent 50%),
-      linear-gradient(135deg, #fafafa 0%, #f0f0f2 100%);
-  }
-  .hero-fade{ background: linear-gradient(to top, #ffffff 0%, rgba(255,255,255,0.85) 55%, transparent 100%); }
-
-  textarea{ transition: border-color .15s ease; }
-  textarea:focus{ outline:none; border-color:#000; }
-
-  ::-webkit-scrollbar{ width:8px; height:8px; }
-  ::-webkit-scrollbar-thumb{ background:#ddd; border-radius:9999px; }
+  ::-webkit-scrollbar{ width:6px; height:6px; }
+  ::-webkit-scrollbar-track{ background: rgba(15, 5, 29, 0.6); }
+  ::-webkit-scrollbar-thumb{ background: rgba(168, 85, 247, 0.4); border-radius:9999px; }
 
   .tab-btn{ transition: background-color .15s ease, color .15s ease; }
   .seg-btn{ transition: background-color .15s ease, color .15s ease; }
 
-  .prose-preview h1{ font-size:1.5rem; font-weight:600; margin:.6em 0 .3em; }
-  .prose-preview h2{ font-size:1.25rem; font-weight:600; margin:.6em 0 .3em; }
-  .prose-preview h3{ font-size:1.1rem; font-weight:600; margin:.5em 0 .3em; }
-  .prose-preview p{ margin:.5em 0; line-height:1.6; }
+  .prose-preview h1{ font-size:1.5rem; font-weight:700; margin:.6em 0 .3em; color:#fff; }
+  .prose-preview h2{ font-size:1.25rem; font-weight:600; margin:.6em 0 .3em; color:#e9d5ff; }
+  .prose-preview h3{ font-size:1.1rem; font-weight:600; margin:.5em 0 .3em; color:#d8b4fe; }
+  .prose-preview p{ margin:.5em 0; line-height:1.6; color:#f3e8ff; }
   .prose-preview ul, .prose-preview ol{ margin:.5em 0 .5em 1.4em; }
-  .prose-preview li{ margin:.2em 0; line-height:1.6; }
-  .prose-preview a{ color:#0b5fae; text-decoration:underline; }
-  .prose-preview code{ background:#f4f4f6; padding:.1em .35em; border-radius:.3em; font-family:'JetBrains Mono',monospace; font-size:.85em; }
-  .prose-preview pre{ background:#f4f4f6; padding:.8em 1em; border-radius:.6em; overflow-x:auto; margin:.6em 0; }
+  .prose-preview li{ margin:.2em 0; line-height:1.6; color:#f3e8ff; }
+  .prose-preview a{ color:#c084fc; text-decoration:underline; }
+  .prose-preview code{ background:#2e1065; color:#e9d5ff; padding:.1em .35em; border-radius:.3em; font-family:'JetBrains Mono',monospace; font-size:.85em; }
+  .prose-preview pre{ background:#1f0747; padding:.8em 1em; border-radius:.6em; overflow-x:auto; margin:.6em 0; }
   .prose-preview pre code{ background:none; padding:0; }
-  .prose-preview blockquote{ border-left:3px solid rgba(0,0,0,0.15); padding-left:1em; color:rgba(0,0,0,0.6); margin:.6em 0; }
-  .prose-preview table{ border-collapse:collapse; margin:.6em 0; font-size:.9em; }
-  .prose-preview th, .prose-preview td{ border:1px solid rgba(0,0,0,0.1); padding:.4em .7em; }
-  .prose-preview hr{ border:none; border-top:1px solid rgba(0,0,0,0.1); margin:1em 0; }
-  .prose-preview img{ max-width:100%; border-radius:.4em; }
+  .prose-preview blockquote{ border-left:3px solid #a855f7; padding-left:1em; color:#d8b4fe; margin:.6em 0; }
 </style>
 </head>
-<body class="min-h-screen flex flex-col">
+<body class="min-h-screen flex flex-col bg-[#080314] text-white">
 
-<!-- ============ HERO ============ -->
-<section class="relative w-full min-h-screen flex flex-col justify-between overflow-hidden">
-  <div class="anim-bg absolute inset-0 z-0 hero-gradient-bg"></div>
-
-  <nav class="anim-navbar relative z-50 flex items-center justify-between px-4 py-4 md:px-8 md:py-6" style="pointer-events:none;">
-    <div class="flex items-center gap-3 md:gap-5" style="pointer-events:auto;">
-      <div class="flex items-center gap-2">
+  <!-- NAVBAR -->
+  <nav class="anim-navbar relative z-50 flex items-center justify-between px-4 py-3 md:px-8 border-b border-purple-900/40 bg-[#0d0422]/90 backdrop-blur-md">
+    <div class="flex items-center gap-3">
+      <a href="/" class="flex items-center gap-2">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-          <path d="M3 6h18v12H3z" stroke="black" stroke-width="1.6" stroke-linejoin="round"/>
-          <path d="M6 15v-6l3 3.5L12 9v6M15 9v6M19 9v6M15 12h4" stroke="black" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+          <rect x="5" y="4" width="6" height="14" rx="2.5" fill="#e9d5ff" transform="rotate(-35 8 11)" />
+          <rect x="12" y="4" width="6" height="14" rx="2.5" fill="#c084fc" transform="rotate(-35 15 11)" />
         </svg>
-        <span class="hidden md:inline text-sm font-medium tracking-tight">Markdown Studio</span>
-      </div>
-      <div class="hidden md:flex items-center gap-3 rounded-full px-4 py-2" style="background:#F4F4F6;">
-        <span class="text-[11px] text-black/70">In-Browser</span>
-        <span class="text-[11px] text-black/70">No Uploads</span>
-      </div>
-    </div>
-    <div class="hidden md:flex items-center gap-3" style="pointer-events:auto;">
-      <div class="flex items-center gap-2 rounded-full pl-2 pr-4 py-1.5" style="background:#F4F4F6;">
-        <span class="flex items-center justify-center bg-black rounded-full" style="width:28px;height:28px;">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="white">
-            <rect x="2" y="2" width="7" height="7" rx="1.5"/><rect x="15" y="2" width="7" height="7" rx="1.5"/>
-            <rect x="2" y="15" width="7" height="7" rx="1.5"/><rect x="15" y="15" width="7" height="7" rx="1.5"/>
-          </svg>
-        </span>
-        <span class="text-[11px] text-black/70">100% Client-Side</span>
-      </div>
+        <span class="font-semibold text-sm tracking-tight text-white">FliTools</span>
+      </a>
+      <span class="text-purple-400/40 text-xs">/</span>
+      <span class="text-xs text-purple-200 font-medium">Markdown Studio</span>
+      <span class="hidden sm:inline bg-purple-950/80 border border-purple-400/30 text-purple-200 text-[10px] uppercase font-semibold px-2 py-0.5 rounded-full">
+        100% Client-Side
+      </span>
     </div>
   </nav>
 
-  <div class="anim-footer relative z-30 hero-fade px-4 pb-8 pt-12 md:px-8 md:pb-10">
-    <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-8">
-      <div>
-        <div class="anim-subtitle flex items-center gap-2 mb-4">
-          <span class="rounded-full bg-black" style="width:8px;height:8px;"></span>
-          <span class="text-[13px]" style="color:rgba(0,0,0,0.55);">Convert between Markdown and HTML, right here</span>
-        </div>
-        <h1 class="anim-heading hero-heading mb-6">
-          Markdown In,<br/>Zero Uploads.<br/>HTML Out.
-        </h1>
-        <div class="anim-buttons flex items-center gap-3">
-          <a href="#how-it-works" class="bg-black text-white text-[13px] rounded-full px-5 py-2.5">How It Works</a>
-        </div>
-      </div>
-      <div class="flex items-center gap-2 md:justify-end flex-wrap">
-        <span class="text-[11px] rounded-full px-3 py-1.5 bg-white border" style="border-color:rgba(0,0,0,0.12);">Live Preview</span>
-        <span class="text-[11px] rounded-full px-3 py-1.5 bg-white border" style="border-color:rgba(0,0,0,0.12);">Two-Way Convert</span>
-        <span class="text-[11px] rounded-full px-3 py-1.5 bg-white border" style="border-color:rgba(0,0,0,0.12);">Instant Download</span>
-      </div>
-    </div>
-  </div>
-</section>
+  <!-- TOOL -->
+  <section class="anim-content w-full max-w-6xl mx-auto px-4 md:px-8 py-8 flex-1 flex flex-col">
 
-<!-- ============ TOOL ============ -->
-<section id="tool" class="w-full max-w-6xl mx-auto px-4 md:px-8 py-16">
-
-  <div class="mb-10">
-    <h2 class="text-2xl md:text-3xl font-light tracking-tight mb-2">Convert Markdown & HTML</h2>
-    <p class="text-sm text-black/50">Write or paste Markdown to get clean HTML, or paste HTML to get tidy Markdown — nothing ever leaves your browser.</p>
-  </div>
-
-  <div class="flex rounded-full overflow-hidden border border-black/10 text-xs mb-10 w-fit">
-    <button data-direction="md2html" class="tab-btn dir-tab px-6 py-2.5 bg-black text-white">Markdown → HTML</button>
-    <button data-direction="html2md" class="tab-btn dir-tab px-6 py-2.5">HTML → Markdown</button>
-  </div>
-
-  <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
-
-    <!-- LEFT: input -->
-    <div class="flex flex-col gap-8">
-      <div>
-        <h3 class="text-sm font-medium mb-3" id="inputLabel">1. Paste your Markdown</h3>
-        <textarea id="sourceInput" spellcheck="false" class="mono w-full h-72 border border-black/10 rounded-2xl p-4 text-xs leading-relaxed resize-none" placeholder="# Hello world
-
-Type or paste **Markdown** here…"></textarea>
-      </div>
-
-      <div>
-        <h3 class="text-sm font-medium mb-3">2. Options</h3>
-        <div class="border border-black/10 rounded-2xl p-5 flex items-center justify-between">
-          <label class="text-xs text-black/60" id="optionLabel">Show live rendered preview</label>
-          <input id="livePreviewToggle" type="checkbox" checked class="accent-black w-4 h-4">
-        </div>
-      </div>
+    <div class="mb-8 border-b border-purple-900/40 pb-5">
+      <h1 class="text-2xl md:text-3xl font-light tracking-tight text-white mb-1">Convert Markdown & HTML</h1>
+      <p class="text-xs text-purple-200/70">Convert between Markdown and sanitized HTML with live rendered preview.</p>
     </div>
 
-    <!-- RIGHT: output -->
-    <div class="flex flex-col gap-8">
-      <div>
-        <h3 class="text-sm font-medium mb-3" id="outputLabel">3. HTML output</h3>
-        <div class="flex rounded-full overflow-hidden border border-black/10 text-xs mb-3 w-fit" id="outputViewToggle">
-          <button data-view="code" class="seg-btn view-btn px-4 py-1.5 bg-black text-white">Code</button>
-          <button data-view="preview" class="seg-btn view-btn px-4 py-1.5">Preview</button>
+    <div class="flex rounded-xl overflow-hidden border border-purple-400/20 text-xs mb-8 w-fit bg-purple-950/60 p-1">
+      <button data-direction="md2html" class="tab-btn dir-tab px-6 py-2 rounded-lg bg-gradient-to-r from-purple-700 to-indigo-600 text-white font-medium shadow-md">Markdown → HTML</button>
+      <button data-direction="html2md" class="tab-btn dir-tab px-6 py-2 rounded-lg text-purple-300 hover:text-white font-medium">HTML → Markdown</button>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+
+      <!-- LEFT: input -->
+      <div class="flex flex-col gap-6">
+        <div class="bg-[#12052b]/90 border border-purple-300/20 rounded-2xl p-5 shadow-xl">
+          <h3 class="text-xs font-bold uppercase tracking-wider text-purple-200 mb-3" id="inputLabel">1. Paste Markdown</h3>
+          <textarea id="sourceInput" spellcheck="false" class="mono w-full h-72 border border-purple-400/20 rounded-xl p-3.5 text-xs leading-relaxed resize-none"></textarea>
         </div>
-        <pre id="codeOutput" class="mono w-full h-72 border border-black/10 rounded-2xl p-4 text-xs leading-relaxed overflow-auto bg-black/[0.02]"><span class="text-black/30">Converted output will appear here</span></pre>
-        <div id="previewOutput" class="prose-preview hidden w-full h-72 border border-black/10 rounded-2xl p-4 text-sm overflow-auto"></div>
+
+        <div class="bg-[#12052b]/90 border border-purple-300/20 rounded-2xl p-5 shadow-xl flex items-center justify-between">
+          <label class="text-xs text-purple-200/80" id="optionLabel">Show live rendered preview</label>
+          <input id="livePreviewToggle" type="checkbox" checked class="accent-purple-500 w-4 h-4 cursor-pointer">
+        </div>
       </div>
-      <div>
-        <h3 class="text-sm font-medium mb-3">4. Download</h3>
-        <div class="border border-black/10 rounded-2xl p-5 flex flex-col gap-3">
-          <div class="flex gap-3">
-            <button id="copyBtn" class="pointer-events-none opacity-30 flex-1 bg-white text-black border border-black/15 text-[13px] rounded-full px-5 py-2.5 cursor-pointer">Copy to Clipboard</button>
-            <a id="downloadBtn" class="pointer-events-none opacity-30 flex-1 bg-black text-white text-[13px] rounded-full px-5 py-2.5 text-center cursor-pointer">Download</a>
+
+      <!-- RIGHT: output -->
+      <div class="flex flex-col gap-6">
+        <div class="bg-[#12052b]/90 border border-purple-300/20 rounded-2xl p-5 shadow-xl flex-1 flex flex-col">
+          <div class="flex items-center justify-between mb-3">
+            <h3 class="text-xs font-bold uppercase tracking-wider text-purple-200" id="outputLabel">3. HTML Output</h3>
+            <div class="flex rounded-lg overflow-hidden border border-purple-400/20 text-xs bg-purple-950/60 p-0.5" id="outputViewToggle">
+              <button data-view="code" class="seg-btn view-btn px-3 py-1 rounded-md bg-purple-700 text-white font-medium">Code</button>
+              <button data-view="preview" class="seg-btn view-btn px-3 py-1 rounded-md text-purple-300 hover:text-white">Preview</button>
+            </div>
           </div>
-          <p class="text-xs text-black/40">Conversion runs locally using the open-source libraries marked and turndown — nothing you type is ever sent anywhere.</p>
+          <pre id="codeOutput" class="mono w-full h-72 border border-purple-400/20 rounded-xl p-3.5 text-xs leading-relaxed overflow-auto bg-[#0a0218] text-purple-100 flex-1"><span class="text-purple-300/40">Converted output will appear here</span></pre>
+          <div id="previewOutput" class="prose-preview hidden w-full h-72 border border-purple-400/20 rounded-xl p-4 text-xs overflow-auto bg-[#0a0218] flex-1"></div>
+        </div>
+
+        <div class="bg-[#12052b]/90 border border-purple-300/20 rounded-2xl p-5 shadow-xl flex flex-col gap-3">
+          <h3 class="text-xs font-bold uppercase tracking-wider text-purple-200">4. Export</h3>
+          <div class="flex gap-3">
+            <button id="copyBtn" class="pointer-events-none opacity-30 flex-1 bg-purple-950/60 hover:bg-purple-900/80 border border-purple-400/30 text-white text-xs font-medium rounded-xl py-2.5 cursor-pointer">Copy to Clipboard</button>
+            <a id="downloadBtn" class="pointer-events-none opacity-30 flex-1 bg-gradient-to-r from-purple-700 to-indigo-600 hover:from-purple-600 hover:to-indigo-500 text-white text-xs font-semibold rounded-xl py-2.5 text-center cursor-pointer shadow-md">Download</a>
+          </div>
         </div>
       </div>
     </div>
-  </div>
-</section>
+  </section>
 
-<!-- ============ HOW IT WORKS ============ -->
-<section id="how-it-works" class="w-full bg-black/[0.02] border-t border-black/10">
-  <div class="max-w-6xl mx-auto px-4 md:px-8 py-16">
-    <div class="mb-10">
-      <h2 class="text-2xl md:text-3xl font-light tracking-tight mb-2">How it works</h2>
-      <p class="text-sm text-black/50 max-w-2xl">Markdown Studio converts between Markdown and HTML entirely inside your browser. Nothing is ever sent to a server — everything below happens on your own device.</p>
-    </div>
-
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-      <div>
-        <div class="flex items-center justify-center rounded-full bg-black text-white text-sm font-medium mb-4" style="width:32px;height:32px;">1</div>
-        <h3 class="text-sm font-medium mb-2">Pick a direction</h3>
-        <p class="text-xs text-black/50 leading-relaxed">Choose Markdown → HTML to render a document, or HTML → Markdown to clean up pasted content.</p>
-      </div>
-      <div>
-        <div class="flex items-center justify-center rounded-full bg-black text-white text-sm font-medium mb-4" style="width:32px;height:32px;">2</div>
-        <h3 class="text-sm font-medium mb-2">Paste your source</h3>
-        <p class="text-xs text-black/50 leading-relaxed">Drop in your Markdown or HTML — the converted result updates automatically as you type.</p>
-      </div>
-      <div>
-        <div class="flex items-center justify-center rounded-full bg-black text-white text-sm font-medium mb-4" style="width:32px;height:32px;">3</div>
-        <h3 class="text-sm font-medium mb-2">Check the preview</h3>
-        <p class="text-xs text-black/50 leading-relaxed">Toggle between raw code and a rendered preview to make sure formatting, links, and tables came through correctly.</p>
-      </div>
-      <div>
-        <div class="flex items-center justify-center rounded-full bg-black text-white text-sm font-medium mb-4" style="width:32px;height:32px;">4</div>
-        <h3 class="text-sm font-medium mb-2">Copy or download</h3>
-        <p class="text-xs text-black/50 leading-relaxed">Copy the result to your clipboard or save it as a file. Your content never leaves your computer.</p>
-      </div>
-    </div>
-
-    <div class="mt-10">
-      <a href="#tool" class="bg-black text-white text-[13px] rounded-full px-5 py-2.5 inline-block">Get Started</a>
-    </div>
-  </div>
-</section>
-
-<footer class="text-center text-xs text-black/30 py-8">
-  Built entirely client-side — your content never leaves this browser.
-</footer>
+  <footer class="text-center text-[11px] text-purple-400/50 py-4 border-t border-purple-900/30 bg-[#080314]">
+    FliTools — 100% Client-Side Markdown Converter
+  </footer>
 
 <script>
 (function(){
@@ -249,32 +151,36 @@ Type or paste **Markdown** here…
 - Item one
 - Item two
 
-[A link](https://example.com)`;
+[A link](https://flitools.cyou)`;
   const sampleHtml = `<h1>Hello world</h1>
 <p>Paste <strong>HTML</strong> here…</p>
 <ul>
   <li>Item one</li>
   <li>Item two</li>
 </ul>
-<p><a href="https://example.com">A link</a></p>`;
+<p><a href="https://flitools.cyou">A link</a></p>`;
 
   sourceInput.value = sampleMd;
 
   dirTabs.forEach(btn => {
     btn.addEventListener('click', () => {
-      dirTabs.forEach(b => b.classList.remove('bg-black','text-white'));
-      btn.classList.add('bg-black','text-white');
+      dirTabs.forEach(b => {
+        b.classList.remove('bg-gradient-to-r','from-purple-700','to-indigo-600','text-white','shadow-md');
+        b.classList.add('text-purple-300');
+      });
+      btn.classList.add('bg-gradient-to-r','from-purple-700','to-indigo-600','text-white','shadow-md');
+      btn.classList.remove('text-purple-300');
       direction = btn.dataset.direction;
       if (direction === 'md2html') {
-        inputLabel.textContent = '1. Paste your Markdown';
-        outputLabel.textContent = '3. HTML output';
+        inputLabel.textContent = '1. Paste Markdown';
+        outputLabel.textContent = '3. HTML Output';
         sourceInput.placeholder = 'Type or paste Markdown here…';
         sourceInput.value = sampleMd;
         outputViewToggle.classList.remove('hidden');
         optionLabel.textContent = 'Show live rendered preview';
       } else {
-        inputLabel.textContent = '1. Paste your HTML';
-        outputLabel.textContent = '3. Markdown output';
+        inputLabel.textContent = '1. Paste HTML';
+        outputLabel.textContent = '3. Markdown Output';
         sourceInput.placeholder = 'Paste HTML here…';
         sourceInput.value = sampleHtml;
         outputViewToggle.classList.add('hidden');
@@ -290,7 +196,7 @@ Type or paste **Markdown** here…
   });
   function setView(view){
     currentView = view;
-    viewBtns.forEach(b => b.classList.toggle('bg-black', b.dataset.view === view));
+    viewBtns.forEach(b => b.classList.toggle('bg-purple-700', b.dataset.view === view));
     viewBtns.forEach(b => b.classList.toggle('text-white', b.dataset.view === view));
     codeOutput.classList.toggle('hidden', view !== 'code');
     previewOutput.classList.toggle('hidden', view !== 'preview');
@@ -309,7 +215,7 @@ Type or paste **Markdown** here…
   async function convert(){
     const src = sourceInput.value;
     if (!src.trim()) {
-      codeOutput.innerHTML = '<span class="text-black/30">Converted output will appear here</span>';
+      codeOutput.innerHTML = '<span class="text-purple-300/40">Converted output will appear here</span>';
       previewOutput.innerHTML = '';
       copyBtn.classList.add('pointer-events-none','opacity-30');
       downloadBtn.classList.add('pointer-events-none','opacity-30');
@@ -350,7 +256,7 @@ Type or paste **Markdown** here…
       downloadBtn.classList.remove('pointer-events-none','opacity-30');
     } catch (err) {
       console.error(err);
-      codeOutput.innerHTML = '<span class="text-red-600">Conversion error: ' + escapeHtml(err.message) + '</span>';
+      codeOutput.innerHTML = '<span class="text-red-400">Conversion error: ' + escapeHtml(err.message) + '</span>';
     }
   }
 
@@ -370,6 +276,5 @@ Type or paste **Markdown** here…
   convert();
 })();
 </script>
-
 </body>
 </html>

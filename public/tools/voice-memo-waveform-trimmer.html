@@ -6,246 +6,156 @@
 <title>Waveform Studio — Trim Voice Memos Locally</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdn.tailwindcss.com"></script>
 <!-- Monetag Vignette / Interstitial Tag Script -->
 <script>(function(s){s.dataset.zone='11579038',s.src='https://n6wxm.com/vignette.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))</script>
 <style>
   :root{ --ease: cubic-bezier(0.16, 1, 0.3, 1); }
   *{ font-family: 'Inter', sans-serif; }
-  body{ background:#fff; color:#000; }
+  body{ background:#080314; color:#ffffff; }
+  .mono{ font-family: 'JetBrains Mono', monospace; }
 
   @keyframes fadeSlideDown{ from{ opacity:0; transform: translateY(-16px); } to{ opacity:1; transform: translateY(0); } }
   @keyframes fadeSlideUp{ from{ opacity:0; transform: translateY(20px); } to{ opacity:1; transform: translateY(0); } }
-  @keyframes fadeScaleIn{ from{ opacity:0; transform: scale(1.05); } to{ opacity:1; transform: scale(1); } }
   .anim-navbar{ animation: fadeSlideDown 0.8s var(--ease) both; }
-  .anim-bg{ animation: fadeScaleIn 1.8s var(--ease) both; }
-  .anim-footer{ animation: fadeSlideUp 1s var(--ease) both; animation-delay: .5s; }
-  .anim-subtitle{ animation: fadeSlideUp .8s var(--ease) both; animation-delay: .6s; }
-  .anim-heading{ animation: fadeSlideUp .8s var(--ease) both; animation-delay: .8s; }
-  .anim-buttons{ animation: fadeSlideUp .8s var(--ease) both; animation-delay: 1s; }
-
-  .hero-heading{ font-weight:300; letter-spacing:-0.03em; line-height:1; font-size: clamp(2rem, 8vw, 4.5rem); }
-  @media (min-width:768px){ .hero-heading{ font-size: clamp(2.5rem, 5.5vw, 4.5rem); } }
-
-  .hero-gradient-bg{
-    background:
-      radial-gradient(circle at 20% 20%, rgba(0,0,0,0.06), transparent 45%),
-      radial-gradient(circle at 80% 30%, rgba(0,0,0,0.04), transparent 50%),
-      linear-gradient(135deg, #fafafa 0%, #f0f0f2 100%);
-  }
-  .hero-fade{ background: linear-gradient(to top, #ffffff 0%, rgba(255,255,255,0.85) 55%, transparent 100%); }
+  .anim-content{ animation: fadeSlideUp 0.8s var(--ease) both; }
 
   .drop-zone{ transition: border-color .2s ease, background-color .2s ease; }
-  .drop-zone.dragover{ border-color:#000; background-color:#f7f7f7; }
+  .drop-zone.dragover{ border-color:#c084fc; background-color:rgba(168,85,247,0.15); }
 
-  input[type=range]{ accent-color:#000; }
-  ::-webkit-scrollbar{ width:8px; }
-  ::-webkit-scrollbar-thumb{ background:#ddd; border-radius:9999px; }
+  input[type=range]{ accent-color:#c084fc; }
+  ::-webkit-scrollbar{ width:6px; }
+  ::-webkit-scrollbar-track{ background: rgba(15, 5, 29, 0.6); }
+  ::-webkit-scrollbar-thumb{ background: rgba(168, 85, 247, 0.4); border-radius:9999px; }
 
   .tab-btn{ transition: background-color .15s ease, color .15s ease; }
 
   .waveform-wrap{ position:relative; }
-  .trim-overlay{ position:absolute; top:0; bottom:0; background:rgba(0,0,0,0.06); border-left:2px solid #000; border-right:2px solid #000; pointer-events:none; }
-  .trim-shade{ position:absolute; top:0; bottom:0; background:rgba(255,255,255,0.7); pointer-events:none; }
+  .trim-overlay{ position:absolute; top:0; bottom:0; background:rgba(192,132,252,0.25); border-left:2px solid #c084fc; border-right:2px solid #c084fc; pointer-events:none; }
+  .trim-shade{ position:absolute; top:0; bottom:0; background:rgba(8,3,20,0.6); pointer-events:none; }
 
-  .rec-dot{ width:8px; height:8px; border-radius:9999px; background:#dc2626; }
+  .rec-dot{ width:8px; height:8px; border-radius:9999px; background:#ef4444; }
   @keyframes pulseDot{ 0%,100%{ opacity:1; } 50%{ opacity:.3; } }
   .rec-dot.active{ animation: pulseDot 1s ease-in-out infinite; }
 </style>
 </head>
-<body class="min-h-screen flex flex-col">
+<body class="min-h-screen flex flex-col bg-[#080314] text-white">
 
-<!-- ============ HERO ============ -->
-<section class="relative w-full min-h-screen flex flex-col justify-between overflow-hidden">
-  <div class="anim-bg absolute inset-0 z-0 hero-gradient-bg"></div>
-
-  <nav class="anim-navbar relative z-50 flex items-center justify-between px-4 py-4 md:px-8 md:py-6" style="pointer-events:none;">
-    <div class="flex items-center gap-3 md:gap-5" style="pointer-events:auto;">
-      <div class="flex items-center gap-2">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="1.6" stroke-linecap="round">
-          <path d="M4 12v0M7 9v6M10 6v12M13 4v16M16 8v8M19 10v4M22 12v0"/>
+  <!-- NAVBAR -->
+  <nav class="anim-navbar relative z-50 flex items-center justify-between px-4 py-3 md:px-8 border-b border-purple-900/40 bg-[#0d0422]/90 backdrop-blur-md">
+    <div class="flex items-center gap-3">
+      <a href="/" class="flex items-center gap-2">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+          <rect x="5" y="4" width="6" height="14" rx="2.5" fill="#e9d5ff" transform="rotate(-35 8 11)" />
+          <rect x="12" y="4" width="6" height="14" rx="2.5" fill="#c084fc" transform="rotate(-35 15 11)" />
         </svg>
-        <span class="hidden md:inline text-sm font-medium tracking-tight">Waveform Studio</span>
-      </div>
-      <div class="hidden md:flex items-center gap-3 rounded-full px-4 py-2" style="background:#F4F4F6;">
-        <span class="text-[11px] text-black/70">In-Browser</span>
-        <span class="text-[11px] text-black/70">No Uploads</span>
-      </div>
-    </div>
-    <div class="hidden md:flex items-center gap-3" style="pointer-events:auto;">
-      <div class="flex items-center gap-2 rounded-full pl-2 pr-4 py-1.5" style="background:#F4F4F6;">
-        <span class="flex items-center justify-center bg-black rounded-full" style="width:28px;height:28px;">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="white">
-            <rect x="2" y="2" width="7" height="7" rx="1.5"/><rect x="15" y="2" width="7" height="7" rx="1.5"/>
-            <rect x="2" y="15" width="7" height="7" rx="1.5"/><rect x="15" y="15" width="7" height="7" rx="1.5"/>
-          </svg>
-        </span>
-        <span class="text-[11px] text-black/70">100% Client-Side</span>
-      </div>
+        <span class="font-semibold text-sm tracking-tight text-white">FliTools</span>
+      </a>
+      <span class="text-purple-400/40 text-xs">/</span>
+      <span class="text-xs text-purple-200 font-medium">Waveform Studio</span>
+      <span class="hidden sm:inline bg-purple-950/80 border border-purple-400/30 text-purple-200 text-[10px] uppercase font-semibold px-2 py-0.5 rounded-full">
+        100% Client-Side
+      </span>
     </div>
   </nav>
 
-  <div class="anim-footer relative z-30 hero-fade px-4 pb-8 pt-12 md:px-8 md:pb-10">
-    <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-8">
-      <div>
-        <div class="anim-subtitle flex items-center gap-2 mb-4">
-          <span class="rounded-full bg-black" style="width:8px;height:8px;"></span>
-          <span class="text-[13px]" style="color:rgba(0,0,0,0.55);">Visualize and trim voice memos, right here</span>
-        </div>
-        <h1 class="anim-heading hero-heading mb-6">
-          Audio In,<br/>Zero Uploads.<br/>Trimmed Out.
-        </h1>
-        <div class="anim-buttons flex items-center gap-3">
-          <a href="#how-it-works" class="bg-black text-white text-[13px] rounded-full px-5 py-2.5">How It Works</a>
-        </div>
-      </div>
-      <div class="flex items-center gap-2 md:justify-end flex-wrap">
-        <span class="text-[11px] rounded-full px-3 py-1.5 bg-white border" style="border-color:rgba(0,0,0,0.12);">Record or Upload</span>
-        <span class="text-[11px] rounded-full px-3 py-1.5 bg-white border" style="border-color:rgba(0,0,0,0.12);">Visual Trim</span>
-        <span class="text-[11px] rounded-full px-3 py-1.5 bg-white border" style="border-color:rgba(0,0,0,0.12);">WAV Export</span>
-      </div>
+  <!-- TOOL -->
+  <section class="anim-content w-full max-w-6xl mx-auto px-4 md:px-8 py-8 flex-1 flex flex-col">
+
+    <div class="mb-8 border-b border-purple-900/40 pb-5">
+      <h1 class="text-2xl md:text-3xl font-light tracking-tight text-white mb-1">Visualize & Trim Audio</h1>
+      <p class="text-xs text-purple-200/70">Record a voice memo or load audio files, see the waveform, trim precision selections, and export WAV.</p>
     </div>
-  </div>
-</section>
 
-<!-- ============ TOOL ============ -->
-<section id="tool" class="w-full max-w-6xl mx-auto px-4 md:px-8 py-16">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
 
-  <div class="mb-10">
-    <h2 class="text-2xl md:text-3xl font-light tracking-tight mb-2">Visualize & trim your audio</h2>
-    <p class="text-sm text-black/50">Record a memo or upload a file, see the waveform, drag to pick the part you want, and export — nothing ever leaves your browser.</p>
-  </div>
-
-  <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
-
-    <!-- LEFT: source -->
-    <div class="flex flex-col gap-8">
-      <div>
-        <h3 class="text-sm font-medium mb-3">1. Get some audio</h3>
-        <div class="flex rounded-full overflow-hidden border border-black/10 text-xs mb-4 w-fit">
-          <button data-source="upload" class="tab-btn source-tab px-6 py-2.5 bg-black text-white">Upload</button>
-          <button data-source="record" class="tab-btn source-tab px-6 py-2.5">Record</button>
-        </div>
-
-        <div id="uploadPanel">
-          <div id="dropZone" class="drop-zone border-2 border-dashed border-black/20 rounded-2xl flex flex-col items-center justify-center text-center py-14 px-6 cursor-pointer">
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="1.5" class="mb-3 opacity-60">
-              <path d="M12 16V4M12 4l-4 4M12 4l4 4" stroke-linecap="round" stroke-linejoin="round"/>
-              <path d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-            <p class="text-sm font-medium">Drag & drop an audio file, or click to browse</p>
-            <p class="text-xs text-black/40 mt-1">MP3, WAV, M4A, OGG, and more</p>
-            <input id="fileInput" type="file" accept="audio/*" class="hidden">
+      <!-- LEFT: source -->
+      <div class="flex flex-col gap-6">
+        <div class="bg-[#12052b]/90 border border-purple-300/20 rounded-2xl p-5 shadow-xl">
+          <h3 class="text-xs font-bold uppercase tracking-wider text-purple-200 mb-3">1. Audio Source</h3>
+          <div class="flex rounded-xl overflow-hidden border border-purple-400/20 text-xs mb-4 w-fit bg-purple-950/60 p-0.5">
+            <button data-source="upload" class="tab-btn source-tab px-6 py-2 rounded-lg bg-gradient-to-r from-purple-700 to-indigo-600 text-white font-medium shadow-md">Upload</button>
+            <button data-source="record" class="tab-btn source-tab px-6 py-2 rounded-lg text-purple-300 hover:text-white font-medium">Record</button>
           </div>
-        </div>
 
-        <div id="recordPanel" class="hidden border border-black/10 rounded-2xl p-8 flex flex-col items-center gap-4 text-center">
-          <button id="recordBtn" class="flex items-center gap-2 bg-black text-white text-[13px] rounded-full px-5 py-2.5">
-            <span id="recDot" class="rec-dot"></span>
-            <span id="recordBtnLabel">Start Recording</span>
-          </button>
-          <p id="recordTime" class="text-xs text-black/40 mono">00:00</p>
-          <p class="text-xs text-black/40">Your browser will ask for microphone permission the first time.</p>
-        </div>
+          <div id="uploadPanel">
+            <div id="dropZone" class="drop-zone border-2 border-dashed border-purple-400/40 hover:border-purple-300 rounded-xl flex flex-col items-center justify-center text-center py-10 px-4 cursor-pointer bg-purple-950/30">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="mb-2 text-purple-300">
+                <path d="M12 16V4M12 4l-4 4M12 4l4 4" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              <p class="text-xs font-semibold text-white">Drag & drop audio, or click to browse</p>
+              <p class="text-[11px] text-purple-300/60 mt-0.5">MP3, WAV, M4A, OGG</p>
+              <input id="fileInput" type="file" accept="audio/*" class="hidden">
+            </div>
+          </div>
 
-        <p id="fileInfo" class="text-xs text-black/40 mt-2">No audio loaded</p>
+          <div id="recordPanel" class="hidden border border-purple-400/20 rounded-xl p-6 flex flex-col items-center gap-3 text-center bg-purple-950/30">
+            <button id="recordBtn" class="flex items-center gap-2 bg-gradient-to-r from-purple-700 to-indigo-600 hover:from-purple-600 hover:to-indigo-500 text-white text-xs font-semibold rounded-full px-5 py-2.5 shadow-md cursor-pointer">
+              <span id="recDot" class="rec-dot"></span>
+              <span id="recordBtnLabel">Start Recording</span>
+            </button>
+            <p id="recordTime" class="text-xs text-purple-200 mono font-semibold">00:00</p>
+            <p class="text-[11px] text-purple-300/60">Mic permission requested on first use.</p>
+          </div>
+
+          <p id="fileInfo" class="text-xs text-purple-300/70 mt-2 font-mono">No audio loaded</p>
+        </div>
       </div>
-    </div>
 
-    <!-- RIGHT: preview -->
-    <div class="flex flex-col gap-8">
-      <div>
-        <h3 class="text-sm font-medium mb-3">2. Preview</h3>
-        <div class="border border-black/10 rounded-2xl p-5 flex flex-col gap-3">
-          <div class="flex items-center gap-3">
-            <button id="playBtn" class="bg-black text-white text-[13px] rounded-full px-5 py-2.5 disabled:opacity-30 disabled:cursor-not-allowed" disabled>▶ Play Selection</button>
-            <span id="selectionTime" class="text-xs text-black/40 mono">–</span>
+      <!-- RIGHT: preview & playback -->
+      <div class="flex flex-col gap-6">
+        <div class="bg-[#12052b]/90 border border-purple-300/20 rounded-2xl p-5 shadow-xl flex flex-col justify-between">
+          <div>
+            <h3 class="text-xs font-bold uppercase tracking-wider text-purple-200 mb-3">2. Preview Playback</h3>
+            <div class="border border-purple-400/20 rounded-xl p-4 bg-purple-950/30 flex items-center justify-between">
+              <button id="playBtn" class="bg-gradient-to-r from-purple-700 to-indigo-600 hover:from-purple-600 hover:to-indigo-500 text-white text-xs font-semibold rounded-full px-5 py-2.5 disabled:opacity-30 disabled:cursor-not-allowed shadow-md cursor-pointer" disabled>▶ Play Selection</button>
+              <span id="selectionTime" class="text-xs text-purple-200 mono font-semibold">–</span>
+            </div>
+          </div>
+
+          <div class="border-t border-purple-900/40 pt-4 mt-4">
+            <h3 class="text-xs font-bold uppercase tracking-wider text-purple-200 mb-2">4. Download Trimmed Audio</h3>
+            <a id="downloadBtn" download="trimmed.wav" class="pointer-events-none opacity-30 block w-full bg-gradient-to-r from-purple-700 to-indigo-600 hover:from-purple-600 hover:to-indigo-500 text-white text-xs font-semibold rounded-xl py-3 text-center cursor-pointer shadow-lg shadow-purple-950/60">
+              Download Trimmed WAV
+            </a>
           </div>
         </div>
       </div>
     </div>
-  </div>
 
-  <!-- WAVEFORM + TRIM full width -->
-  <div class="mt-10">
-    <h3 class="text-sm font-medium mb-3">3. Trim</h3>
-    <div class="waveform-wrap border border-black/10 rounded-2xl bg-black/[0.02] p-4 overflow-hidden">
-      <canvas id="waveformCanvas" class="w-full block" height="140"></canvas>
-      <div id="trimShadeLeft" class="trim-shade" style="left:0; width:0;"></div>
-      <div id="trimShadeRight" class="trim-shade" style="right:0; width:0;"></div>
-      <div id="trimOverlay" class="trim-overlay" style="left:0; width:100%;"></div>
-    </div>
-    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mt-4">
-      <div>
-        <div class="flex items-center justify-between mb-1">
-          <label class="text-xs text-black/60">Start</label>
-          <span id="startValue" class="text-xs font-medium mono">0:00.0</span>
+    <!-- WAVEFORM + TRIM full width -->
+    <div class="mt-8 bg-[#12052b]/90 border border-purple-300/20 rounded-2xl p-5 shadow-xl">
+      <h3 class="text-xs font-bold uppercase tracking-wider text-purple-200 mb-3">3. Interactive Waveform Trim</h3>
+      <div class="waveform-wrap border border-purple-400/20 rounded-xl bg-[#0a0218] p-4 overflow-hidden">
+        <canvas id="waveformCanvas" class="w-full block" height="140"></canvas>
+        <div id="trimShadeLeft" class="trim-shade" style="left:0; width:0;"></div>
+        <div id="trimShadeRight" class="trim-shade" style="right:0; width:0;"></div>
+        <div id="trimOverlay" class="trim-overlay" style="left:0; width:100%;"></div>
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mt-4">
+        <div>
+          <div class="flex items-center justify-between mb-1">
+            <label class="text-xs text-purple-200/80">Start Time</label>
+            <span id="startValue" class="text-xs font-semibold text-purple-200 mono">0:00.0</span>
+          </div>
+          <input id="startRange" type="range" min="0" max="100" step="0.1" value="0" class="w-full cursor-pointer" disabled>
         </div>
-        <input id="startRange" type="range" min="0" max="100" step="0.1" value="0" class="w-full" disabled>
-      </div>
-      <div>
-        <div class="flex items-center justify-between mb-1">
-          <label class="text-xs text-black/60">End</label>
-          <span id="endValue" class="text-xs font-medium mono">0:00.0</span>
+        <div>
+          <div class="flex items-center justify-between mb-1">
+            <label class="text-xs text-purple-200/80">End Time</label>
+            <span id="endValue" class="text-xs font-semibold text-purple-200 mono">0:00.0</span>
+          </div>
+          <input id="endRange" type="range" min="0" max="100" step="0.1" value="100" class="w-full cursor-pointer" disabled>
         </div>
-        <input id="endRange" type="range" min="0" max="100" step="0.1" value="100" class="w-full" disabled>
       </div>
     </div>
-  </div>
+  </section>
 
-  <!-- DOWNLOAD -->
-  <div class="mt-10 max-w-md">
-    <h3 class="text-sm font-medium mb-3">4. Download</h3>
-    <div class="border border-black/10 rounded-2xl p-5 flex flex-col gap-3">
-      <a id="downloadBtn" download="trimmed.wav" class="pointer-events-none opacity-30 bg-black text-white text-[13px] rounded-full px-5 py-2.5 text-center cursor-pointer">
-        Download Trimmed WAV
-      </a>
-      <p class="text-xs text-black/40">Everything is decoded, trimmed, and re-encoded locally using the browser's native Web Audio API — nothing you record or upload is ever sent anywhere.</p>
-    </div>
-  </div>
-</section>
-
-<!-- ============ HOW IT WORKS ============ -->
-<section id="how-it-works" class="w-full bg-black/[0.02] border-t border-black/10">
-  <div class="max-w-6xl mx-auto px-4 md:px-8 py-16">
-    <div class="mb-10">
-      <h2 class="text-2xl md:text-3xl font-light tracking-tight mb-2">How it works</h2>
-      <p class="text-sm text-black/50 max-w-2xl">Waveform Studio decodes and trims audio entirely inside your browser. Nothing is ever sent to a server — everything below happens on your own device.</p>
-    </div>
-
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-      <div>
-        <div class="flex items-center justify-center rounded-full bg-black text-white text-sm font-medium mb-4" style="width:32px;height:32px;">1</div>
-        <h3 class="text-sm font-medium mb-2">Record or upload</h3>
-        <p class="text-xs text-black/50 leading-relaxed">Record straight from your microphone, or drag in an existing MP3, WAV, M4A, or OGG file.</p>
-      </div>
-      <div>
-        <div class="flex items-center justify-center rounded-full bg-black text-white text-sm font-medium mb-4" style="width:32px;height:32px;">2</div>
-        <h3 class="text-sm font-medium mb-2">See the waveform</h3>
-        <p class="text-xs text-black/50 leading-relaxed">Your browser decodes the audio and draws its amplitude over time so you can see exactly where the sound is.</p>
-      </div>
-      <div>
-        <div class="flex items-center justify-center rounded-full bg-black text-white text-sm font-medium mb-4" style="width:32px;height:32px;">3</div>
-        <h3 class="text-sm font-medium mb-2">Drag to trim</h3>
-        <p class="text-xs text-black/50 leading-relaxed">Set a start and end point with the sliders, preview just that selection, and adjust until it's exactly right.</p>
-      </div>
-      <div>
-        <div class="flex items-center justify-center rounded-full bg-black text-white text-sm font-medium mb-4" style="width:32px;height:32px;">4</div>
-        <h3 class="text-sm font-medium mb-2">Export</h3>
-        <p class="text-xs text-black/50 leading-relaxed">Download the trimmed selection as a standard WAV file. Your recording never leaves your computer.</p>
-      </div>
-    </div>
-
-    <div class="mt-10">
-      <a href="#tool" class="bg-black text-white text-[13px] rounded-full px-5 py-2.5 inline-block">Get Started</a>
-    </div>
-  </div>
-</section>
-
-<footer class="text-center text-xs text-black/30 py-8">
-  Built entirely client-side — your audio never leaves this browser.
-</footer>
+  <footer class="text-center text-[11px] text-purple-400/50 py-4 border-t border-purple-900/30 bg-[#080314]">
+    FliTools — 100% Client-Side Waveform Studio
+  </footer>
 
 <script>
 (function(){
@@ -291,15 +201,18 @@
 
   sourceTabs.forEach(btn => {
     btn.addEventListener('click', () => {
-      sourceTabs.forEach(b => b.classList.remove('bg-black','text-white'));
-      btn.classList.add('bg-black','text-white');
+      sourceTabs.forEach(b => {
+        b.classList.remove('bg-gradient-to-r','from-purple-700','to-indigo-600','text-white','shadow-md');
+        b.classList.add('text-purple-300');
+      });
+      btn.classList.add('bg-gradient-to-r','from-purple-700','to-indigo-600','text-white','shadow-md');
+      btn.classList.remove('text-purple-300');
       const src = btn.dataset.source;
       uploadPanel.classList.toggle('hidden', src !== 'upload');
       recordPanel.classList.toggle('hidden', src !== 'record');
     });
   });
 
-  // ---------- upload ----------
   dropZone.addEventListener('click', () => fileInput.click());
   fileInput.addEventListener('change', e => { if (e.target.files[0]) loadFile(e.target.files[0]); });
   ['dragenter','dragover'].forEach(evt => dropZone.addEventListener(evt, e => { e.preventDefault(); dropZone.classList.add('dragover'); }));
@@ -314,11 +227,10 @@
       setAudioBuffer(decoded, file.name);
     } catch (err) {
       console.error(err);
-      fileInfo.textContent = 'Could not decode this file: ' + err.message;
+      fileInfo.textContent = 'Could not decode file: ' + err.message;
     }
   }
 
-  // ---------- record ----------
   recordBtn.addEventListener('click', async () => {
     if (!mediaRecorder || mediaRecorder.state === 'inactive') {
       try {
@@ -347,7 +259,7 @@
         recDot.classList.add('active');
       } catch (err) {
         console.error(err);
-        fileInfo.textContent = 'Microphone access was denied or unavailable.';
+        fileInfo.textContent = 'Microphone access denied or unavailable.';
       }
     } else {
       mediaRecorder.stop();
@@ -356,10 +268,9 @@
     }
   });
 
-  // ---------- waveform + trim ----------
   function setAudioBuffer(buffer, name){
     audioBuffer = buffer;
-    fileInfo.textContent = name + ' — ' + formatTime(buffer.duration) + ' — ' + buffer.sampleRate + ' Hz, ' + buffer.numberOfChannels + ' ch';
+    fileInfo.textContent = name + ' — ' + formatTime(buffer.duration) + ' — ' + buffer.sampleRate + ' Hz';
     drawWaveform();
     startRange.disabled = false;
     endRange.disabled = false;
@@ -386,7 +297,7 @@
     const samplesPerPixel = Math.max(1, Math.floor(data.length / w));
     const mid = h / 2;
 
-    ctx.fillStyle = '#000';
+    ctx.fillStyle = '#c084fc';
     for (let x = 0; x < w; x++) {
       const start = x * samplesPerPixel;
       let min = 1.0, max = -1.0;
@@ -443,7 +354,6 @@
     updateTrimUI();
   });
 
-  // ---------- playback ----------
   playBtn.addEventListener('click', () => {
     if (!audioBuffer) return;
     if (isPlaying) {
@@ -471,7 +381,6 @@
     playBtn.textContent = '▶ Play Selection';
   }
 
-  // ---------- WAV export ----------
   function encodeWav(buffer, start, end){
     const sampleRate = buffer.sampleRate;
     const numChannels = buffer.numberOfChannels;
@@ -535,6 +444,5 @@
   });
 })();
 </script>
-
 </body>
 </html>

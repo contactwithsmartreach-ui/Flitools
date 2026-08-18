@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PDF Studio — Merge & Split PDFs Locally</title>
+<title>PDF Merger & Splitter — FliTools</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -13,279 +13,185 @@
 <style>
   :root{ --ease: cubic-bezier(0.16, 1, 0.3, 1); }
   *{ font-family: 'Inter', sans-serif; }
-  body{ background:#fff; color:#000; }
+  body{ background:#080314; color:#ffffff; }
 
   @keyframes fadeSlideDown{ from{ opacity:0; transform: translateY(-16px); } to{ opacity:1; transform: translateY(0); } }
   @keyframes fadeSlideUp{ from{ opacity:0; transform: translateY(20px); } to{ opacity:1; transform: translateY(0); } }
-  @keyframes fadeScaleIn{ from{ opacity:0; transform: scale(1.05); } to{ opacity:1; transform: scale(1); } }
   .anim-navbar{ animation: fadeSlideDown 0.8s var(--ease) both; }
-  .anim-bg{ animation: fadeScaleIn 1.8s var(--ease) both; }
-  .anim-footer{ animation: fadeSlideUp 1s var(--ease) both; animation-delay: .5s; }
-  .anim-subtitle{ animation: fadeSlideUp .8s var(--ease) both; animation-delay: .6s; }
-  .anim-heading{ animation: fadeSlideUp .8s var(--ease) both; animation-delay: .8s; }
-  .anim-buttons{ animation: fadeSlideUp .8s var(--ease) both; animation-delay: 1s; }
-
-  .hero-heading{ font-weight:300; letter-spacing:-0.03em; line-height:1; font-size: clamp(2rem, 8vw, 4.5rem); }
-  @media (min-width:768px){ .hero-heading{ font-size: clamp(2.5rem, 5.5vw, 4.5rem); } }
-
-  .hero-gradient-bg{
-    background:
-      radial-gradient(circle at 20% 20%, rgba(0,0,0,0.06), transparent 45%),
-      radial-gradient(circle at 80% 30%, rgba(0,0,0,0.04), transparent 50%),
-      linear-gradient(135deg, #fafafa 0%, #f0f0f2 100%);
-  }
-  .hero-fade{ background: linear-gradient(to top, #ffffff 0%, rgba(255,255,255,0.85) 55%, transparent 100%); }
+  .anim-content{ animation: fadeSlideUp 0.8s var(--ease) both; }
 
   .drop-zone{ transition: border-color .2s ease, background-color .2s ease; }
-  .drop-zone.dragover{ border-color:#000; background-color:#f7f7f7; }
+  .drop-zone.dragover{ border-color:#c084fc; background-color:rgba(168,85,247,0.15); }
 
-  input[type=text], input[type=number]{ transition: border-color .15s ease; }
-  input[type=text]:focus, input[type=number]:focus{ outline:none; border-color:#000; }
+  input[type=text], input[type=number]{ transition: border-color .15s ease; background:#1a0836; color:#ffffff; }
+  input[type=text]:focus, input[type=number]:focus{ outline:none; border-color:#c084fc; }
 
-  ::-webkit-scrollbar{ width:8px; }
-  ::-webkit-scrollbar-thumb{ background:#ddd; border-radius:9999px; }
+  ::-webkit-scrollbar{ width:6px; }
+  ::-webkit-scrollbar-track{ background: rgba(15, 5, 29, 0.6); }
+  ::-webkit-scrollbar-thumb{ background: rgba(168, 85, 247, 0.4); border-radius:9999px; }
 
   .tab-btn{ transition: background-color .15s ease, color .15s ease; }
   .seg-btn{ transition: background-color .15s ease, color .15s ease; }
 
   .file-row{ transition: background-color .15s ease; }
-  .file-row:hover{ background-color:#fafafa; }
+  .file-row:hover{ background-color:rgba(168,85,247,0.15); }
   .drag-handle{ cursor: grab; }
   .file-row.dragging{ opacity:.4; }
 </style>
 </head>
-<body class="min-h-screen flex flex-col">
+<body class="min-h-screen flex flex-col bg-[#080314] text-white">
 
-<!-- ============ HERO ============ -->
-<section class="relative w-full min-h-screen flex flex-col justify-between overflow-hidden">
-  <div class="anim-bg absolute inset-0 z-0 hero-gradient-bg"></div>
-
-  <nav class="anim-navbar relative z-50 flex items-center justify-between px-4 py-4 md:px-8 md:py-6" style="pointer-events:none;">
-    <div class="flex items-center gap-3 md:gap-5" style="pointer-events:auto;">
-      <div class="flex items-center gap-2">
+  <!-- NAVBAR -->
+  <nav class="anim-navbar relative z-50 flex items-center justify-between px-4 py-3 md:px-8 border-b border-purple-900/40 bg-[#0d0422]/90 backdrop-blur-md">
+    <div class="flex items-center gap-3">
+      <a href="/" class="flex items-center gap-2">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-          <path d="M6 2h9l5 5v15a1 1 0 01-1 1H6a1 1 0 01-1-1V3a1 1 0 011-1z" stroke="black" stroke-width="1.6" stroke-linejoin="round"/>
-          <path d="M15 2v5h5" stroke="black" stroke-width="1.6" stroke-linejoin="round"/>
+          <rect x="5" y="4" width="6" height="14" rx="2.5" fill="#e9d5ff" transform="rotate(-35 8 11)" />
+          <rect x="12" y="4" width="6" height="14" rx="2.5" fill="#c084fc" transform="rotate(-35 15 11)" />
         </svg>
-        <span class="hidden md:inline text-sm font-medium tracking-tight">PDF Studio</span>
-      </div>
-      <div class="hidden md:flex items-center gap-3 rounded-full px-4 py-2" style="background:#F4F4F6;">
-        <span class="text-[11px] text-black/70">In-Browser</span>
-        <span class="text-[11px] text-black/70">No Uploads</span>
-      </div>
-    </div>
-    <div class="hidden md:flex items-center gap-3" style="pointer-events:auto;">
-      <div class="flex items-center gap-2 rounded-full pl-2 pr-4 py-1.5" style="background:#F4F4F6;">
-        <span class="flex items-center justify-center bg-black rounded-full" style="width:28px;height:28px;">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="white">
-            <rect x="2" y="2" width="7" height="7" rx="1.5"/><rect x="15" y="2" width="7" height="7" rx="1.5"/>
-            <rect x="2" y="15" width="7" height="7" rx="1.5"/><rect x="15" y="15" width="7" height="7" rx="1.5"/>
-          </svg>
-        </span>
-        <span class="text-[11px] text-black/70">100% Client-Side</span>
-      </div>
+        <span class="font-semibold text-sm tracking-tight text-white">FliTools</span>
+      </a>
+      <span class="text-purple-400/40 text-xs">/</span>
+      <span class="text-xs text-purple-200 font-medium">PDF Merger & Splitter</span>
+      <span class="hidden sm:inline bg-purple-950/80 border border-purple-400/30 text-purple-200 text-[10px] uppercase font-semibold px-2 py-0.5 rounded-full">
+        100% Client-Side
+      </span>
     </div>
   </nav>
 
-  <div class="anim-footer relative z-30 hero-fade px-4 pb-8 pt-12 md:px-8 md:pb-10">
-    <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-8">
-      <div>
-        <div class="anim-subtitle flex items-center gap-2 mb-4">
-          <span class="rounded-full bg-black" style="width:8px;height:8px;"></span>
-          <span class="text-[13px]" style="color:rgba(0,0,0,0.55);">Combine or break apart PDFs, right here</span>
-        </div>
-        <h1 class="anim-heading hero-heading mb-6">
-          PDFs In,<br/>Zero Uploads.<br/>Rearranged Out.
-        </h1>
-        <div class="anim-buttons flex items-center gap-3">
-          <a href="#how-it-works" class="bg-black text-white text-[13px] rounded-full px-5 py-2.5">How It Works</a>
-        </div>
-      </div>
-      <div class="flex items-center gap-2 md:justify-end flex-wrap">
-        <span class="text-[11px] rounded-full px-3 py-1.5 bg-white border" style="border-color:rgba(0,0,0,0.12);">Merge</span>
-        <span class="text-[11px] rounded-full px-3 py-1.5 bg-white border" style="border-color:rgba(0,0,0,0.12);">Split</span>
-        <span class="text-[11px] rounded-full px-3 py-1.5 bg-white border" style="border-color:rgba(0,0,0,0.12);">Reorder</span>
-      </div>
-    </div>
-  </div>
-</section>
+  <!-- TOOL -->
+  <section class="anim-content w-full max-w-6xl mx-auto px-4 md:px-8 py-8 flex-1 flex flex-col">
 
-<!-- ============ TOOL ============ -->
-<section id="tool" class="w-full max-w-6xl mx-auto px-4 md:px-8 py-16">
-
-  <div class="mb-10">
-    <h2 class="text-2xl md:text-3xl font-light tracking-tight mb-2">Merge or split your PDFs</h2>
-    <p class="text-sm text-black/50">Combine several PDFs into one, or pull pages out of a single file — nothing ever leaves your browser.</p>
-  </div>
-
-  <div class="flex rounded-full overflow-hidden border border-black/10 text-xs mb-10 w-fit">
-    <button data-panel="merge" class="tab-btn panel-tab px-6 py-2.5 bg-black text-white">Merge PDFs</button>
-    <button data-panel="split" class="tab-btn panel-tab px-6 py-2.5">Split a PDF</button>
-  </div>
-
-  <!-- ===== MERGE PANEL ===== -->
-  <div id="panelMerge" class="grid grid-cols-1 lg:grid-cols-2 gap-10">
-    <div class="flex flex-col gap-8">
-      <div>
-        <h3 class="text-sm font-medium mb-3">1. Upload PDFs</h3>
-        <div id="mergeDropZone" class="drop-zone border-2 border-dashed border-black/20 rounded-2xl flex flex-col items-center justify-center text-center py-14 px-6 cursor-pointer">
-          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="1.5" class="mb-3 opacity-60">
-            <path d="M12 16V4M12 4l-4 4M12 4l4 4" stroke-linecap="round" stroke-linejoin="round"/>
-            <path d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-          <p class="text-sm font-medium">Drag & drop PDFs, or click to browse</p>
-          <p class="text-xs text-black/40 mt-1">Upload 2 or more PDF files — they'll merge in the order shown below</p>
-          <input id="mergeFileInput" type="file" accept="application/pdf" multiple class="hidden">
-        </div>
-      </div>
-
-      <div>
-        <h3 class="text-sm font-medium mb-3">2. Order the files</h3>
-        <div class="border border-black/10 rounded-2xl overflow-hidden">
-          <div id="mergeFileList" class="divide-y divide-black/5"></div>
-          <p id="mergeEmptyMsg" class="text-xs text-black/30 text-center py-8">No files yet — files you upload will be listed here</p>
-        </div>
-        <p class="text-[11px] text-black/30 mt-2">Drag rows by the handle, or use the arrows, to reorder.</p>
-      </div>
-
-      <button id="mergeBtn" class="bg-black text-white text-[13px] rounded-full px-5 py-2.5 disabled:opacity-30 disabled:cursor-not-allowed w-fit" disabled>
-        Merge PDFs
-      </button>
-      <div id="mergeProgressWrap" class="hidden -mt-4">
-        <div class="w-full h-1.5 bg-black/10 rounded-full overflow-hidden">
-          <div id="mergeProgressBar" class="h-full bg-black" style="width:0%;"></div>
-        </div>
-        <p id="mergeProgressLabel" class="text-xs text-black/40 mt-1">Merging…</p>
-      </div>
+    <div class="mb-8 border-b border-purple-900/40 pb-5">
+      <h1 class="text-2xl md:text-3xl font-light tracking-tight text-white mb-1">Merge or Split PDFs</h1>
+      <p class="text-xs text-purple-200/70">Combine several PDF documents into one, or extract pages into a single PDF or .zip file.</p>
     </div>
 
-    <div class="flex flex-col gap-8">
-      <div>
-        <h3 class="text-sm font-medium mb-3">3. Result</h3>
-        <div class="border border-black/10 rounded-2xl min-h-[12rem] flex items-center justify-center bg-black/[0.02] p-6 text-center">
-          <p id="mergeResultText" class="text-xs text-black/30">Your merged PDF summary will appear here</p>
+    <div class="flex rounded-xl overflow-hidden border border-purple-400/20 text-xs mb-8 w-fit bg-purple-950/60 p-1">
+      <button data-panel="merge" class="tab-btn panel-tab px-6 py-2 rounded-lg bg-gradient-to-r from-purple-700 to-indigo-600 text-white font-medium shadow-md">Merge PDFs</button>
+      <button data-panel="split" class="tab-btn panel-tab px-6 py-2 rounded-lg text-purple-300 hover:text-white font-medium">Split a PDF</button>
+    </div>
+
+    <!-- ===== MERGE PANEL ===== -->
+    <div id="panelMerge" class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <div class="flex flex-col gap-6">
+        <div class="bg-[#12052b]/90 border border-purple-300/20 rounded-2xl p-5 shadow-xl">
+          <h3 class="text-xs font-bold uppercase tracking-wider text-purple-200 mb-3">1. Upload PDFs</h3>
+          <div id="mergeDropZone" class="drop-zone border-2 border-dashed border-purple-400/40 hover:border-purple-300 rounded-xl flex flex-col items-center justify-center text-center py-10 px-4 cursor-pointer bg-purple-950/30">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="mb-2 text-purple-300">
+              <path d="M12 16V4M12 4l-4 4M12 4l4 4" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <p class="text-xs font-semibold text-white">Drag & drop PDFs, or click to browse</p>
+            <p class="text-[11px] text-purple-300/60 mt-0.5">Upload 2 or more files</p>
+            <input id="mergeFileInput" type="file" accept="application/pdf" multiple class="hidden">
+          </div>
         </div>
-      </div>
-      <div>
-        <h3 class="text-sm font-medium mb-3">4. Download</h3>
-        <div class="border border-black/10 rounded-2xl p-5 flex flex-col gap-3">
-          <button id="mergeDownloadBtn" class="pointer-events-none opacity-30 bg-black text-white text-[13px] rounded-full px-5 py-2.5 text-center cursor-pointer">
-            Download Merged PDF
+
+        <div class="bg-[#12052b]/90 border border-purple-300/20 rounded-2xl p-5 shadow-xl">
+          <h3 class="text-xs font-bold uppercase tracking-wider text-purple-200 mb-3">2. File Order</h3>
+          <div class="border border-purple-400/20 rounded-xl overflow-hidden bg-purple-950/30">
+            <div id="mergeFileList" class="divide-y divide-purple-900/30"></div>
+            <p id="mergeEmptyMsg" class="text-xs text-purple-300/50 text-center py-6">No files yet — uploaded files will appear here</p>
+          </div>
+          <p class="text-[11px] text-purple-300/60 mt-2">Reorder files using arrows or drag handle.</p>
+
+          <button id="mergeBtn" class="mt-4 w-full bg-gradient-to-r from-purple-700 to-indigo-600 hover:from-purple-600 hover:to-indigo-500 text-white text-xs font-semibold rounded-xl py-3 disabled:opacity-30 disabled:cursor-not-allowed shadow-md cursor-pointer" disabled>
+            Merge PDFs
           </button>
-          <p class="text-xs text-black/40">Everything is combined locally with the open-source library pdf-lib — no files are ever uploaded anywhere.</p>
+          <div id="mergeProgressWrap" class="hidden mt-3">
+            <div class="w-full h-1.5 bg-purple-950 rounded-full overflow-hidden border border-purple-400/20">
+              <div id="mergeProgressBar" class="h-full bg-gradient-to-r from-purple-500 to-indigo-500" style="width:0%;"></div>
+            </div>
+            <p id="mergeProgressLabel" class="text-xs text-purple-300/70 mt-1 text-center">Merging…</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex flex-col gap-6">
+        <div class="bg-[#12052b]/90 border border-purple-300/20 rounded-2xl p-5 shadow-xl flex-1 flex flex-col justify-between">
+          <div>
+            <h3 class="text-xs font-bold uppercase tracking-wider text-purple-200 mb-3">3. Result Summary</h3>
+            <div class="border border-purple-400/20 rounded-xl min-h-[10rem] flex items-center justify-center bg-purple-950/30 p-6 text-center">
+              <p id="mergeResultText" class="text-xs text-purple-300/60">Your merged PDF summary will appear here</p>
+            </div>
+          </div>
+          <div class="border-t border-purple-900/40 pt-4 mt-4">
+            <h3 class="text-xs font-bold uppercase tracking-wider text-purple-200 mb-2">4. Download</h3>
+            <button id="mergeDownloadBtn" class="pointer-events-none opacity-30 w-full bg-gradient-to-r from-purple-700 to-indigo-600 text-white text-xs font-semibold rounded-xl py-3 text-center cursor-pointer shadow-lg shadow-purple-950/60">
+              Download Merged PDF
+            </button>
+          </div>
         </div>
       </div>
     </div>
-  </div>
 
-  <!-- ===== SPLIT PANEL ===== -->
-  <div id="panelSplit" class="hidden grid grid-cols-1 lg:grid-cols-2 gap-10">
-    <div class="flex flex-col gap-8">
-      <div>
-        <h3 class="text-sm font-medium mb-3">1. Upload a PDF</h3>
-        <div id="splitDropZone" class="drop-zone border-2 border-dashed border-black/20 rounded-2xl flex flex-col items-center justify-center text-center py-14 px-6 cursor-pointer">
-          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="1.5" class="mb-3 opacity-60">
-            <path d="M12 16V4M12 4l-4 4M12 4l4 4" stroke-linecap="round" stroke-linejoin="round"/>
-            <path d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-          <p class="text-sm font-medium">Drag & drop a PDF, or click to browse</p>
-          <p class="text-xs text-black/40 mt-1">Upload a single PDF file to split apart</p>
-          <input id="splitFileInput" type="file" accept="application/pdf" class="hidden">
+    <!-- ===== SPLIT PANEL ===== -->
+    <div id="panelSplit" class="hidden grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <div class="flex flex-col gap-6">
+        <div class="bg-[#12052b]/90 border border-purple-300/20 rounded-2xl p-5 shadow-xl">
+          <h3 class="text-xs font-bold uppercase tracking-wider text-purple-200 mb-3">1. Upload a PDF</h3>
+          <div id="splitDropZone" class="drop-zone border-2 border-dashed border-purple-400/40 hover:border-purple-300 rounded-xl flex flex-col items-center justify-center text-center py-10 px-4 cursor-pointer bg-purple-950/30">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="mb-2 text-purple-300">
+              <path d="M12 16V4M12 4l-4 4M12 4l4 4" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <p class="text-xs font-semibold text-white">Drag & drop a PDF, or click to browse</p>
+            <input id="splitFileInput" type="file" accept="application/pdf" class="hidden">
+          </div>
+          <p id="splitFileInfo" class="text-xs text-purple-300/70 mt-2 font-mono">No file loaded</p>
         </div>
-        <p id="splitFileInfo" class="text-xs text-black/40 mt-2">No file loaded</p>
-      </div>
 
-      <div>
-        <h3 class="text-sm font-medium mb-3">2. Choose a split method</h3>
-        <div class="border border-black/10 rounded-2xl p-5 flex flex-col gap-5">
-
-          <div class="flex rounded-full overflow-hidden border border-black/10 text-xs">
-            <button data-split-mode="ranges" class="seg-btn split-mode-btn flex-1 py-2 bg-black text-white">Page ranges</button>
-            <button data-split-mode="every" class="seg-btn split-mode-btn flex-1 py-2">Every page</button>
+        <div class="bg-[#12052b]/90 border border-purple-300/20 rounded-2xl p-5 shadow-xl flex flex-col gap-4">
+          <h3 class="text-xs font-bold uppercase tracking-wider text-purple-200">2. Split Mode</h3>
+          <div class="flex rounded-xl overflow-hidden border border-purple-400/20 text-xs bg-purple-950/60 p-0.5">
+            <button data-split-mode="ranges" class="seg-btn split-mode-btn flex-1 py-1.5 rounded-lg bg-purple-700 text-white font-medium">Page ranges</button>
+            <button data-split-mode="every" class="seg-btn split-mode-btn flex-1 py-1.5 rounded-lg text-purple-300 hover:text-white">Every page</button>
           </div>
 
           <div id="rangesWrap">
-            <label class="text-xs text-black/60 block mb-2">Page ranges to extract</label>
-            <input id="rangesInput" type="text" placeholder="e.g. 1-3, 5, 8-10" class="w-full border border-black/10 rounded-xl px-4 py-3 text-sm">
-            <p class="text-[11px] text-black/30 mt-1">Comma-separate ranges or single pages. Produces one PDF with just these pages, in this order.</p>
+            <label class="text-xs text-purple-200/80 block mb-1">Page ranges to extract</label>
+            <input id="rangesInput" type="text" placeholder="e.g. 1-3, 5, 8-10" class="w-full border border-purple-400/20 rounded-xl px-4 py-2.5 text-xs">
+            <p class="text-[11px] text-purple-300/50 mt-1">Comma-separated ranges or single pages.</p>
           </div>
           <div id="everyWrap" class="hidden">
-            <p class="text-xs text-black/50">Every page of the document becomes its own single-page PDF, delivered together as a .zip.</p>
+            <p class="text-xs text-purple-300/70">Every page becomes its own single-page PDF, delivered together as a .zip.</p>
+          </div>
+
+          <button id="splitBtn" class="w-full bg-gradient-to-r from-purple-700 to-indigo-600 hover:from-purple-600 hover:to-indigo-500 text-white text-xs font-semibold rounded-xl py-3 disabled:opacity-30 disabled:cursor-not-allowed shadow-md cursor-pointer mt-2" disabled>
+            Split PDF
+          </button>
+          <div id="splitProgressWrap" class="hidden">
+            <div class="w-full h-1.5 bg-purple-950 rounded-full overflow-hidden border border-purple-400/20">
+              <div id="splitProgressBar" class="h-full bg-gradient-to-r from-purple-500 to-indigo-500" style="width:0%;"></div>
+            </div>
+            <p id="splitProgressLabel" class="text-xs text-purple-300/70 mt-1 text-center">Splitting…</p>
           </div>
         </div>
       </div>
 
-      <button id="splitBtn" class="bg-black text-white text-[13px] rounded-full px-5 py-2.5 disabled:opacity-30 disabled:cursor-not-allowed w-fit" disabled>
-        Split PDF
-      </button>
-      <div id="splitProgressWrap" class="hidden -mt-4">
-        <div class="w-full h-1.5 bg-black/10 rounded-full overflow-hidden">
-          <div id="splitProgressBar" class="h-full bg-black" style="width:0%;"></div>
-        </div>
-        <p id="splitProgressLabel" class="text-xs text-black/40 mt-1">Splitting…</p>
-      </div>
-    </div>
-
-    <div class="flex flex-col gap-8">
-      <div>
-        <h3 class="text-sm font-medium mb-3">3. Result</h3>
-        <div class="border border-black/10 rounded-2xl min-h-[12rem] flex items-center justify-center bg-black/[0.02] p-6 text-center">
-          <p id="splitResultText" class="text-xs text-black/30">Your split result summary will appear here</p>
-        </div>
-      </div>
-      <div>
-        <h3 class="text-sm font-medium mb-3">4. Download</h3>
-        <div class="border border-black/10 rounded-2xl p-5 flex flex-col gap-3">
-          <button id="splitDownloadBtn" class="pointer-events-none opacity-30 bg-black text-white text-[13px] rounded-full px-5 py-2.5 text-center cursor-pointer">
-            Download Result
-          </button>
-          <p class="text-xs text-black/40">Everything is split locally with the open-source library pdf-lib. Multi-file results are zipped with JSZip — no files are ever uploaded anywhere.</p>
+      <div class="flex flex-col gap-6">
+        <div class="bg-[#12052b]/90 border border-purple-300/20 rounded-2xl p-5 shadow-xl flex-1 flex flex-col justify-between">
+          <div>
+            <h3 class="text-xs font-bold uppercase tracking-wider text-purple-200 mb-3">3. Result Summary</h3>
+            <div class="border border-purple-400/20 rounded-xl min-h-[10rem] flex items-center justify-center bg-purple-950/30 p-6 text-center">
+              <p id="splitResultText" class="text-xs text-purple-300/60">Your split result summary will appear here</p>
+            </div>
+          </div>
+          <div class="border-t border-purple-900/40 pt-4 mt-4">
+            <h3 class="text-xs font-bold uppercase tracking-wider text-purple-200 mb-2">4. Download</h3>
+            <button id="splitDownloadBtn" class="pointer-events-none opacity-30 w-full bg-gradient-to-r from-purple-700 to-indigo-600 text-white text-xs font-semibold rounded-xl py-3 text-center cursor-pointer shadow-lg shadow-purple-950/60">
+              Download Result
+            </button>
+          </div>
         </div>
       </div>
     </div>
-  </div>
-</section>
+  </section>
 
-<!-- ============ HOW IT WORKS ============ -->
-<section id="how-it-works" class="w-full bg-black/[0.02] border-t border-black/10">
-  <div class="max-w-6xl mx-auto px-4 md:px-8 py-16">
-    <div class="mb-10">
-      <h2 class="text-2xl md:text-3xl font-light tracking-tight mb-2">How it works</h2>
-      <p class="text-sm text-black/50 max-w-2xl">PDF Studio combines and splits documents entirely inside your browser. No files are ever sent to a server — everything below happens on your own device.</p>
-    </div>
-
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-      <div>
-        <div class="flex items-center justify-center rounded-full bg-black text-white text-sm font-medium mb-4" style="width:32px;height:32px;">1</div>
-        <h3 class="text-sm font-medium mb-2">Upload your PDFs</h3>
-        <p class="text-xs text-black/50 leading-relaxed">Drag and drop, or click to browse. Merge takes two or more files; Split takes one file you want to break apart.</p>
-      </div>
-      <div>
-        <div class="flex items-center justify-center rounded-full bg-black text-white text-sm font-medium mb-4" style="width:32px;height:32px;">2</div>
-        <h3 class="text-sm font-medium mb-2">Arrange or choose pages</h3>
-        <p class="text-xs text-black/50 leading-relaxed">Reorder files before merging, or specify page ranges — or split into one file per page — before splitting.</p>
-      </div>
-      <div>
-        <div class="flex items-center justify-center rounded-full bg-black text-white text-sm font-medium mb-4" style="width:32px;height:32px;">3</div>
-        <h3 class="text-sm font-medium mb-2">Process locally</h3>
-        <p class="text-xs text-black/50 leading-relaxed">Your browser rebuilds the PDF structure using an open-source library — no upload, no waiting on a server.</p>
-      </div>
-      <div>
-        <div class="flex items-center justify-center rounded-full bg-black text-white text-sm font-medium mb-4" style="width:32px;height:32px;">4</div>
-        <h3 class="text-sm font-medium mb-2">Download</h3>
-        <p class="text-xs text-black/50 leading-relaxed">Download the merged PDF, or the split result as a single file or a .zip. Your originals never leave your computer.</p>
-      </div>
-    </div>
-
-    <div class="mt-10">
-      <a href="#tool" class="bg-black text-white text-[13px] rounded-full px-5 py-2.5 inline-block">Get Started</a>
-    </div>
-  </div>
-</section>
-
-<footer class="text-center text-xs text-black/30 py-8">
-  Built entirely client-side — your documents never leaves this browser.
-</footer>
+  <footer class="text-center text-[11px] text-purple-400/50 py-4 border-t border-purple-900/30 bg-[#080314]">
+    FliTools — 100% Client-Side PDF Merger & Splitter
+  </footer>
 
 <script>
 (function(){
@@ -296,8 +202,12 @@
   const panelSplit = document.getElementById('panelSplit');
   panelTabs.forEach(btn => {
     btn.addEventListener('click', () => {
-      panelTabs.forEach(b => b.classList.remove('bg-black','text-white'));
-      btn.classList.add('bg-black','text-white');
+      panelTabs.forEach(b => {
+        b.classList.remove('bg-gradient-to-r','from-purple-700','to-indigo-600','text-white','shadow-md');
+        b.classList.add('text-purple-300');
+      });
+      btn.classList.add('bg-gradient-to-r','from-purple-700','to-indigo-600','text-white','shadow-md');
+      btn.classList.remove('text-purple-300');
       const panel = btn.dataset.panel;
       panelMerge.classList.toggle('hidden', panel !== 'merge');
       panelSplit.classList.toggle('hidden', panel !== 'split');
@@ -344,18 +254,18 @@
     mergeEmptyMsg.classList.toggle('hidden', mergeFiles.length > 0);
     mergeFiles.forEach((item, idx) => {
       const row = document.createElement('div');
-      row.className = 'file-row flex items-center gap-3 px-4 py-3';
+      row.className = 'file-row flex items-center gap-3 px-4 py-3 text-xs';
       row.draggable = true;
       row.dataset.idx = idx;
       row.innerHTML = `
-        <span class="drag-handle text-black/30 select-none">⠿</span>
-        <span class="text-xs w-5 text-black/40">${idx + 1}</span>
-        <span class="text-xs font-medium flex-1 truncate">${item.file.name}</span>
-        <span class="text-[11px] text-black/40">${fmtBytes(item.file.size)}</span>
+        <span class="drag-handle text-purple-400/50 select-none">⠿</span>
+        <span class="w-4 text-purple-300/60 font-mono">${idx + 1}</span>
+        <span class="font-medium flex-1 truncate text-white">${item.file.name}</span>
+        <span class="text-[11px] text-purple-300/60 font-mono">${fmtBytes(item.file.size)}</span>
         <div class="flex items-center gap-1">
-          <button class="up-btn text-xs w-6 h-6 rounded-full hover:bg-black/5" title="Move up">↑</button>
-          <button class="down-btn text-xs w-6 h-6 rounded-full hover:bg-black/5" title="Move down">↓</button>
-          <button class="remove-btn text-xs w-6 h-6 rounded-full hover:bg-black/5" title="Remove">×</button>
+          <button class="up-btn w-6 h-6 rounded-md hover:bg-purple-800/50 text-purple-200" title="Move up">↑</button>
+          <button class="down-btn w-6 h-6 rounded-md hover:bg-purple-800/50 text-purple-200" title="Move down">↓</button>
+          <button class="remove-btn w-6 h-6 rounded-md hover:bg-red-900/50 text-red-300" title="Remove">×</button>
         </div>
       `;
       row.querySelector('.up-btn').onclick = () => { if (idx > 0) { [mergeFiles[idx-1], mergeFiles[idx]] = [mergeFiles[idx], mergeFiles[idx-1]]; renderMergeList(); } };
@@ -420,13 +330,13 @@
       const blob = new Blob([outBytes], { type: 'application/pdf' });
       mergedBlobUrl = URL.createObjectURL(blob);
 
-      mergeResultText.innerHTML = `<span class="text-black/70">Merged ${mergeFiles.length} files into one PDF — ${totalPages} pages, ${fmtBytes(blob.size)}.</span>`;
+      mergeResultText.innerHTML = `<span class="text-purple-200">Merged ${mergeFiles.length} files into one PDF — ${totalPages} pages (${fmtBytes(blob.size)}).</span>`;
       mergeDownloadBtn.classList.remove('pointer-events-none','opacity-30');
       mergeProgressLabel.textContent = 'Done!';
     } catch (err) {
       console.error(err);
       mergeProgressLabel.textContent = 'Error: ' + err.message;
-      mergeResultText.textContent = 'Something went wrong while merging — please check your files and try again.';
+      mergeResultText.textContent = 'Something went wrong while merging.';
     } finally {
       mergeBtn.disabled = false;
     }
@@ -466,8 +376,12 @@
 
   splitModeBtns.forEach(btn => {
     btn.addEventListener('click', () => {
-      splitModeBtns.forEach(b => b.classList.remove('bg-black','text-white'));
-      btn.classList.add('bg-black','text-white');
+      splitModeBtns.forEach(b => {
+        b.classList.remove('bg-purple-700','text-white','font-medium');
+        b.classList.add('text-purple-300');
+      });
+      btn.classList.add('bg-purple-700','text-white','font-medium');
+      btn.classList.remove('text-purple-300');
       splitMode = btn.dataset.splitMode;
       rangesWrap.classList.toggle('hidden', splitMode !== 'ranges');
       everyWrap.classList.toggle('hidden', splitMode !== 'every');
@@ -486,7 +400,7 @@
       splitBtn.disabled = false;
     } catch (err) {
       console.error(err);
-      splitFileInfo.textContent = 'Could not read this PDF: ' + err.message;
+      splitFileInfo.textContent = 'Could not read PDF: ' + err.message;
       splitBtn.disabled = true;
     }
   }
@@ -531,7 +445,7 @@
       if (splitMode === 'ranges') {
         const pageIndices = parseRanges(rangesInput.value, splitPageCount);
         if (pageIndices.length === 0) {
-          splitResultText.textContent = 'Enter at least one valid page or range, e.g. "1-3, 5".';
+          splitResultText.textContent = 'Enter at least one valid page range, e.g. "1-3, 5".';
           splitProgressLabel.textContent = '';
           splitBtn.disabled = false;
           return;
@@ -546,7 +460,7 @@
         splitBlobUrl = URL.createObjectURL(blob);
         splitDownloadName = baseName + '-extracted.pdf';
 
-        splitResultText.innerHTML = `<span class="text-black/70">Extracted ${pageIndices.length} page${pageIndices.length===1?'':'s'} into one PDF — ${fmtBytes(blob.size)}.</span>`;
+        splitResultText.innerHTML = `<span class="text-purple-200">Extracted ${pageIndices.length} page${pageIndices.length===1?'':'s'} into one PDF (${fmtBytes(blob.size)}).</span>`;
         splitDownloadBtn.textContent = 'Download Result';
         splitDownloadBtn.classList.remove('pointer-events-none','opacity-30');
         splitProgressLabel.textContent = 'Done!';
@@ -570,7 +484,7 @@
         splitBlobUrl = URL.createObjectURL(zipBlob);
         splitDownloadName = baseName + '-pages.zip';
 
-        splitResultText.innerHTML = `<span class="text-black/70">Split into ${splitPageCount} single-page PDFs, zipped — ${fmtBytes(zipBlob.size)}.</span>`;
+        splitResultText.innerHTML = `<span class="text-purple-200">Split into ${splitPageCount} single-page PDFs, zipped (${fmtBytes(zipBlob.size)}).</span>`;
         splitDownloadBtn.textContent = 'Download .zip';
         splitDownloadBtn.classList.remove('pointer-events-none','opacity-30');
         splitProgressLabel.textContent = 'Done!';
@@ -578,7 +492,7 @@
     } catch (err) {
       console.error(err);
       splitProgressLabel.textContent = 'Error: ' + err.message;
-      splitResultText.textContent = 'Something went wrong while splitting — please check your file and try again.';
+      splitResultText.textContent = 'Something went wrong while splitting.';
     } finally {
       splitBtn.disabled = false;
     }
@@ -594,6 +508,5 @@
   });
 })();
 </script>
-
 </body>
 </html>
