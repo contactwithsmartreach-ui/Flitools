@@ -313,6 +313,7 @@
         reader.readAsDataURL(file);
       } else {
         const url = URL.createObjectURL(file);
+        img.crossOrigin = 'anonymous';
         img.src = url;
         images.push({ file, url, img });
         renderThumbs();
