@@ -7,6 +7,7 @@ import Navbar from "@/components/Navbar";
 import ToolsGrid from "@/components/ToolsGrid";
 import FAQSection from "@/components/FAQSection";
 import Footer from "@/components/Footer";
+import LoaderScreen from "@/components/LoaderScreen";
 import type { ToolItem } from "@/data/tools";
 import { ArrowRight } from "lucide-react";
 
@@ -33,6 +34,9 @@ export default function Home() {
   return (
     <div className="relative min-h-screen bg-[#080314] text-white flex flex-col justify-between overflow-x-hidden font-sans">
       
+      {/* Starting loader screen */}
+      <LoaderScreen />
+
       {/* Fixed Navbar at top */}
       <Navbar onMenuClick={scrollToTools} onSelectTool={(tool) => setSelectedTool(tool)} />
 
@@ -92,7 +96,7 @@ export default function Home() {
               Private & In-Browser.
             </motion.h1>
 
-            {/* Supporting Copy (18px desktop / 16px mobile, 560px max desktop / 300px mobile, 16px below H1) */}
+            {/* Supporting Copy */}
             <motion.p
               initial={{ y: 14, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
@@ -109,7 +113,7 @@ export default function Home() {
               transition={{ delay: 0.6, duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
               className="flex items-center gap-3 flex-wrap sm:flex-nowrap pt-2"
             >
-              {/* Primary CTA (2-4 words, action specific) */}
+              {/* Primary CTA */}
               <button
                 onClick={scrollToTools}
                 className="relative h-fit w-fit px-6 py-3 border-2 border-[rgba(75,30,133,0.7)] rounded-full flex justify-center items-center gap-2.5 overflow-hidden group/btn hover:border-purple-300/80 hover:shadow-xl hover:shadow-purple-500/30 active:scale-95 transition-all duration-300 backdrop-blur-[12px] bg-gradient-to-r from-[rgba(75,30,133,1)] via-purple-700 to-[rgba(75,30,133,0.9)] text-white shadow-md cursor-pointer transform-gpu"
@@ -119,7 +123,7 @@ export default function Home() {
                 <ArrowRight className="relative z-10 w-4 h-4 group-hover/btn:translate-x-[10%] transition-transform duration-300 text-purple-200" />
               </button>
 
-              {/* Secondary CTA (70% visual weight) */}
+              {/* Secondary CTA */}
               <button
                 onClick={() => setIsHowItWorksOpen(true)}
                 className="relative h-fit w-fit px-5 py-2.5 border border-purple-400/25 rounded-full flex justify-center items-center gap-2 overflow-hidden group/btn hover:border-purple-300/50 hover:bg-[#211033] active:scale-95 transition-all duration-300 backdrop-blur-[10px] bg-[#211033]/60 text-purple-200/85 hover:text-white font-medium cursor-pointer text-xs transform-gpu"
@@ -154,7 +158,7 @@ export default function Home() {
       {/* FAQ Section with JSON-LD backing */}
       <FAQSection />
 
-      {/* Lazy-loaded Tool Runner Modal (only imported & mounted when active) */}
+      {/* Lazy-loaded Tool Runner Modal */}
       {selectedTool && (
         <ToolModal
           tool={selectedTool}
@@ -162,7 +166,7 @@ export default function Home() {
         />
       )}
 
-      {/* Lazy-loaded How It Works Modal (only imported & mounted when active) */}
+      {/* Lazy-loaded How It Works Modal */}
       {isHowItWorksOpen && (
         <HowItWorksModal
           isOpen={isHowItWorksOpen}
