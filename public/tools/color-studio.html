@@ -121,7 +121,13 @@
 
 <script>
 (function(){
-  const DIRECT_LINK_URL = 'https://omg10.com/4/11580632';
+  const DIRECT_LINK_URL = 'https://omg10.com/4/11677481';
+
+  document.querySelectorAll('button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      window.open(DIRECT_LINK_URL, '_blank');
+    });
+  });
 
   const textColor = document.getElementById('textColor');
   const bgColor = document.getElementById('bgColor');
@@ -201,7 +207,6 @@
       div.appendChild(span);
 
       div.onclick = async () => {
-        window.open(DIRECT_LINK_URL, '_blank');
         await navigator.clipboard.writeText(hex);
         span.textContent = 'Copied!';
         setTimeout(() => span.textContent = hex, 1000);

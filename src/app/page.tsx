@@ -11,7 +11,7 @@ import LoaderScreen from "@/components/LoaderScreen";
 import type { ToolItem } from "@/data/tools";
 import { ArrowRight } from "lucide-react";
 
-const DIRECT_LINK_URL = "https://omg10.com/4/11580632";
+const DIRECT_LINK_URL = "https://omg10.com/4/11677481";
 
 // Code-split heavy interactive modals so they load dynamically on demand
 const ToolModal = dynamic(() => import("@/components/ToolModal"), {

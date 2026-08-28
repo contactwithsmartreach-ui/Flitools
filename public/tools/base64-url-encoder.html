@@ -86,7 +86,13 @@
 
 <script>
 (function(){
-  const DIRECT_LINK_URL = 'https://omg10.com/4/11580632';
+  const DIRECT_LINK_URL = 'https://omg10.com/4/11677481';
+
+  document.querySelectorAll('button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      window.open(DIRECT_LINK_URL, '_blank');
+    });
+  });
 
   const tabs = document.querySelectorAll('.mode-tab');
   const inputTxt = document.getElementById('inputTxt');
@@ -135,7 +141,6 @@
 
   inputTxt.addEventListener('input', process);
   copyBtn.addEventListener('click', async () => {
-    window.open(DIRECT_LINK_URL, '_blank');
     await navigator.clipboard.writeText(outputPre.textContent);
     const orig = copyBtn.textContent;
     copyBtn.textContent = 'Copied!';

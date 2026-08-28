@@ -173,7 +173,13 @@
 
 <script>
 (function(){
-  const DIRECT_LINK_URL = 'https://omg10.com/4/11580632';
+  const DIRECT_LINK_URL = 'https://omg10.com/4/11677481';
+
+  document.querySelectorAll('button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      window.open(DIRECT_LINK_URL, '_blank');
+    });
+  });
 
   const typeBtns = document.querySelectorAll('.type-btn');
   const eclBtns = document.querySelectorAll('.ecl-btn');
@@ -313,7 +319,6 @@
 
   downloadPngBtn.addEventListener('click', () => {
     if (!pngDataUrl) return;
-    window.open(DIRECT_LINK_URL, '_blank');
     const a = document.createElement('a');
     a.href = pngDataUrl;
     a.download = 'qrcode.png';
@@ -322,7 +327,6 @@
 
   downloadSvgBtn.addEventListener('click', () => {
     if (!svgBlobUrl) return;
-    window.open(DIRECT_LINK_URL, '_blank');
     const a = document.createElement('a');
     a.href = svgBlobUrl;
     a.download = 'qrcode.svg';

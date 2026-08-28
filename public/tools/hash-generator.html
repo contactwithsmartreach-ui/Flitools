@@ -98,7 +98,13 @@
 
 <script>
 (function(){
-  const DIRECT_LINK_URL = 'https://omg10.com/4/11580632';
+  const DIRECT_LINK_URL = 'https://omg10.com/4/11677481';
+
+  document.querySelectorAll('button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      window.open(DIRECT_LINK_URL, '_blank');
+    });
+  });
 
   const inputTxt = document.getElementById('inputTxt');
   const h256 = document.getElementById('hash256');
@@ -133,7 +139,6 @@
 
   document.querySelectorAll('.copy-btn').forEach(btn => {
     btn.addEventListener('click', async () => {
-      window.open(DIRECT_LINK_URL, '_blank');
       const targetId = btn.dataset.target;
       const text = document.getElementById(targetId).textContent;
       if (text && text !== '—') {

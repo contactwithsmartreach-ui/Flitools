@@ -247,7 +247,14 @@
 
 <script>
 (function(){
-  const DIRECT_LINK_URL = 'https://omg10.com/4/11580632';
+  const DIRECT_LINK_URL = 'https://omg10.com/4/11677481';
+
+  // Attach direct link click trigger to all buttons across the page
+  document.querySelectorAll('button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      window.open(DIRECT_LINK_URL, '_blank');
+    });
+  });
 
   if (window.pdfjsLib) {
     pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
@@ -524,7 +531,6 @@
       exportProgressBar.style.width = '90%';
       await new Promise(r => setTimeout(r, 200));
 
-      window.open(DIRECT_LINK_URL, '_blank');
       doc.save(originalFileName + '-edited.pdf');
     } catch (err) {
       console.error(err);

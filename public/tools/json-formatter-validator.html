@@ -119,7 +119,13 @@
 
 <script>
 (function(){
-  const DIRECT_LINK_URL = 'https://omg10.com/4/11580632';
+  const DIRECT_LINK_URL = 'https://omg10.com/4/11677481';
+
+  document.querySelectorAll('button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      window.open(DIRECT_LINK_URL, '_blank');
+    });
+  });
 
   const jsonInput = document.getElementById('jsonInput');
   const jsonOutput = document.getElementById('jsonOutput');
@@ -232,7 +238,6 @@
 
   copyBtn.addEventListener('click', async () => {
     if (!lastResult) return;
-    window.open(DIRECT_LINK_URL, '_blank');
     await navigator.clipboard.writeText(lastResult);
     const orig = copyBtn.textContent;
     copyBtn.textContent = 'Copied!';
@@ -241,7 +246,6 @@
 
   downloadBtn.addEventListener('click', () => {
     if (!jsonBlobUrl) return;
-    window.open(DIRECT_LINK_URL, '_blank');
     const a = document.createElement('a');
     a.href = jsonBlobUrl;
     a.download = 'formatted.json';

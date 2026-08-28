@@ -123,7 +123,13 @@
 
 <script>
 (function(){
-  const DIRECT_LINK_URL = 'https://omg10.com/4/11580632';
+  const DIRECT_LINK_URL = 'https://omg10.com/4/11677481';
+
+  document.querySelectorAll('button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      window.open(DIRECT_LINK_URL, '_blank');
+    });
+  });
 
   const dirTabs = document.querySelectorAll('.dir-tab');
   const sourceInput = document.getElementById('sourceInput');
@@ -262,15 +268,10 @@ Type or paste **Markdown** here…
 
   copyBtn.addEventListener('click', async () => {
     if (!lastResult) return;
-    window.open(DIRECT_LINK_URL, '_blank');
     await navigator.clipboard.writeText(lastResult);
     const orig = copyBtn.textContent;
     copyBtn.textContent = 'Copied!';
     setTimeout(() => copyBtn.textContent = orig, 1200);
-  });
-
-  downloadBtn.addEventListener('click', () => {
-    window.open(DIRECT_LINK_URL, '_blank');
   });
 
   convert();

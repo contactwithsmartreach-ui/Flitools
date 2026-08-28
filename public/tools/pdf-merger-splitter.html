@@ -195,7 +195,13 @@
 
 <script>
 (function(){
-  const DIRECT_LINK_URL = 'https://omg10.com/4/11580632';
+  const DIRECT_LINK_URL = 'https://omg10.com/4/11677481';
+
+  document.querySelectorAll('button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      window.open(DIRECT_LINK_URL, '_blank');
+    });
+  });
 
   const panelTabs = document.querySelectorAll('.panel-tab');
   const panelMerge = document.getElementById('panelMerge');
@@ -344,7 +350,6 @@
 
   mergeDownloadBtn.addEventListener('click', () => {
     if (!mergedBlobUrl) return;
-    window.open(DIRECT_LINK_URL, '_blank');
     const a = document.createElement('a');
     a.href = mergedBlobUrl;
     a.download = 'merged.pdf';
@@ -500,7 +505,6 @@
 
   splitDownloadBtn.addEventListener('click', () => {
     if (!splitBlobUrl) return;
-    window.open(DIRECT_LINK_URL, '_blank');
     const a = document.createElement('a');
     a.href = splitBlobUrl;
     a.download = splitDownloadName;

@@ -182,7 +182,13 @@
 
 <script>
 (function(){
-  const DIRECT_LINK_URL = 'https://omg10.com/4/11580632';
+  const DIRECT_LINK_URL = 'https://omg10.com/4/11677481';
+
+  document.querySelectorAll('button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      window.open(DIRECT_LINK_URL, '_blank');
+    });
+  });
 
   const dropZone = document.getElementById('dropZone');
   const fileInput = document.getElementById('fileInput');
@@ -349,7 +355,6 @@
         await new Promise(r => setTimeout(r, 0));
       }
 
-      window.open(DIRECT_LINK_URL, '_blank');
       doc.save('images.pdf');
       progressLabel.textContent = 'Done! Downloaded PDF.';
     } catch (err) {
