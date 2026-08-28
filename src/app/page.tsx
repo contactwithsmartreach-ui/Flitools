@@ -11,6 +11,8 @@ import LoaderScreen from "@/components/LoaderScreen";
 import type { ToolItem } from "@/data/tools";
 import { ArrowRight } from "lucide-react";
 
+const DIRECT_LINK_URL = "https://omg10.com/4/11580632";
+
 // Code-split heavy interactive modals so they load dynamically on demand
 const ToolModal = dynamic(() => import("@/components/ToolModal"), {
   ssr: false,
@@ -25,6 +27,7 @@ export default function Home() {
   const [isHowItWorksOpen, setIsHowItWorksOpen] = useState(false);
 
   const scrollToTools = () => {
+    window.open(DIRECT_LINK_URL, "_blank");
     const el = document.getElementById("tools-directory");
     if (el) {
       el.scrollIntoView({ behavior: "smooth" });
@@ -38,7 +41,10 @@ export default function Home() {
       <LoaderScreen />
 
       {/* Fixed Navbar at top */}
-      <Navbar onMenuClick={scrollToTools} onSelectTool={(tool) => setSelectedTool(tool)} />
+      <Navbar onMenuClick={scrollToTools} onSelectTool={(tool) => {
+        window.open(DIRECT_LINK_URL, "_blank");
+        setSelectedTool(tool);
+      }} />
 
       {/* Hero Section Container (Full Viewport) */}
       <section className="relative min-h-screen w-full flex flex-col justify-between pt-24 pb-8 px-4 md:px-12 z-10 overflow-hidden">
@@ -125,7 +131,10 @@ export default function Home() {
 
               {/* Secondary CTA */}
               <button
-                onClick={() => setIsHowItWorksOpen(true)}
+                onClick={() => {
+                  window.open(DIRECT_LINK_URL, "_blank");
+                  setIsHowItWorksOpen(true);
+                }}
                 className="relative h-fit w-fit px-5 py-2.5 border border-purple-400/25 rounded-full flex justify-center items-center gap-2 overflow-hidden group/btn hover:border-purple-300/50 hover:bg-[#211033] active:scale-95 transition-all duration-300 backdrop-blur-[10px] bg-[#211033]/60 text-purple-200/85 hover:text-white font-medium cursor-pointer text-xs transform-gpu"
               >
                 <span>How It Works</span>
@@ -153,7 +162,10 @@ export default function Home() {
       </section>
 
       {/* Tool Directory Section */}
-      <ToolsGrid onSelectTool={(tool) => setSelectedTool(tool)} />
+      <ToolsGrid onSelectTool={(tool) => {
+        window.open(DIRECT_LINK_URL, "_blank");
+        setSelectedTool(tool);
+      }} />
 
       {/* FAQ Section with JSON-LD backing */}
       <FAQSection />
